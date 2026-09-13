@@ -1,10 +1,8 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public sealed class RallyCheckpointManager : MonoBehaviour
 {
     [SerializeField] RallyCheckpointTrigger[] checkpoints;
-    [SerializeField] Text timeText;
 
     int nextCheckpoint;
     float elapsedTime;
@@ -16,6 +14,17 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     public float ElapsedTime => elapsedTime;
     public bool IsRunning => running;
     public bool IsFinished => finished;
+    public int RaceCheckpointCount => Mathf.Max(0, CheckpointCount - 1);
+    public int CompletedRaceCheckpoints => Mathf.Clamp(nextCheckpoint, 0, RaceCheckpointCount);
+    public string FormattedTime
+    {
+        get
+        {
+            int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+            float seconds = elapsedTime - minutes * 60f;
+            return $"{minutes:00}:{seconds:00.000}";
+        }
+    }
 
     void Awake()
     {
@@ -26,13 +35,11 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     {
         if (running)
             elapsedTime += Time.deltaTime;
-        UpdateDisplay();
     }
 
-    public void Configure(RallyCheckpointTrigger[] orderedCheckpoints, Text display)
+    public void Configure(RallyCheckpointTrigger[] orderedCheckpoints)
     {
         checkpoints = orderedCheckpoints;
-        timeText = display;
         ResetTimer();
     }
 
@@ -57,7 +64,6 @@ public sealed class RallyCheckpointManager : MonoBehaviour
             running = false;
             finished = true;
         }
-        UpdateDisplay();
     }
 
     public void ResetTimer()
@@ -66,16 +72,5 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         elapsedTime = 0f;
         running = false;
         finished = false;
-        UpdateDisplay();
-    }
-
-    void UpdateDisplay()
-    {
-        if (timeText == null)
-            return;
-        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
-        float seconds = elapsedTime - minutes * 60f;
-        string prefix = finished ? "Meta  " : "Tiempo  ";
-        timeText.text = $"{prefix}{minutes:00}:{seconds:00.000}";
     }
 }

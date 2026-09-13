@@ -6,7 +6,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 [InitializeOnLoad]
 public static class Circuit01CheckpointSetup
@@ -80,8 +79,7 @@ public static class Circuit01CheckpointSetup
             gates[i].Configure(manager, i);
         }
 
-        Text display = CreateDisplay(root.transform);
-        manager.Configure(gates, display);
+        manager.Configure(gates);
         if (roadMesh.vertexCount != vertexCount || roadMesh.triangles.Length != triangleCount || roadMesh.bounds != roadBounds)
             throw new InvalidOperationException("Road geometry changed while adding checkpoints.");
 
@@ -91,36 +89,6 @@ public static class Circuit01CheckpointSetup
         AssetDatabase.SaveAssets();
         Selection.activeGameObject = root;
         Debug.Log($"CIRCUIT_01_CHECKPOINTS_OK: {GateCount} invisible trigger gates, {total / (GateCount - 1):F1}m spacing, start-to-finish timer and UI saved; road mesh unchanged.");
-    }
-
-    static Text CreateDisplay(Transform parent)
-    {
-        var canvasObject = new GameObject("Checkpoint Timer Canvas");
-        canvasObject.transform.SetParent(parent);
-        var canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = canvasObject.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        canvasObject.AddComponent<GraphicRaycaster>();
-
-        var textObject = new GameObject("Time Text", typeof(RectTransform));
-        textObject.transform.SetParent(canvasObject.transform, false);
-        var rect = (RectTransform)textObject.transform;
-        rect.anchorMin = new Vector2(0, 1);
-        rect.anchorMax = new Vector2(0, 1);
-        rect.pivot = new Vector2(0, 1);
-        rect.anchoredPosition = new Vector2(30, -30);
-        rect.sizeDelta = new Vector2(500, 80);
-        var text = textObject.AddComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = 38;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = TextAnchor.UpperLeft;
-        text.color = Color.white;
-        text.text = "Tiempo  00:00.000";
-        text.raycastTarget = false;
-        return text;
     }
 
     static void DefineRoute()

@@ -8,6 +8,8 @@
 
 ## Reglas de trabajo
 
+- Cada vez que se cree o actualice una pista, dejar el Porsche principal activo al inicio, orientado hacia el recorrido y apoyado correctamente sobre el camino, con controles y cámara de seguimiento funcionando. Verificar su posición antes de guardar la escena; no dejar pistas de prueba sin auto salvo pedido explícito.
+
 - El auto principal utiliza el asset de físicas ubicado en `Assets/JS Vehicle Physics Controller/` (referido también como `JS_Vehicle_Physics_Controller`). Reutilizar y configurar ese sistema; no reescribir las físicas del vehículo desde cero.
 - Nunca modificar ni borrar el auto de policía original incluido dentro de la carpeta del asset. Para hacer pruebas o variantes, desactivarlo o duplicarlo.
 - `Active Input Handling` está configurado como `Both` en Player Settings. No cambiar esta configuración.
