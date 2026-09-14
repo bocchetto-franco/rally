@@ -45,9 +45,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Rally drift sideways friction - rear")]
     [SerializeField] private float rearSideExtremumSlip = 0.06f;
-    [SerializeField] private float rearSideExtremumValue = 0.36f;
+    [SerializeField] private float rearSideExtremumValue = 0.405f;
     [SerializeField] private float rearSideAsymptoteSlip = 0.35f;
-    [SerializeField] private float rearSideAsymptoteValue = 0.12f;
+    [SerializeField] private float rearSideAsymptoteValue = 0.135f;
     [SerializeField] private float rearSideStiffness = 0.50f;
 
     [Header("Handbrake and downforce")]

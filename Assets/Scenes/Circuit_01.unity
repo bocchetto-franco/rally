@@ -8948,9 +8948,9 @@ MonoBehaviour:
   frontSideAsymptoteValue: 0.72
   frontSideStiffness: 0.92
   rearSideExtremumSlip: 0.06
-  rearSideExtremumValue: 0.36
+  rearSideExtremumValue: 0.405
   rearSideAsymptoteSlip: 0.35
-  rearSideAsymptoteValue: 0.12
+  rearSideAsymptoteValue: 0.135
   rearSideStiffness: 0.5
   rearHandbrakeTorque: 3500
   minimumDownforceSpeed: 8
@@ -11697,9 +11697,9 @@ WheelCollider:
     m_Stiffness: 1.25
   m_SidewaysFriction:
     m_ExtremumSlip: 0.06
-    m_ExtremumValue: 0.36
+    m_ExtremumValue: 0.405
     m_AsymptoteSlip: 0.35
-    m_AsymptoteValue: 0.12
+    m_AsymptoteValue: 0.135
     m_Stiffness: 0.5
   m_IncludeLayers:
     serializedVersion: 2
@@ -13841,9 +13841,9 @@ WheelCollider:
     m_Stiffness: 1.25
   m_SidewaysFriction:
     m_ExtremumSlip: 0.06
-    m_ExtremumValue: 0.36
+    m_ExtremumValue: 0.405
     m_AsymptoteSlip: 0.35
-    m_AsymptoteValue: 0.12
+    m_AsymptoteValue: 0.135
     m_Stiffness: 0.5
   m_IncludeLayers:
     serializedVersion: 2
