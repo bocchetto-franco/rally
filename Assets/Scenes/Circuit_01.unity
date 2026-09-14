@@ -8925,6 +8925,7 @@ MonoBehaviour:
   rearLeft: {fileID: 1180953520}
   rearRight: {fileID: 965115943}
   vehicleMass: 1450
+  vehicleAngularDamping: 1.5
   maximumSteerAngle: 36
   steeringResponse: 6
   motorForce: 480
@@ -8946,11 +8947,11 @@ MonoBehaviour:
   frontSideAsymptoteSlip: 0.7
   frontSideAsymptoteValue: 0.72
   frontSideStiffness: 0.92
-  rearSideExtremumSlip: 0.12
-  rearSideExtremumValue: 0.65
-  rearSideAsymptoteSlip: 0.55
-  rearSideAsymptoteValue: 0.28
-  rearSideStiffness: 0.6
+  rearSideExtremumSlip: 0.06
+  rearSideExtremumValue: 0.36
+  rearSideAsymptoteSlip: 0.35
+  rearSideAsymptoteValue: 0.12
+  rearSideStiffness: 0.5
   rearHandbrakeTorque: 3500
   minimumDownforceSpeed: 8
   downforceCoefficient: 0.45
@@ -11695,11 +11696,11 @@ WheelCollider:
     m_AsymptoteValue: 0.65
     m_Stiffness: 1.25
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.12
-    m_ExtremumValue: 0.65
-    m_AsymptoteSlip: 0.55
-    m_AsymptoteValue: 0.28
-    m_Stiffness: 0.6
+    m_ExtremumSlip: 0.06
+    m_ExtremumValue: 0.36
+    m_AsymptoteSlip: 0.35
+    m_AsymptoteValue: 0.12
+    m_Stiffness: 0.5
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -13525,7 +13526,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1450
   m_LinearDamping: 0
-  m_AngularDamping: 5
+  m_AngularDamping: 1.5
   m_CenterOfMass: {x: 0, y: -0.45, z: -0.1}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -13839,11 +13840,11 @@ WheelCollider:
     m_AsymptoteValue: 0.65
     m_Stiffness: 1.25
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.12
-    m_ExtremumValue: 0.65
-    m_AsymptoteSlip: 0.55
-    m_AsymptoteValue: 0.28
-    m_Stiffness: 0.6
+    m_ExtremumSlip: 0.06
+    m_ExtremumValue: 0.36
+    m_AsymptoteSlip: 0.35
+    m_AsymptoteValue: 0.12
+    m_Stiffness: 0.5
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

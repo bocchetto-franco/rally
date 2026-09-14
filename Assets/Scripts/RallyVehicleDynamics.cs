@@ -14,6 +14,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;
+    [SerializeField] private float vehicleAngularDamping = 1.5f;
     [SerializeField] private float maximumSteerAngle = 36f;
     [SerializeField] private float steeringResponse = 6f;
     [SerializeField] private float motorForce = 480f;
@@ -43,11 +44,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float frontSideStiffness = 0.92f;
 
     [Header("Rally drift sideways friction - rear")]
-    [SerializeField] private float rearSideExtremumSlip = 0.12f;
-    [SerializeField] private float rearSideExtremumValue = 0.65f;
-    [SerializeField] private float rearSideAsymptoteSlip = 0.55f;
-    [SerializeField] private float rearSideAsymptoteValue = 0.28f;
-    [SerializeField] private float rearSideStiffness = 0.60f;
+    [SerializeField] private float rearSideExtremumSlip = 0.06f;
+    [SerializeField] private float rearSideExtremumValue = 0.36f;
+    [SerializeField] private float rearSideAsymptoteSlip = 0.35f;
+    [SerializeField] private float rearSideAsymptoteValue = 0.12f;
+    [SerializeField] private float rearSideStiffness = 0.50f;
 
     [Header("Handbrake and downforce")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
@@ -131,7 +132,10 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     private void ConfigureArcadeHandling()
     {
         if (vehicleBody != null)
+        {
             vehicleBody.mass = vehicleMass;
+            vehicleBody.angularDamping = vehicleAngularDamping;
+        }
 
         controller.maxSteerAngle = maximumSteerAngle;
         controller.motorForce = motorForce;
