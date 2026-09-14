@@ -35,11 +35,14 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float frontSideStiffness = 0.92f;
 
     [Header("Rally drift sideways friction - rear")]
-    [SerializeField] private float rearSideExtremumSlip = 0.42f;
-    [SerializeField] private float rearSideExtremumValue = 0.95f;
-    [SerializeField] private float rearSideAsymptoteSlip = 1.00f;
-    [SerializeField] private float rearSideAsymptoteValue = 0.52f;
-    [SerializeField] private float rearSideStiffness = 0.78f;
+    [SerializeField] private float rearSideExtremumSlip = 0.24f;
+    [SerializeField] private float rearSideExtremumValue = 0.78f;
+    [SerializeField] private float rearSideAsymptoteSlip = 0.75f;
+    [SerializeField] private float rearSideAsymptoteValue = 0.38f;
+    [SerializeField] private float rearSideStiffness = 0.68f;
+    [SerializeField] private float rearHighSpeedStiffness = 0.52f;
+    [SerializeField] private float rearGripFadeStartSpeed = 12f;
+    [SerializeField] private float rearGripFadeEndSpeed = 30f;
 
     [Header("Handbrake and downforce")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
@@ -79,6 +82,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (vehicleBody == null)
             return;
 
+        Vector3 planarVelocity = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up);
+        UpdateRearGripForSpeed(planarVelocity.magnitude);
+
         // Apply only a small, torque-free aerodynamic load while both axles
         // have ground contact. Vertical/bounce velocity must not amplify it.
         bool frontGrounded = IsGrounded(frontLeft) || IsGrounded(frontRight);
@@ -86,7 +92,6 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (!frontGrounded || !rearGrounded)
             return;
 
-        Vector3 planarVelocity = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up);
         float speedSquaredAboveThreshold = Mathf.Max(
             0f,
             planarVelocity.sqrMagnitude - minimumDownforceSpeed * minimumDownforceSpeed);
@@ -98,6 +103,27 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     private static bool IsGrounded(WheelCollider wheel)
     {
         return wheel != null && wheel.enabled && wheel.isGrounded;
+    }
+
+    private void UpdateRearGripForSpeed(float speedMetersPerSecond)
+    {
+        float highSpeedBlend = Mathf.InverseLerp(
+            rearGripFadeStartSpeed,
+            rearGripFadeEndSpeed,
+            speedMetersPerSecond);
+        float stiffness = Mathf.Lerp(rearSideStiffness, rearHighSpeedStiffness, highSpeedBlend);
+        SetSidewaysStiffness(rearLeft, stiffness);
+        SetSidewaysStiffness(rearRight, stiffness);
+    }
+
+    private static void SetSidewaysStiffness(WheelCollider wheel, float stiffness)
+    {
+        if (wheel == null)
+            return;
+
+        WheelFrictionCurve sideways = wheel.sidewaysFriction;
+        sideways.stiffness = stiffness;
+        wheel.sidewaysFriction = sideways;
     }
 
     public void ApplySetup()

@@ -8940,11 +8940,14 @@ MonoBehaviour:
   frontSideAsymptoteSlip: 0.7
   frontSideAsymptoteValue: 0.72
   frontSideStiffness: 0.92
-  rearSideExtremumSlip: 0.42
-  rearSideExtremumValue: 0.95
-  rearSideAsymptoteSlip: 1
-  rearSideAsymptoteValue: 0.52
-  rearSideStiffness: 0.78
+  rearSideExtremumSlip: 0.24
+  rearSideExtremumValue: 0.78
+  rearSideAsymptoteSlip: 0.75
+  rearSideAsymptoteValue: 0.38
+  rearSideStiffness: 0.68
+  rearHighSpeedStiffness: 0.52
+  rearGripFadeStartSpeed: 12
+  rearGripFadeEndSpeed: 30
   rearHandbrakeTorque: 3500
   minimumDownforceSpeed: 8
   downforceCoefficient: 0.45
@@ -11689,11 +11692,11 @@ WheelCollider:
     m_AsymptoteValue: 0.65
     m_Stiffness: 1.25
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.42
-    m_ExtremumValue: 0.95
-    m_AsymptoteSlip: 1
-    m_AsymptoteValue: 0.52
-    m_Stiffness: 0.78
+    m_ExtremumSlip: 0.24
+    m_ExtremumValue: 0.78
+    m_AsymptoteSlip: 0.75
+    m_AsymptoteValue: 0.38
+    m_Stiffness: 0.68
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -13833,11 +13836,11 @@ WheelCollider:
     m_AsymptoteValue: 0.65
     m_Stiffness: 1.25
   m_SidewaysFriction:
-    m_ExtremumSlip: 0.42
-    m_ExtremumValue: 0.95
-    m_AsymptoteSlip: 1
-    m_AsymptoteValue: 0.52
-    m_Stiffness: 0.78
+    m_ExtremumSlip: 0.24
+    m_ExtremumValue: 0.78
+    m_AsymptoteSlip: 0.75
+    m_AsymptoteValue: 0.38
+    m_Stiffness: 0.68
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
