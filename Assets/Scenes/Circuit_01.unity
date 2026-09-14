@@ -881,7 +881,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -957,7 +957,7 @@ Transform:
   m_GameObject: {fileID: 135501690}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.567442, y: 0.019940019, z: 1.1199999}
+  m_LocalPosition: {x: 0.567442, y: 0.019939959, z: 1.1199999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5588,7 +5588,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 100
@@ -5665,8 +5665,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6088685, y: 0.96726376, z: 4.759914}
-  m_Center: {x: -0.14156199, y: 0.527828, z: 0.43550515}
+  m_Size: {x: 1.6088685, y: 0.96726394, z: 4.759914}
+  m_Center: {x: -0.14156199, y: 0.52782804, z: 0.43550515}
 --- !u!1 &486294490
 GameObject:
   m_ObjectHideFlags: 0
@@ -8942,8 +8942,8 @@ MonoBehaviour:
   forwardAsymptoteSlip: 0.95
   forwardAsymptoteValue: 0.65
   forwardStiffness: 1.25
-  rearForwardExtremumValue: 1.1
-  rearForwardAsymptoteValue: 0.78
+  rearForwardExtremumValue: 0.99
+  rearForwardAsymptoteValue: 0.702
   frontSideExtremumSlip: 0.32
   frontSideExtremumValue: 1
   frontSideAsymptoteSlip: 0.7
@@ -8951,7 +8951,7 @@ MonoBehaviour:
   frontSideStiffness: 0.92
   rearSideExtremumSlip: 0.06
   rearSideExtremumValue: 0.405
-  rearSideAsymptoteSlip: 0.65
+  rearSideAsymptoteSlip: 0.585
   rearSideAsymptoteValue: 0.135
   rearSideStiffness: 0.5
   rearHandbrakeTorque: 3500
@@ -11682,7 +11682,7 @@ WheelCollider:
   m_GameObject: {fileID: 965115941}
   serializedVersion: 2
   m_Center: {x: 0, y: 0, z: 0}
-  m_Radius: 0.38963
+  m_Radius: 0.38962996
   m_SuspensionSpring:
     spring: 45000
     damper: 4500
@@ -11693,14 +11693,14 @@ WheelCollider:
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.5
-    m_ExtremumValue: 1.1
+    m_ExtremumValue: 0.99
     m_AsymptoteSlip: 0.95
-    m_AsymptoteValue: 0.78
+    m_AsymptoteValue: 0.702
     m_Stiffness: 1.25
   m_SidewaysFriction:
     m_ExtremumSlip: 0.06
     m_ExtremumValue: 0.405
-    m_AsymptoteSlip: 0.65
+    m_AsymptoteSlip: 0.585
     m_AsymptoteValue: 0.135
     m_Stiffness: 0.5
   m_IncludeLayers:
@@ -12711,7 +12711,7 @@ Transform:
   m_GameObject: {fileID: 1105769526}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.45, z: -0.1}
+  m_LocalPosition: {x: -0.14156199, y: 0.34181574, z: 0.43550515}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13312,7 +13312,7 @@ Transform:
   m_GameObject: {fileID: 1141717633}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.599701, z: 3}
+  m_LocalPosition: {x: 5.05, y: 0.599701, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13569,6 +13569,8 @@ MonoBehaviour:
   rearRightWheelTransform: {fileID: 497422608}
   centerOfMassObject: {fileID: 1105769526}
   wheelCollidersBrake:
+  - {fileID: 1817842582}
+  - {fileID: 135501692}
   - {fileID: 1180953520}
   - {fileID: 965115943}
   brakeForce: 3500
@@ -13837,14 +13839,14 @@ WheelCollider:
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.5
-    m_ExtremumValue: 1.1
+    m_ExtremumValue: 0.99
     m_AsymptoteSlip: 0.95
-    m_AsymptoteValue: 0.78
+    m_AsymptoteValue: 0.702
     m_Stiffness: 1.25
   m_SidewaysFriction:
     m_ExtremumSlip: 0.06
     m_ExtremumValue: 0.405
-    m_AsymptoteSlip: 0.65
+    m_AsymptoteSlip: 0.585
     m_AsymptoteValue: 0.135
     m_Stiffness: 0.5
   m_IncludeLayers:
@@ -74372,7 +74374,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -75173,7 +75175,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -78870,7 +78872,7 @@ Transform:
   m_GameObject: {fileID: 1724800217}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.03999996, z: 10}
+  m_LocalPosition: {x: 5, y: 0.03999996, z: 10}
   m_LocalScale: {x: 12, y: 0.04, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
