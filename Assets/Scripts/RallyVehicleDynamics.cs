@@ -14,7 +14,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;
-    [SerializeField] private float vehicleAngularDamping = 1.5f;
+    [SerializeField] private float vehicleAngularDamping = 2.1f;
     [SerializeField] private float maximumSteerAngle = 36f;
     [SerializeField] private float steeringResponse = 6f;
     [SerializeField] private float motorForce = 480f;
