@@ -12,6 +12,14 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private WheelCollider rearLeft;
     [SerializeField] private WheelCollider rearRight;
 
+    [Header("Arcade handling")]
+    [SerializeField] private float vehicleMass = 1450f;
+    [SerializeField] private float maximumSteerAngle = 36f;
+    [SerializeField] private float steeringResponse = 6f;
+    [SerializeField] private float motorForce = 480f;
+    [SerializeField] private float firstGearRatio = 6.0f;
+    [SerializeField] private float secondGearRatio = 3.75f;
+
     [Header("Rally suspension")]
     [SerializeField] private float suspensionDistance = 0.18f;
     [SerializeField] private float springForce = 45000f;
@@ -35,14 +43,14 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float frontSideStiffness = 0.92f;
 
     [Header("Rally drift sideways friction - rear")]
-    [SerializeField] private float rearSideExtremumSlip = 0.24f;
-    [SerializeField] private float rearSideExtremumValue = 0.78f;
-    [SerializeField] private float rearSideAsymptoteSlip = 0.75f;
-    [SerializeField] private float rearSideAsymptoteValue = 0.38f;
-    [SerializeField] private float rearSideStiffness = 0.68f;
-    [SerializeField] private float rearHighSpeedStiffness = 0.52f;
-    [SerializeField] private float rearGripFadeStartSpeed = 12f;
-    [SerializeField] private float rearGripFadeEndSpeed = 30f;
+    [SerializeField] private float rearSideExtremumSlip = 0.18f;
+    [SerializeField] private float rearSideExtremumValue = 0.72f;
+    [SerializeField] private float rearSideAsymptoteSlip = 0.60f;
+    [SerializeField] private float rearSideAsymptoteValue = 0.32f;
+    [SerializeField] private float rearSideStiffness = 0.62f;
+    [SerializeField] private float rearHighSpeedStiffness = 0.46f;
+    [SerializeField] private float rearGripFadeStartSpeed = 10f;
+    [SerializeField] private float rearGripFadeEndSpeed = 28f;
 
     [Header("Handbrake and downforce")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
@@ -136,12 +144,34 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         ConfigureWheel(rearLeft, true);
         ConfigureWheel(rearRight, true);
 
+        ConfigureArcadeHandling();
         ConfigureCenterOfMass();
 
         // JrsVehicleController already reads Space every frame. Restricting this
         // array to the rear axle turns that existing input into a handbrake.
         controller.wheelCollidersBrake = new[] { rearLeft, rearRight };
         controller.brakeForce = rearHandbrakeTorque;
+    }
+
+    private void ConfigureArcadeHandling()
+    {
+        if (vehicleBody != null)
+            vehicleBody.mass = vehicleMass;
+
+        controller.maxSteerAngle = maximumSteerAngle;
+        controller.motorForce = motorForce;
+        if (controller.gearRatios != null)
+        {
+            if (controller.gearRatios.Length > 0)
+                controller.gearRatios[0] = firstGearRatio;
+            if (controller.gearRatios.Length > 1)
+                controller.gearRatios[1] = secondGearRatio;
+        }
+
+        GameObject inputObject = GameObject.Find("Circuit Keyboard Input");
+        JrsInputController input = inputObject != null ? inputObject.GetComponent<JrsInputController>() : null;
+        if (input != null)
+            input.steerSpeed = steeringResponse;
     }
 
     private void ConfigureCenterOfMass()
