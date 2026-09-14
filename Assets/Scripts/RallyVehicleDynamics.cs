@@ -35,6 +35,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float forwardAsymptoteSlip = 0.95f;
     [SerializeField] private float forwardAsymptoteValue = 0.65f;
     [SerializeField] private float forwardStiffness = 1.25f;
+    [SerializeField] private float rearForwardExtremumValue = 1.10f;
+    [SerializeField] private float rearForwardAsymptoteValue = 0.78f;
 
     [Header("Gravel sideways friction - front")]
     [SerializeField] private float frontSideExtremumSlip = 0.32f;
@@ -46,7 +48,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [Header("Rally drift sideways friction - rear")]
     [SerializeField] private float rearSideExtremumSlip = 0.06f;
     [SerializeField] private float rearSideExtremumValue = 0.405f;
-    [SerializeField] private float rearSideAsymptoteSlip = 0.35f;
+    [SerializeField] private float rearSideAsymptoteSlip = 0.65f;
     [SerializeField] private float rearSideAsymptoteValue = 0.135f;
     [SerializeField] private float rearSideStiffness = 0.50f;
 
@@ -175,9 +177,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
         WheelFrictionCurve forward = wheel.forwardFriction;
         forward.extremumSlip = forwardExtremumSlip;
-        forward.extremumValue = forwardExtremumValue;
+        forward.extremumValue = rear ? rearForwardExtremumValue : forwardExtremumValue;
         forward.asymptoteSlip = forwardAsymptoteSlip;
-        forward.asymptoteValue = forwardAsymptoteValue;
+        forward.asymptoteValue = rear ? rearForwardAsymptoteValue : forwardAsymptoteValue;
         forward.stiffness = forwardStiffness;
         wheel.forwardFriction = forward;
 
