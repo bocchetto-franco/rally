@@ -74,7 +74,7 @@ public static class Circuit01RallyDynamicsSetup
             throw new InvalidOperationException("Could not save Circuit_01 rally dynamics.");
         AssetDatabase.SaveAssets();
         Selection.activeGameObject = setup;
-        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: gravel grip, 0.18m/45k suspension, rear Space handbrake, speed-squared downforce and visible start/finish markers saved.");
+        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: gravel grip, stable low center of mass, rear Space handbrake, subtle centered downforce and visible start/finish markers saved.");
     }
 
     public static void RunBatch()

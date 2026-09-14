@@ -43,14 +43,13 @@ public static class Circuit01VehicleSetup
         var start = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true)).FirstOrDefault(t => t.name == "Checkpoint_00_Start");
         var heading = start != null ? start.rotation : Quaternion.identity;
         var position = start != null ? start.position : Vector3.zero;
-        // Begin just inside the starting gate so entering Play starts the clock.
+        // Begin behind the starting gate so the timer starts on a real crossing.
         position.y = 0;
-        position += heading * Vector3.forward * 3;
+        position -= heading * Vector3.forward * 7;
         if (start != null)
         {
-            // Cover the grid so all four wheels rest on the road while the timer starts.
             var gate = start.GetComponent<BoxCollider>();
-            gate.size = new Vector3(gate.size.x, gate.size.y, 10);
+            gate.size = new Vector3(gate.size.x, gate.size.y, 2);
         }
         car.transform.SetPositionAndRotation(position, heading);
         car.SetActive(true);

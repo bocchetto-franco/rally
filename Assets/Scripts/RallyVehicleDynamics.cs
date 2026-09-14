@@ -17,6 +17,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float springForce = 45000f;
     [SerializeField] private float springDamper = 4500f;
     [SerializeField, Range(0f, 1f)] private float springTargetPosition = 0.45f;
+    [SerializeField] private float centerOfMassHeight = -0.45f;
+    [SerializeField] private float centerOfMassLongitudinalOffset = -0.10f;
 
     [Header("Gravel forward friction - all wheels")]
     [SerializeField] private float forwardExtremumSlip = 0.50f;
@@ -41,8 +43,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Handbrake and downforce")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
-    [SerializeField] private float downforceCoefficient = 3.5f;
-    [SerializeField] private float maximumDownforce = 9000f;
+    [SerializeField] private float minimumDownforceSpeed = 8f;
+    [SerializeField] private float downforceCoefficient = 0.45f;
+    [SerializeField] private float maximumDownforce = 600f;
 
     public void Configure(
         JrsVehicleController vehicleController,
@@ -76,8 +79,25 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (vehicleBody == null)
             return;
 
-        float force = Mathf.Min(maximumDownforce, downforceCoefficient * vehicleBody.linearVelocity.sqrMagnitude);
-        vehicleBody.AddForce(Vector3.down * force, ForceMode.Force);
+        // Apply only a small, torque-free aerodynamic load while both axles
+        // have ground contact. Vertical/bounce velocity must not amplify it.
+        bool frontGrounded = IsGrounded(frontLeft) || IsGrounded(frontRight);
+        bool rearGrounded = IsGrounded(rearLeft) || IsGrounded(rearRight);
+        if (!frontGrounded || !rearGrounded)
+            return;
+
+        Vector3 planarVelocity = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up);
+        float speedSquaredAboveThreshold = Mathf.Max(
+            0f,
+            planarVelocity.sqrMagnitude - minimumDownforceSpeed * minimumDownforceSpeed);
+        float force = Mathf.Min(maximumDownforce, downforceCoefficient * speedSquaredAboveThreshold);
+        if (force > 0f)
+            vehicleBody.AddForceAtPosition(Vector3.down * force, vehicleBody.worldCenterOfMass, ForceMode.Force);
+    }
+
+    private static bool IsGrounded(WheelCollider wheel)
+    {
+        return wheel != null && wheel.enabled && wheel.isGrounded;
     }
 
     public void ApplySetup()
@@ -90,10 +110,22 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         ConfigureWheel(rearLeft, true);
         ConfigureWheel(rearRight, true);
 
+        ConfigureCenterOfMass();
+
         // JrsVehicleController already reads Space every frame. Restricting this
         // array to the rear axle turns that existing input into a handbrake.
         controller.wheelCollidersBrake = new[] { rearLeft, rearRight };
         controller.brakeForce = rearHandbrakeTorque;
+    }
+
+    private void ConfigureCenterOfMass()
+    {
+        if (vehicleBody == null || controller.centerOfMassObject == null)
+            return;
+
+        Vector3 center = new Vector3(0f, centerOfMassHeight, centerOfMassLongitudinalOffset);
+        controller.centerOfMassObject.transform.localPosition = center;
+        vehicleBody.centerOfMass = center;
     }
 
     private void ConfigureWheel(WheelCollider wheel, bool rear)

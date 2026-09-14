@@ -62,7 +62,10 @@ public static class Circuit01CheckpointSetup
 
         for (int i = 0; i < GateCount; i++)
         {
-            float distance = total * i / (GateCount - 1f);
+            // Leave a short run-up before the start gate so the vehicle crosses
+            // it after Play begins instead of spawning already inside it.
+            const float startDistance = 10f;
+            float distance = Mathf.Lerp(startDistance, total, i / (GateCount - 1f));
             Sample(distance, out Vector3 position, out Vector3 tangent, out float width);
             var ray = new Ray(position + Vector3.up * 5f, Vector3.down);
             if (!roadCollider.Raycast(ray, out RaycastHit hit, 10f))

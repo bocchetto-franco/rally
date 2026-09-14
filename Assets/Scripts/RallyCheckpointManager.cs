@@ -48,7 +48,10 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         if (finished || checkpointIndex != nextCheckpoint || vehicleCollider == null)
             return;
 
-        JrsVehicleController vehicle = vehicleCollider.GetComponentInParent<JrsVehicleController>();
+        Rigidbody attachedBody = vehicleCollider.attachedRigidbody;
+        JrsVehicleController vehicle = attachedBody != null
+            ? attachedBody.GetComponent<JrsVehicleController>()
+            : vehicleCollider.GetComponentInParent<JrsVehicleController>();
         if (vehicle == null)
             return;
 
