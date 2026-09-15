@@ -54,6 +54,14 @@ public static class Circuit01BoundarySetup
         if (scene.path != ScenePath || EditorApplication.isPlayingOrWillChangePlaymode)
             return;
 
+        if (GameObject.Find(Circuit01LoopSetup.Marker) != null)
+        {
+            Circuit01LoopSetup.RebuildBoundaries();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            return;
+        }
+
         GameObject existing = GameObject.Find(RootName);
         if (existing != null)
             UnityEngine.Object.DestroyImmediate(existing);

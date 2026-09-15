@@ -43,6 +43,13 @@ public static class Circuit01CheckpointSetup
         Scene scene = SceneManager.GetActiveScene();
         if (scene.path != ScenePath || EditorApplication.isPlayingOrWillChangePlaymode)
             return;
+        if (GameObject.Find(Circuit01LoopSetup.Marker) != null)
+        {
+            Circuit01LoopSetup.RebuildCheckpoints();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            return;
+        }
         if (GameObject.Find("Checkpoint System") != null)
             throw new InvalidOperationException("Circuit_01 already has a checkpoint system.");
 
