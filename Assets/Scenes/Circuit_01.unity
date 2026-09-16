@@ -23448,6 +23448,52 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.67242}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &360341971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 360341973}
+  - component: {fileID: 360341972}
+  m_Layer: 0
+  m_Name: Race Flow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &360341972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360341971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4a7876b2d6e71e4285ec0023f6a54df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyRaceFlow
+  checkpointManager: {fileID: 1827243373}
+  resultsDelay: 1.25
+--- !u!4 &360341973
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360341971}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &360865466
 GameObject:
   m_ObjectHideFlags: 0
@@ -118543,6 +118589,9 @@ MonoBehaviour:
   rearSideAsymptoteSlip: 0.585
   rearSideAsymptoteValue: 0.135
   rearSideStiffness: 0.5
+  rearGripIncreaseStartKph: 90
+  rearGripIncreaseFullKph: 150
+  rearGripMultiplierAtFullSpeed: 1.4
   rearHandbrakeTorque: 3500
   minimumDownforceSpeed: 8
   downforceCoefficient: 0.45
@@ -387833,3 +387882,4 @@ SceneRoots:
   - {fileID: 1674696884}
   - {fileID: 1845603246}
   - {fileID: 321088923}
+  - {fileID: 360341973}

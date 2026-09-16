@@ -6,7 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/MainMenu.unity
+    guid: 34217823018df9e4e9e63a6c9b7e1743
+  - enabled: 1
+    path: Assets/Scenes/VehicleCircuitSelection.unity
+    guid: 54530a16949579b4db2b6598e964ef4b
+  - enabled: 1
+    path: Assets/Scenes/Circuit_01.unity
+    guid: b22d30c455b51a24898e2d1235879c48
+  - enabled: 1
+    path: Assets/Scenes/RaceResults.unity
+    guid: 2b28c158fbf72ce4fb3570680aac98bb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
