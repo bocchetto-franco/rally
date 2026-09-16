@@ -114,8 +114,8 @@ public sealed class RallyMenuController : MonoBehaviour
         RectTransform orangeRail = PanelRect(background, "Orange Rail", Accent, new Vector2(-925f, 0f), new Vector2(10f, 1080f));
         orangeRail.anchorMin = orangeRail.anchorMax = new Vector2(0.5f, 0.5f);
         PanelRect(background, "Top Shade", new Color(0.08f, 0.105f, 0.14f, 0.55f), new Vector2(0f, 500f), new Vector2(1920f, 80f));
-        Text(background, "Brand", "RALLY // PROTOTYPE", 22f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-790f, 500f), new Vector2(500f, 40f), Accent);
-        Text(background, "Build", "SINGLE STAGE BUILD", 18f, FontStyles.Bold, TextAlignmentOptions.Right, new Vector2(790f, 500f), new Vector2(430f, 40f), Muted);
+        Text(background, "Brand", "RALLY // PROTOTYPE", 22f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-600f, 500f), new Vector2(600f, 40f), Accent);
+        Text(background, "Build", "SINGLE STAGE BUILD", 18f, FontStyles.Bold, TextAlignmentOptions.Right, new Vector2(680f, 500f), new Vector2(500f, 40f), Muted);
 
         switch (screen)
         {
@@ -133,23 +133,23 @@ public sealed class RallyMenuController : MonoBehaviour
 
     void BuildMainMenu(Transform root)
     {
-        Text(root, "Eyebrow", "GRAVA  /  VELOCIDAD  /  CONTROL", 23f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-610f, 245f), new Vector2(720f, 42f), Accent);
-        Text(root, "Title", "RALLY", 150f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-605f, 100f), new Vector2(800f, 190f), Color.white);
-        Text(root, "Subtitle", "Una etapa. Un auto. Tu mejor tiempo.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-590f, -25f), new Vector2(820f, 60f), Muted);
+        Text(root, "Eyebrow", "GRAVA  /  VELOCIDAD  /  CONTROL", 23f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-455f, 245f), new Vector2(770f, 42f), Accent);
+        Text(root, "Title", "RALLY", 150f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-420f, 100f), new Vector2(840f, 190f), Color.white);
+        Text(root, "Subtitle", "Una etapa. Un auto. Tu mejor tiempo.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-390f, -25f), new Vector2(900f, 60f), Muted);
         PanelRect(root, "Title Accent", Accent, new Vector2(-862f, 94f), new Vector2(12f, 250f));
 
         RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 440f));
-        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-210f, 150f), new Vector2(430f, 36f), Accent);
-        Text(card, "Circuit", RallyGameSession.CircuitName.ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-210f, 87f), new Vector2(440f, 60f), Color.white);
-        Text(card, "Details", "LOOP  •  3,63 KM  •  RIPIO\nPORSCHE 911 SC RALLY", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-210f, 5f), new Vector2(450f, 80f), Muted);
+        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 150f), new Vector2(460f, 36f), Accent);
+        Text(card, "Circuit", RallyGameSession.CircuitName.ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 87f), new Vector2(460f, 60f), Color.white);
+        Text(card, "Details", "LOOP  •  3,63 KM  •  RIPIO\nPORSCHE 911 SC RALLY", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 5f), new Vector2(460f, 80f), Muted);
         Button(card, "Play Button", "JUGAR", new Vector2(0f, -125f), new Vector2(470f, 86f), StartSelection, true);
-        Text(root, "Hint", "ENTER: seleccionar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-750f, -475f), new Vector2(700f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.75f));
+        Text(root, "Hint", "ENTER: seleccionar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-500f, -475f), new Vector2(800f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.75f));
     }
 
     void BuildSelection(Transform root)
     {
-        Text(root, "Title", "CONFIGURACIÓN DE CARRERA", 52f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-550f, 345f), new Vector2(1100f, 70f), Color.white);
-        Text(root, "Subtitle", "Elegí auto y circuito antes de salir a pista.", 25f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-600f, 292f), new Vector2(1000f, 42f), Muted);
+        Text(root, "Title", "CONFIGURACIÓN DE CARRERA", 52f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 345f), new Vector2(1500f, 70f), Color.white);
+        Text(root, "Subtitle", "Elegí auto y circuito antes de salir a pista.", 25f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 292f), new Vector2(1400f, 42f), Muted);
 
         RectTransform carCard = SelectionCard(root, "Vehicle Card", new Vector2(-375f, 40f), "AUTO", "PORSCHE 911 SC RALLY", "TRACCIÓN ARCADE\nAJUSTE DE RALLY ACTIVO");
         Text(carCard, "Vehicle Glyph", "911", 92f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 40f), new Vector2(300f, 115f), new Color(1f, 1f, 1f, 0.12f));
@@ -179,9 +179,9 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         RectTransform card = PanelRect(root, name, Panel, position, new Vector2(650f, 470f));
         PanelRect(card, "Selected Border", Accent, new Vector2(-317f, 0f), new Vector2(8f, 470f));
-        Text(card, "Category", category, 20f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-240f, 178f), new Vector2(450f, 34f), Accent);
-        Text(card, "Title", title, 34f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-210f, -82f), new Vector2(520f, 52f), Color.white);
-        Text(card, "Details", details, 19f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-210f, -148f), new Vector2(520f, 62f), Muted);
+        Text(card, "Category", category, 20f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 178f), new Vector2(540f, 34f), Accent);
+        Text(card, "Title", title, 34f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, -82f), new Vector2(540f, 52f), Color.white);
+        Text(card, "Details", details, 19f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, -148f), new Vector2(540f, 62f), Muted);
         RectTransform badge = PanelRect(card, "Selected Badge", Accent, new Vector2(215f, 183f), new Vector2(150f, 36f));
         Text(badge, "Selected", "SELECCIONADO", 15f, FontStyles.Bold, TextAlignmentOptions.Center, Vector2.zero, new Vector2(140f, 30f), Color.white);
         return card;

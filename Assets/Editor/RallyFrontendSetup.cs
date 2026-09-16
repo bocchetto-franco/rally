@@ -76,8 +76,9 @@ public static class RallyFrontendSetup
                 .ToArray();
             AssetDatabase.SaveAssets();
 
-            string sceneToRestore = !string.IsNullOrEmpty(originalPath) && File.Exists(originalPath) ? originalPath : MainMenuPath;
-            EditorSceneManager.OpenScene(sceneToRestore, OpenSceneMode.Single);
+            // Leave the project at the real entry point so pressing Play tests
+            // the complete frontend flow instead of starting inside the race.
+            EditorSceneManager.OpenScene(MainMenuPath, OpenSceneMode.Single);
             Debug.Log("RALLY_FRONTEND_OK: MainMenu -> VehicleCircuitSelection -> Circuit_01 -> RaceResults; build settings updated.");
         }
         catch (Exception exception)
