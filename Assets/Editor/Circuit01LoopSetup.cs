@@ -14,6 +14,7 @@ public static class Circuit01LoopSetup
 {
     const string ScenePath = "Assets/Scenes/Circuit_01.unity";
     public const string Marker = "Circuit 01 Closed Loop v2";
+    const string InteractivePropsMarker = "Circuit 01 Interactive Props v1";
     sealed class Section
     {
         public float start, length, yaw, curvature, width;
@@ -33,8 +34,13 @@ public static class Circuit01LoopSetup
         if (busy || EditorApplication.isPlayingOrWillChangePlaymode) return;
         if (EditorApplication.isCompiling || EditorApplication.isUpdating)
         { EditorApplication.delayCall += Once; return; }
-        if (SceneManager.GetActiveScene().path == ScenePath && GameObject.Find(Marker) == null)
+        if (SceneManager.GetActiveScene().path != ScenePath)
+            return;
+
+        if (GameObject.Find(Marker) == null)
             Build();
+        else if (GameObject.Find(InteractivePropsMarker) == null)
+            RebuildInteractiveProps();
     }
     static void Define()
     {
@@ -246,9 +252,27 @@ public static class Circuit01LoopSetup
             }
         }
     }
+    [MenuItem("Tools/Rally/Rebuild Circuit 01 Interactive Props")]
+    public static void RebuildInteractiveProps()
+    {
+        var scene = SceneManager.GetActiveScene();
+        if (busy || scene.path != ScenePath || EditorApplication.isPlayingOrWillChangePlaymode) return;
+        busy = true;
+        try
+        {
+            Define();
+            CreateProps();
+            EditorSceneManager.MarkSceneDirty(scene);
+            AssetDatabase.SaveAssets();
+            if (!EditorSceneManager.SaveScene(scene))
+                throw new InvalidOperationException("Interactive props could not be saved.");
+            Debug.Log("CIRCUIT_01_INTERACTIVE_PROPS_OK: 4 puddle brake triggers at 3.5m/s^2 and dynamic hay bales saved.");
+        }
+        finally { busy = false; }
+    }
     static void CreateProps()
     {
-        Remove("Loop Puddles"); Remove("Loop Hay Bales");
+        Remove("Loop Puddles"); Remove("Loop Hay Bales"); Remove(InteractivePropsMarker);
         var waterRoot=new GameObject("Loop Puddles");var hayRoot=new GameObject("Loop Hay Bales");
         var water=Material("Circuit_01_WaterPlaceholder",new Color(.04f,.42f,.8f,.65f));
         water.SetFloat("_Surface",1); water.SetFloat("_SrcBlend",5); water.SetFloat("_DstBlend",10); water.SetFloat("_ZWrite",0);
@@ -264,6 +288,9 @@ public static class Circuit01LoopSetup
             var mesh=ProBuilderMesh.Create(v,f);mesh.name=$"Puddle_{i+1:00}_distance_{d:F1}m_size_{w}x{length}m";
             mesh.transform.SetParent(waterRoot.transform);mesh.transform.SetPositionAndRotation(p+Vector3.up*.035f,Quaternion.LookRotation(Vector3.Cross(r,Vector3.up)));
             mesh.GetComponent<MeshRenderer>().sharedMaterial=water;
+            var trigger=mesh.gameObject.AddComponent<BoxCollider>();trigger.isTrigger=true;
+            trigger.center=new Vector3(0,.45f,0);trigger.size=new Vector3(w,.9f,length);
+            mesh.gameObject.AddComponent<RallyPuddleSlowZone>();
         }
         int id=0;
         foreach(var bend in sections.Where(s=>s.curvature!=0 && Mathf.Abs(s.curvature*s.length*Mathf.Rad2Deg)>=90).Take(8))
@@ -275,7 +302,11 @@ public static class Circuit01LoopSetup
             mesh.transform.position=p-Mathf.Sign(bend.curvature)*r*(w/2+3)+Vector3.up*.65f;
             mesh.GetComponent<MeshRenderer>().sharedMaterial=hay;
             foreach(var col in mesh.GetComponents<Collider>()) UnityEngine.Object.DestroyImmediate(col);
+            var capsule=mesh.gameObject.AddComponent<CapsuleCollider>();capsule.direction=1;capsule.radius=.7f;capsule.height=1.3f;
+            var body=mesh.gameObject.AddComponent<Rigidbody>();body.mass=22;body.linearDamping=.15f;body.angularDamping=.25f;
+            body.interpolation=RigidbodyInterpolation.Interpolate;body.collisionDetectionMode=CollisionDetectionMode.ContinuousDynamic;body.maxAngularVelocity=30;
         }
+        new GameObject(InteractivePropsMarker);
         EditorUtility.SetDirty(water);
     }
 }

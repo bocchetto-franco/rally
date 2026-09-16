@@ -52,6 +52,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float rearSideAsymptoteValue = 0.135f;
     [SerializeField] private float rearSideStiffness = 0.50f;
 
+    [Header("High-speed rear stability")]
+    [SerializeField] private float rearGripIncreaseStartKph = 90f;
+    [SerializeField] private float rearGripIncreaseFullKph = 150f;
+    [SerializeField, Min(1f)] private float rearGripMultiplierAtFullSpeed = 1.40f;
+
     [Header("Handbrake and downforce")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
     [SerializeField] private float minimumDownforceSpeed = 8f;
@@ -91,6 +96,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             return;
 
         Vector3 planarVelocity = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up);
+        UpdateRearHighSpeedGrip(planarVelocity.magnitude * 3.6f);
 
         // Apply only a small, torque-free aerodynamic load while both axles
         // have ground contact. Vertical/bounce velocity must not amplify it.
@@ -105,6 +111,38 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         float force = Mathf.Min(maximumDownforce, downforceCoefficient * speedSquaredAboveThreshold);
         if (force > 0f)
             vehicleBody.AddForceAtPosition(Vector3.down * force, vehicleBody.worldCenterOfMass, ForceMode.Force);
+    }
+
+    private void OnDisable()
+    {
+        SetRearSidewaysStiffness(rearSideStiffness);
+    }
+
+    private void UpdateRearHighSpeedGrip(float speedKph)
+    {
+        // Keep the established arcade drift exactly as tuned through low and
+        // medium speeds. Only the high-speed tail of the curve gains grip.
+        float speedRange = Mathf.Max(1f, rearGripIncreaseFullKph - rearGripIncreaseStartKph);
+        float normalizedSpeed = Mathf.Clamp01((speedKph - rearGripIncreaseStartKph) / speedRange);
+        float blend = Mathf.SmoothStep(0f, 1f, normalizedSpeed);
+        float stiffness = rearSideStiffness * Mathf.Lerp(1f, rearGripMultiplierAtFullSpeed, blend);
+        SetRearSidewaysStiffness(stiffness);
+    }
+
+    private void SetRearSidewaysStiffness(float stiffness)
+    {
+        SetSidewaysStiffness(rearLeft, stiffness);
+        SetSidewaysStiffness(rearRight, stiffness);
+    }
+
+    private static void SetSidewaysStiffness(WheelCollider wheel, float stiffness)
+    {
+        if (wheel == null)
+            return;
+
+        WheelFrictionCurve sideways = wheel.sidewaysFriction;
+        sideways.stiffness = stiffness;
+        wheel.sidewaysFriction = sideways;
     }
 
     private static bool IsGrounded(WheelCollider wheel)
