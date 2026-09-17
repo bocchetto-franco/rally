@@ -1,0 +1,186 @@
+{
+  "source": "Poly Haven CC0",
+  "assets": [
+    {
+      "file": "Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dry_ground_01/dry_ground_01_diff_2k.jpg",
+      "md5": "53e674dc3212a1313eea8a7254e23650",
+      "bytes": 2541635
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dry_ground_01/dry_ground_01_nor_gl_2k.jpg",
+      "md5": "e858292013690e440ef0af30c020bb46",
+      "bytes": 1080854
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dry_ground_01/dry_ground_01_rough_2k.jpg",
+      "md5": "5f2fa688052d79aa6d7bcc4ce58e6428",
+      "bytes": 1456821
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dry_ground_01/dry_ground_01_ao_2k.jpg",
+      "md5": "13fe6eb6deef37fd31cc9b8419422828",
+      "bytes": 2014209
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/gravelly_sand/gravelly_sand_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravelly_sand/gravelly_sand_diff_2k.jpg",
+      "md5": "b90aa766dac59af8c136321149ca86bc",
+      "bytes": 4402825
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/gravelly_sand/gravelly_sand_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravelly_sand/gravelly_sand_nor_gl_2k.jpg",
+      "md5": "cad65c6ba322bbd7f89e72f00d9508cf",
+      "bytes": 5955314
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/gravelly_sand/gravelly_sand_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravelly_sand/gravelly_sand_rough_2k.jpg",
+      "md5": "ffa5636da8fad6a051030218f2c01a92",
+      "bytes": 1825952
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/gravelly_sand/gravelly_sand_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/gravelly_sand/gravelly_sand_ao_2k.jpg",
+      "md5": "011dfbd4c9607be1b9c82adf06656365",
+      "bytes": 3569842
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/rock_boulder_dry/rock_boulder_dry_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_boulder_dry/rock_boulder_dry_diff_2k.jpg",
+      "md5": "fbc9cf377db427f54381f463c0639e1f",
+      "bytes": 3437626
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/rock_boulder_dry/rock_boulder_dry_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_boulder_dry/rock_boulder_dry_nor_gl_2k.jpg",
+      "md5": "513ef3fdaadd106c38a9c40919918cc0",
+      "bytes": 3307320
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/rock_boulder_dry/rock_boulder_dry_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_boulder_dry/rock_boulder_dry_rough_2k.jpg",
+      "md5": "f69a2caafb58d427cb17cab31c202e0e",
+      "bytes": 2706723
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/rock_boulder_dry/rock_boulder_dry_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rock_boulder_dry/rock_boulder_dry_ao_2k.jpg",
+      "md5": "1b45230f78f21c791ca81f7bb5d7265f",
+      "bytes": 2182922
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wild_rooibos_bush/wild_rooibos_bush_diff_1k.jpg",
+      "md5": "47ee13b7a87d2aff07c0ec708a33f6ab",
+      "bytes": 374003
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wild_rooibos_bush/wild_rooibos_bush_nor_gl_1k.jpg",
+      "md5": "78a6bd59ce4a2e21fb01cadf382a1338",
+      "bytes": 463170
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wild_rooibos_bush/wild_rooibos_bush_rough_1k.jpg",
+      "md5": "1fdc5f75b7aeb2a1e4d043d97e319a88",
+      "bytes": 232122
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush_ao_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wild_rooibos_bush/wild_rooibos_bush_ao_1k.jpg",
+      "md5": "70b7be1493b01330ea3f24da3fe50644",
+      "bytes": 355212
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush_alpha_1k.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/wild_rooibos_bush/wild_rooibos_bush_alpha_1k.png",
+      "md5": "f58e9c4d8874751b2a02dcc65c11c655",
+      "bytes": 90888
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/wild_rooibos_bush/wild_rooibos_bush.fbx",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/wild_rooibos_bush/wild_rooibos_bush_1k.fbx",
+      "md5": "82b7e210b3a0b2b8648f1a78fc355bde",
+      "bytes": 1037820
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/grass_medium_01/grass_medium_01_diff_1k.jpg",
+      "md5": "6b18ed50d776fd20c1304d9994bd764e",
+      "bytes": 395673
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/grass_medium_01/grass_medium_01_nor_gl_1k.jpg",
+      "md5": "fcf43dd1253f56e4c361079f34155c37",
+      "bytes": 956166
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/grass_medium_01/grass_medium_01_rough_1k.jpg",
+      "md5": "f60c4663fb5b1f08c7c7178db9f8b684",
+      "bytes": 541262
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_ao_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/grass_medium_01/grass_medium_01_ao_1k.jpg",
+      "md5": "d3e783bfe376060ab86c42c033040d4d",
+      "bytes": 264342
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_alpha_1k.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/grass_medium_01/grass_medium_01_alpha_1k.png",
+      "md5": "6b5b251ef1ca9a69ab9f49def66d758a",
+      "bytes": 648718
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_dry_diff_1k.png",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/grass_medium_01/grass_medium_01_dry_diff_1k.png",
+      "md5": "6f5ae8d4f152542de30aad6b6a3ea327",
+      "bytes": 2167830
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01.fbx",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/grass_medium_01/grass_medium_01_1k.fbx",
+      "md5": "1983d7917839afc27471e9c223180aef",
+      "bytes": 1056796
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/namaqualand_rocks_01/namaqualand_rocks_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_rocks_01/namaqualand_rocks_01_diff_1k.jpg",
+      "md5": "3b0bb3ffafa585b8e85565f2debb2dd1",
+      "bytes": 868888
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/namaqualand_rocks_01/namaqualand_rocks_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_rocks_01/namaqualand_rocks_01_nor_gl_1k.jpg",
+      "md5": "46c9238b7d2cbcbc7bbf417a7ffd6e56",
+      "bytes": 1171905
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/namaqualand_rocks_01/namaqualand_rocks_01_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_rocks_01/namaqualand_rocks_01_rough_1k.jpg",
+      "md5": "015e203afb8f4a09335175a16a505c39",
+      "bytes": 527235
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/namaqualand_rocks_01/namaqualand_rocks_01_ao_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_rocks_01/namaqualand_rocks_01_ao_1k.jpg",
+      "md5": "6ab313ac9357d540cf3a58361f4c4153",
+      "bytes": 749916
+    },
+    {
+      "file": "Assets/Art/Environment/PolyHaven/namaqualand_rocks_01/namaqualand_rocks_01.fbx",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/namaqualand_rocks_01/namaqualand_rocks_01_1k.fbx",
+      "md5": "eda82433ea9b043c7cf4950ab69e28ba",
+      "bytes": 2566044
+    }
+  ],
+  "unityWaterSampleFiles": 12
+}
