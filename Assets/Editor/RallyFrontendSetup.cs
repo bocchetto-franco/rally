@@ -35,6 +35,23 @@ public static class RallyFrontendSetup
         bool raceFlowMissing = SceneManager.GetActiveScene().path == RacePath && GameObject.Find(RaceFlowName) == null;
         if (scenesMissing || buildSettingsMissing || raceFlowMissing)
             BuildAll();
+
+        // Unity normally starts Play Mode from whichever scene happens to be
+        // open in the editor. Circuit/environment tools intentionally leave
+        // Circuit_01 open, so without an explicit start scene they bypass the
+        // menu and selection flow. Keep the circuit open for editing while
+        // always entering the game through the real frontend.
+        ConfigurePlayModeStartScene();
+    }
+
+    static void ConfigurePlayModeStartScene()
+    {
+        SceneAsset mainMenu = AssetDatabase.LoadAssetAtPath<SceneAsset>(MainMenuPath);
+        if (mainMenu == null)
+            return;
+
+        if (EditorSceneManager.playModeStartScene != mainMenu)
+            EditorSceneManager.playModeStartScene = mainMenu;
     }
 
     [MenuItem("Tools/Rally/Build Frontend Flow")]
@@ -74,6 +91,7 @@ public static class RallyFrontendSetup
             EditorBuildSettings.scenes = BuildScenePaths
                 .Select(path => new EditorBuildSettingsScene(path, true))
                 .ToArray();
+            ConfigurePlayModeStartScene();
             AssetDatabase.SaveAssets();
 
             // Leave the project at the real entry point so pressing Play tests
