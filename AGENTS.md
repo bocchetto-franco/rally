@@ -52,7 +52,9 @@
 
 ## Efectos de conducción implementados
 
-- El Porsche tiene downforce cuadrático que comienza a `85 km/h`, usa coeficiente `1.8` y está limitado a `2200 N`. Se aplica en el centro de masa y solo cuando ambos ejes tienen contacto con el suelo, para evitar torque artificial o levantar un eje.
+- El Porsche tiene downforce cuadrático fuerte que comienza a `65 km/h`, usa coeficiente `3.2` y está limitado a `4500 N`. Se aplica en el centro de masa y solo cuando ambos ejes tienen contacto con el suelo, para evitar torque artificial o levantar un eje.
+- La frenada de servicio se activa con `S` o flecha abajo mientras el auto avanza y usa `4200 Nm` por rueda delantera y `1800 Nm` por rueda trasera, equivalentes a un reparto aproximado 70/30. Incluye modulación por `forwardSlip` para reducir bloqueos; Espacio sigue siendo el freno de mano trasero.
+- Para retrasar el trompo sin quitar el derrape normal, `Angular Damping` quedó en `3.0`, el `Asymptote Slip` lateral trasero en `0.72`, y la fricción longitudinal trasera en `1.05` de Extremum Value y `0.76` de Asymptote Value.
 - Las dos ruedas traseras reutilizan los Particle Systems y el material de polvo incluidos en el asset. Cada emisor se activa independientemente al superar `0.18` de `sidewaysSlip`, se apaga por debajo de `0.12` y requiere al menos `25 km/h`.
 - El humo es solamente visual: no modifica las curvas de fricción ni aplica fuerzas al auto.
 

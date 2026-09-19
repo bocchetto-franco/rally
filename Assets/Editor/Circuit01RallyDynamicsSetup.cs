@@ -79,7 +79,7 @@ public static class Circuit01RallyDynamicsSetup
             throw new InvalidOperationException("Could not save Circuit_01 rally dynamics.");
         AssetDatabase.SaveAssets();
         Selection.activeGameObject = setup;
-        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: existing arcade tuning preserved; high-speed quadratic downforce and rear-wheel slip smoke saved.");
+        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: 70/30 ABS-modulated service braking, later spin limit, stronger quadratic downforce and existing rear smoke saved.");
     }
 
     public static void RunBatch()
