@@ -57,11 +57,33 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float rearGripIncreaseFullKph = 150f;
     [SerializeField, Min(1f)] private float rearGripMultiplierAtFullSpeed = 1.40f;
 
-    [Header("Handbrake and downforce")]
+    [Header("Handbrake")]
     [SerializeField] private float rearHandbrakeTorque = 3500f;
-    [SerializeField] private float minimumDownforceSpeed = 8f;
-    [SerializeField] private float downforceCoefficient = 0.45f;
-    [SerializeField] private float maximumDownforce = 600f;
+
+    [Header("High-speed downforce")]
+    [SerializeField] private float minimumDownforceSpeedKph = 85f;
+    [SerializeField] private float downforceCoefficient = 1.8f;
+    [SerializeField] private float maximumDownforce = 2200f;
+
+    [Header("Rear drift smoke")]
+    [SerializeField] private ParticleSystem rearLeftDriftSmoke;
+    [SerializeField] private ParticleSystem rearRightDriftSmoke;
+    [SerializeField] private float smokeStartSlip = 0.18f;
+    [SerializeField] private float smokeStopSlip = 0.12f;
+    [SerializeField] private float smokeMinimumSpeedKph = 25f;
+    [SerializeField] private float smokeMaximumSlip = 0.75f;
+    [SerializeField] private float smokeMinimumEmission = 12f;
+    [SerializeField] private float smokeMaximumEmission = 42f;
+
+    private bool rearLeftSmokeActive;
+    private bool rearRightSmokeActive;
+
+    public bool HasConfiguredHighSpeedEffects =>
+        rearLeftDriftSmoke != null &&
+        rearRightDriftSmoke != null &&
+        minimumDownforceSpeedKph >= 80f &&
+        downforceCoefficient >= 1f &&
+        maximumDownforce >= 1500f;
 
     public void Configure(
         JrsVehicleController vehicleController,
@@ -77,6 +99,17 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         frontRight = frontRightWheel;
         rearLeft = rearLeftWheel;
         rearRight = rearRightWheel;
+        rearLeftDriftSmoke = controller != null ? controller.rearLeftDustParticleSystem : null;
+        rearRightDriftSmoke = controller != null ? controller.rearRightDustParticleSystem : null;
+        minimumDownforceSpeedKph = 85f;
+        downforceCoefficient = 1.8f;
+        maximumDownforce = 2200f;
+        smokeStartSlip = 0.18f;
+        smokeStopSlip = 0.12f;
+        smokeMinimumSpeedKph = 25f;
+        smokeMaximumSlip = 0.75f;
+        smokeMinimumEmission = 12f;
+        smokeMaximumEmission = 42f;
         ApplySetup();
     }
 
@@ -105,6 +138,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (!frontGrounded || !rearGrounded)
             return;
 
+        float minimumDownforceSpeed = minimumDownforceSpeedKph / 3.6f;
         float speedSquaredAboveThreshold = Mathf.Max(
             0f,
             planarVelocity.sqrMagnitude - minimumDownforceSpeed * minimumDownforceSpeed);
@@ -113,9 +147,67 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             vehicleBody.AddForceAtPosition(Vector3.down * force, vehicleBody.worldCenterOfMass, ForceMode.Force);
     }
 
+    private void LateUpdate()
+    {
+        if (vehicleBody == null)
+            return;
+
+        float speedKph = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up).magnitude * 3.6f;
+        UpdateDriftSmoke(rearLeft, rearLeftDriftSmoke, speedKph, ref rearLeftSmokeActive);
+        UpdateDriftSmoke(rearRight, rearRightDriftSmoke, speedKph, ref rearRightSmokeActive);
+    }
+
     private void OnDisable()
     {
         SetRearSidewaysStiffness(rearSideStiffness);
+        StopSmoke(rearLeftDriftSmoke);
+        StopSmoke(rearRightDriftSmoke);
+        rearLeftSmokeActive = false;
+        rearRightSmokeActive = false;
+    }
+
+    private void UpdateDriftSmoke(
+        WheelCollider wheel,
+        ParticleSystem smoke,
+        float speedKph,
+        ref bool smokeActive)
+    {
+        if (wheel == null || smoke == null)
+            return;
+
+        bool hasGroundContact = wheel.GetGroundHit(out WheelHit hit);
+        float lateralSlip = hasGroundContact ? Mathf.Abs(hit.sidewaysSlip) : 0f;
+        float threshold = smokeActive ? smokeStopSlip : smokeStartSlip;
+        bool shouldEmit = hasGroundContact && speedKph >= smokeMinimumSpeedKph && lateralSlip >= threshold;
+
+        if (hasGroundContact)
+        {
+            smoke.transform.SetPositionAndRotation(
+                hit.point + Vector3.up * 0.04f,
+                Quaternion.LookRotation(Vector3.up, vehicleBody.transform.forward));
+        }
+
+        ParticleSystem.EmissionModule emission = smoke.emission;
+        if (shouldEmit)
+        {
+            float intensity = Mathf.InverseLerp(smokeStartSlip, smokeMaximumSlip, lateralSlip);
+            emission.rateOverTime = Mathf.Lerp(smokeMinimumEmission, smokeMaximumEmission, intensity);
+            if (!smoke.isPlaying)
+                smoke.Play(true);
+            smokeActive = true;
+        }
+        else
+        {
+            emission.rateOverTime = 0f;
+            StopSmoke(smoke);
+            smokeActive = false;
+        }
+    }
+
+    private static void StopSmoke(ParticleSystem smoke)
+    {
+        if (smoke != null && smoke.isPlaying)
+            smoke.Stop(true, ParticleSystemStopBehavior.StopEmitting);
     }
 
     private void UpdateRearHighSpeedGrip(float speedKph)
@@ -155,6 +247,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (controller == null || frontLeft == null || frontRight == null || rearLeft == null || rearRight == null)
             return;
 
+        if (rearLeftDriftSmoke == null)
+            rearLeftDriftSmoke = controller.rearLeftDustParticleSystem;
+        if (rearRightDriftSmoke == null)
+            rearRightDriftSmoke = controller.rearRightDustParticleSystem;
+
         ConfigureWheel(frontLeft, false);
         ConfigureWheel(frontRight, false);
         ConfigureWheel(rearLeft, true);
@@ -162,11 +259,43 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
         ConfigureArcadeHandling();
         ConfigureCenterOfMass();
+        ConfigureDriftSmoke(rearLeftDriftSmoke);
+        ConfigureDriftSmoke(rearRightDriftSmoke);
 
         // JrsVehicleController already reads Space every frame. Restricting this
         // array to the rear axle turns that existing input into a handbrake.
         controller.wheelCollidersBrake = new[] { rearLeft, rearRight };
         controller.brakeForce = rearHandbrakeTorque;
+    }
+
+    private static void ConfigureDriftSmoke(ParticleSystem smoke)
+    {
+        if (smoke == null)
+            return;
+
+        ParticleSystem.MainModule main = smoke.main;
+        main.loop = true;
+        main.playOnAwake = false;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(0.65f, 1.25f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(0.35f, 1.0f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.35f, 0.85f);
+        main.startColor = new ParticleSystem.MinMaxGradient(
+            new Color(0.55f, 0.52f, 0.47f, 0.18f),
+            new Color(0.78f, 0.74f, 0.66f, 0.34f));
+
+        ParticleSystem.EmissionModule emission = smoke.emission;
+        emission.enabled = true;
+        emission.rateOverTime = 0f;
+
+        ParticleSystem.ShapeModule shape = smoke.shape;
+        shape.enabled = true;
+        shape.shapeType = ParticleSystemShapeType.Cone;
+        shape.angle = 18f;
+        shape.radius = 0.12f;
+
+        if (smoke.isPlaying)
+            smoke.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     private void ConfigureArcadeHandling()

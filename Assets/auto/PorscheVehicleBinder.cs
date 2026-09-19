@@ -138,14 +138,24 @@ public sealed class PorscheVehicleBinder : MonoBehaviour
             collider.enabled = isPorscheCollider;
         }
 
-        ParticleSystem[] dustSystems =
+        ParticleSystem[] frontDustSystems =
         {
             controller.frontLeftDustParticleSystem,
-            controller.frontRightDustParticleSystem,
+            controller.frontRightDustParticleSystem
+        };
+        foreach (ParticleSystem dust in frontDustSystems.Where(system => system != null))
+        {
+            ParticleSystemRenderer dustRenderer = dust.GetComponent<ParticleSystemRenderer>();
+            if (dustRenderer != null)
+                dustRenderer.enabled = false;
+        }
+
+        ParticleSystem[] rearDustSystems =
+        {
             controller.rearLeftDustParticleSystem,
             controller.rearRightDustParticleSystem
         };
-        foreach (ParticleSystem dust in dustSystems.Where(system => system != null))
+        foreach (ParticleSystem dust in rearDustSystems.Where(system => system != null))
         {
             ParticleSystemRenderer dustRenderer = dust.GetComponent<ParticleSystemRenderer>();
             if (dustRenderer != null)

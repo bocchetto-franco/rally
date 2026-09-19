@@ -25,7 +25,12 @@ public static class Circuit01RallyDynamicsSetup
             return;
         }
 
-        if (SceneManager.GetActiveScene().path == ScenePath && GameObject.Find(SetupName) == null)
+        if (SceneManager.GetActiveScene().path != ScenePath)
+            return;
+
+        GameObject setup = GameObject.Find(SetupName);
+        RallyVehicleDynamics dynamics = setup != null ? setup.GetComponent<RallyVehicleDynamics>() : null;
+        if (dynamics == null || !dynamics.HasConfiguredHighSpeedEffects)
             Install();
     }
 
@@ -74,7 +79,7 @@ public static class Circuit01RallyDynamicsSetup
             throw new InvalidOperationException("Could not save Circuit_01 rally dynamics.");
         AssetDatabase.SaveAssets();
         Selection.activeGameObject = setup;
-        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: 1450kg arcade handling, 36-degree fast steering, punchier low gears, progressive rear drift, stable center of mass and subtle downforce saved.");
+        Debug.Log("CIRCUIT_01_RALLY_DYNAMICS_OK: existing arcade tuning preserved; high-speed quadratic downforce and rear-wheel slip smoke saved.");
     }
 
     public static void RunBatch()
