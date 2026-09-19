@@ -302,7 +302,8 @@ public static class Circuit01EnvironmentSetup
                 count++;
             }
         }
-        Debug.Log("ENVIRONMENT: "+count+" downloaded prop instances placed outside driveable road/shoulders.");
+        int converted=Circuit01PerformanceSetup.ConvertLooseVegetationToTerrainDetails(terrain,props);
+        Debug.Log("ENVIRONMENT: "+count+" downloaded prop placements created outside the driveable road/shoulders; "+converted+" vegetation instances stored as Terrain Details.");
     }
     static void ApplyWater(RallyPuddleSlowZone[] puddles)
     {
