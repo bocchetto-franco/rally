@@ -31,6 +31,9 @@
 
 ## Estado de optimización
 
+- Vegetación de `Circuit_01`: 80 árboles Quiver, 850 Searsia Lucida, 180 arbustos rooibos y 195 pastos. Arbustos y pastos usan Terrain Details con `alignToGround = 1`; los árboles siguen la normal del Terrain.
+- `Circuit01VegetationRepair.cs` repara/revalida las plantaciones y aumenta densidad sin tocar gameplay. Conservar la corrección de ejes del FBX al hornear mallas (Quiver tiene rotación raíz de -90° en X); no cancelarla con `worldToLocalMatrix` de la raíz. Comprobar el volumen de la planta y el jitter de Terrain Details contra el camino, no solo su centro.
+
 - Ya se aplicaron manualmente Half Res en texturas, menor distancia de sombras, menor Far Clip Plane y Occlusion Culling baked.
 - En la optimización más reciente, aproximadamente 292 colocaciones superiores de vegetación (195 pastos y 97 arbustos, que expandían a unos 4092 GameObjects) se migraron a Terrain Details. Se conservaron 73 colocaciones de rocas como GameObjects.
 - Los Terrain Details quedaron con resolución `1024`, patch resolution `32`, distancia de dibujo `180 m` y densidad `1`.

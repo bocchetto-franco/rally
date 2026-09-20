@@ -53,7 +53,7 @@ public static class Circuit01VegetationExpansion
         var prototypes=data.detailPrototypes.ToList();
         prototypes.Add(new DetailPrototype { prototype=shrub,usePrototypeMesh=true,useInstancing=true,
             renderMode=DetailRenderMode.VertexLit,minWidth=.8f,maxWidth=1.3f,minHeight=.85f,maxHeight=1.25f,
-            noiseSeed=190926,noiseSpread=.3f,healthyColor=Color.white,dryColor=Color.white });
+            noiseSeed=190926,noiseSpread=.3f,alignToGround=1,healthyColor=Color.white,dryColor=Color.white });
         data.detailPrototypes=prototypes.ToArray();
         var cells=new int[data.detailHeight,data.detailWidth];
         var random=new System.Random(190926);
@@ -85,7 +85,8 @@ public static class Circuit01VegetationExpansion
                 var go=(GameObject)PrefabUtility.InstantiatePrefab(tree,group.transform);
                 go.name="Quiver desert tree "+trees.ToString("00");
                 p.y=terrain.SampleHeight(p)+terrain.transform.position.y;
-                go.transform.SetPositionAndRotation(p,Quaternion.Euler(0,(float)random.NextDouble()*360,0));
+                var normal=data.GetInterpolatedNormal(n.x/data.size.x,n.z/data.size.z);
+                go.transform.SetPositionAndRotation(p,Quaternion.FromToRotation(Vector3.up,normal)*Quaternion.Euler(0,(float)random.NextDouble()*360,0));
                 go.transform.localScale=Vector3.one*(.8f+(float)random.NextDouble()*.5f);
                 placed.Add(p);trees++;
             }
@@ -102,7 +103,7 @@ public static class Circuit01VegetationExpansion
         Circuit01EnvironmentSetup.Preview();
     }
 
-    static float Clearance(Vector3 p,Vector3[] v)
+    public static float Clearance(Vector3 p,Vector3[] v)
     {
         float result=float.MaxValue;
         for(int i=0;i<v.Length;i+=4)
@@ -115,7 +116,7 @@ public static class Circuit01VegetationExpansion
         return result;
     }
 
-    static GameObject CreatePrefab(string id,float height,bool shrub)
+    public static GameObject CreatePrefab(string id,float height,bool shrub)
     {
         string folder=Root+"/PolyHaven/"+id;
         string modelPath=folder+"/"+id+"_1k.fbx";
@@ -138,12 +139,17 @@ public static class Circuit01VegetationExpansion
         var go=new GameObject(id+" optimized");
         var mf=go.AddComponent<MeshFilter>();
         var mesh=Object.Instantiate(selected.sharedMesh);
-        var points=mesh.vertices.Select(p=>source.transform.worldToLocalMatrix.MultiplyPoint3x4(selected.transform.localToWorldMatrix.MultiplyPoint3x4(p))).ToArray();
+        // Include the FBX root's axis conversion (Quiver has -90 degrees around X).
+        var points=mesh.vertices.Select(p=>selected.transform.localToWorldMatrix.MultiplyPoint3x4(p)).ToArray();
         var bounds=new Bounds(points[0],Vector3.zero);foreach(var p in points)bounds.Encapsulate(p);
         float scale=height/Mathf.Max(.01f,bounds.size.y);
         mesh.vertices=points.Select(p=>(p-new Vector3(bounds.center.x,bounds.min.y,bounds.center.z))*scale).ToArray();
-        mesh.RecalculateNormals();mesh.RecalculateBounds();
-        string meshPath=Root+"/Prefabs/"+id+"_optimized.asset";AssetDatabase.CreateAsset(mesh,meshPath);mf.sharedMesh=mesh;
+        mesh.RecalculateNormals();mesh.RecalculateTangents();mesh.RecalculateBounds();
+        string meshPath=Root+"/Prefabs/"+id+"_optimized.asset";
+        var existingMesh=AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+        if(existingMesh!=null) { existingMesh.Clear(); EditorUtility.CopySerialized(mesh,existingMesh); Object.DestroyImmediate(mesh); mesh=existingMesh; mesh.UploadMeshData(false); EditorUtility.SetDirty(mesh); }
+        else AssetDatabase.CreateAsset(mesh,meshPath);
+        mf.sharedMesh=mesh;
         var renderer=go.AddComponent<MeshRenderer>();
         var sourceMaterials=selected.GetComponent<Renderer>().sharedMaterials;
         renderer.sharedMaterials=sourceMaterials.Select(m=>MakeMaterial(id,shrub?"":m.name.ToLower().Contains("leaf")?"leaf_":"trunk_",shrub)).ToArray();
