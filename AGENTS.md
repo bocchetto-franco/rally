@@ -27,7 +27,7 @@
 - Hay cuatro zonas de charcos visibles. Cada una conserva su trigger y la lógica de frenado o pérdida temporal de velocidad; no mover ni redimensionar estas zonas al cambiar solamente su aspecto visual.
 - Los fardos de heno tienen Collider y Rigidbody dinámico para reaccionar a los impactos del auto.
 - La ambientación incorporada por Astra incluye Terrain montañoso/desértico, materiales de suelo árido, vegetación seca dispersa y rocas.
-- La documentación solicitada menciona espectadores o público en algunas curvas, pero la auditoría actual del repositorio no encontró GameObjects ni assets de público identificables por nombre. Verificarlo visualmente en Unity antes de asumir que esa parte de la ambientación está presente o antes de eliminar objetos aparentemente relacionados.
+- Hay 12 espectadores estáticos de Quaternius (LowPoly Posed Humans, CC0), en cuatro grupos de tres bajo `Rally Spectators - Outside Barriers`. Assets y licencia en `Assets/Art/Environment/QuaterniusPeople/`. `Circuit01SpectatorsSetup.cs` coloca y valida el público: cuerpo completo al exterior de las barreras reales, separación mínima exigida de 3 m (medida actual: 5.98 m), fuera del camino y mirando a la pista. Si se cambia el trazado o las barreras, revalidar estas posiciones; no mover público dentro del área jugable.
 
 ## Estado de optimización
 
