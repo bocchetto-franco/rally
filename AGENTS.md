@@ -15,21 +15,25 @@
 - El botón **Jugar** de `MainMenu` abre `Assets/Scenes/VehicleCircuitSelection.unity`.
 - La selección actual ofrece un único auto, **Porsche 911 SC Rally**, y un único circuito, **Circuit 01**. `RallyGameSession` conserva ambas selecciones en PlayerPrefs (`Rally.SelectedVehicle` y `Rally.SelectedCircuit`).
 - El botón para iniciar la carrera guarda la selección y carga `Assets/Scenes/Circuit_01.unity`.
-- En `Circuit_01`, el GameObject `Race Flow` usa `RallyRaceFlow`: espera que `RallyCheckpointManager.IsFinished` indique el final, guarda el tiempo y carga `Assets/Scenes/RaceResults.unity` después de una pausa breve.
+- En `Circuit_01`, el GameObject `Race Flow` usa `RallyRaceFlow`: al finalizar congela el Porsche, deshabilita el control y la dinámica adicional, pausa con `Time.timeScale = 0` y muestra un Canvas con tiempo final, reinicio, ranking y regreso a selección. El ranking guarda los cinco mejores tiempos por circuito en PlayerPrefs bajo `Rally.BestTimes.*`. Los botones restauran `Time.timeScale = 1` antes de cambiar o recargar escena.
 - Desde resultados se puede repetir la carrera, volver a selección o regresar al menú principal.
 - El orden esperado en Build Settings es: `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `RaceResults`.
 - La configuración y reparación de este flujo se centraliza en `Assets/Editor/RallyFrontendSetup.cs` y su comportamiento en `Assets/Scripts/RallyMenuController.cs`. No cambiar los nombres de escena sin actualizar ambas partes.
 
 ## Estado de `Circuit_01`
 
-- Es un loop cerrado de rallycross con curvas abiertas y cerradas, al menos dos horquillas y varios tramos con desnivel.
+- Es un loop corto de rallycross de aproximadamente 1512 m (antes 3637 m). Conserva los primeros ~578 m del recorrido anterior, con curvas de 110°, chicana y desniveles; una horquilla nueva de 180° y radio 22 m inicia el retorno exterior a la salida. No restaurar el recorrido largo sin pedido explícito. El marcador `Circuit 01 Short Loop v1` hace que la ruta compartida de `Circuit01LoopSetup` genere el trazado corto.
 - Tiene checkpoints y cronómetro funcionales, HUD de carrera y reinicio del auto al último checkpoint con la tecla `R`.
-- Hay cuatro zonas de charcos visibles. Cada una conserva su trigger y la lógica de frenado o pérdida temporal de velocidad; no mover ni redimensionar estas zonas al cambiar solamente su aspecto visual.
-- Los fardos de heno tienen Collider y Rigidbody dinámico para reaccionar a los impactos del auto.
+- Queda el charco del tramo inicial (aprox. 100 m), con su trigger, material y lógica de frenado originales. Se retiraron los tres charcos del recorrido eliminado.
+- Quedan seis fardos de heno, con Collider y Rigidbody dinámico originales; se retiraron 18 del recorrido eliminado. Hay diez gates ordenados, salida y meta separadas, aproximadamente cada 167 m.
 - La ambientación incorporada por Astra incluye Terrain montañoso/desértico, materiales de suelo árido, vegetación seca dispersa y rocas.
 - Hay 12 espectadores estáticos de Quaternius (LowPoly Posed Humans, CC0), en cuatro grupos de tres bajo `Rally Spectators - Outside Barriers`. Assets y licencia en `Assets/Art/Environment/QuaterniusPeople/`. `Circuit01SpectatorsSetup.cs` coloca y valida el público: cuerpo completo al exterior de las barreras reales, separación mínima exigida de 3 m (medida actual: 5.98 m), fuera del camino y mirando a la pista. Si se cambia el trazado o las barreras, revalidar estas posiciones; no mover público dentro del área jugable.
 
 ## Estado de optimización
+
+- `Circuit01CrowdSetup.cs` agregó 80 espectadores estáticos en cuatro grupos de 20, además de los 12 anteriores. Buscar `Large Rally Crowds - Outside Barriers` en Hierarchy. Poses existentes de Quaternius, posición/yaw/escala y ropa variadas; mallas combinadas por material y por zona: 28 MeshRenderers, sin colliders, Rigidbody ni Animator adicionales, sombras proyectadas desactivadas y culling por LODGroup. No se ha medido todavía un framerate comparativo. Separación mínima validada del cuerpo completo a barreras: 5.38 m. Posiciones individuales originales registradas en `Assets/Art/Environment/QuaterniusPeople/LargeCrowdPlacements.txt`; se hornearon en las mallas, no hay un GameObject por persona. Al cambiar la pista, revalidar tanto esta raíz como el público anterior.
+
+- El recorte se aplicó con `Circuit01ShortLoopSetup.cs`; el terreno se ajustó al nuevo retorno, se regeneraron las barreras y se retiraron/desactivaron 55 colocaciones de vegetación del nuevo margen de escape. Se conservó el ambiente lejano. Los conteos de vegetación siguientes son previos al recorte; no asumir que todos siguen activos. Respaldo local del circuito largo: `Logs/SceneBackups/ShortLoop_20260921_105154/`.
 
 - Vegetación de `Circuit_01`: 80 árboles Quiver, 850 Searsia Lucida, 180 arbustos rooibos y 195 pastos. Arbustos y pastos usan Terrain Details con `alignToGround = 1`; los árboles siguen la normal del Terrain.
 - `Circuit01VegetationRepair.cs` repara/revalida las plantaciones y aumenta densidad sin tocar gameplay. Conservar la corrección de ejes del FBX al hornear mallas (Quiver tiene rotación raíz de -90° en X); no cancelarla con `worldToLocalMatrix` de la raíz. Comprobar el volumen de la planta y el jitter de Terrain Details contra el camino, no solo su centro.

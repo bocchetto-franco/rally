@@ -14,6 +14,7 @@ public static class Circuit01LoopSetup
 {
     const string ScenePath = "Assets/Scenes/Circuit_01.unity";
     public const string Marker = "Circuit 01 Closed Loop v2";
+    public const string ShortMarker = "Circuit 01 Short Loop v1";
     const string InteractivePropsMarker = "Circuit 01 Interactive Props v1";
     sealed class Section
     {
@@ -53,8 +54,21 @@ public static class Circuit01LoopSetup
         {
             Straight(straights[i], ref p, ref h);
             if (i < turns.Length) Turn(turns[i], radii[i], ref p, ref h);
+            if (GameObject.Find(ShortMarker) != null && i == 5) break;
         }
         originalLength = total;
+        if (GameObject.Find(ShortMarker) != null)
+        {
+            // Keep the original first six sections through the S-bend, then return outside them.
+            Turn(180,22,ref p,ref h);
+            Add(p.z+55,0,12,ref p,ref h);
+            Turn(90,55,ref p,ref h);
+            Add(p.x-55,0,12,ref p,ref h);
+            Turn(90,55,ref p,ref h);
+            Add(-p.z,0,12,ref p,ref h);
+            if(p.magnitude>.01f)throw new InvalidOperationException("Short loop does not close.");
+            return;
+        }
         // Two opposing hairpins north of the existing course, with 44m between legs.
         Straight(160, ref p, ref h);
         Turn(180, 22, ref p, ref h);
