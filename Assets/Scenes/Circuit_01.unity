@@ -3342,7 +3342,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.014616
+      value: 4.7904453
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14593,7 +14593,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyRaceFlow
   checkpointManager: {fileID: 1827243373}
-  resultsDelay: 1.25
 --- !u!4 &360341973
 Transform:
   m_ObjectHideFlags: 0
@@ -56079,6 +56078,8 @@ MonoBehaviour:
   rearGripIncreaseStartKph: 90
   rearGripIncreaseFullKph: 150
   rearGripMultiplierAtFullSpeed: 1.4
+  spinAssistYawRateThreshold: 1.75
+  spinAssistCorrectionStrength: 4.5
   frontServiceBrakeTorque: 4200
   rearServiceBrakeTorque: 1800
   serviceBrakeMinimumForwardSpeedKph: 3
@@ -62731,7 +62732,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.81904733
+      value: 0.27540338
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -82347,7 +82348,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14.905949
+      value: 14.56353
       objectReference: {fileID: 0}
     - target: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -86873,6 +86874,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyPuddleSlowZone
   brakingAcceleration: 3.5
+  additionalHighSpeedBraking: 2.5
+  aquaplaningStartSpeedKph: 55
+  aquaplaningFullSpeedKph: 110
+  maximumLateralAcceleration: 2.2
+  splashMinimumSpeedKph: 35
+  entrySplashParticles: 22
+  maximumContinuousParticlesPerSecond: 36
+  splashParticles: {fileID: 0}
 --- !u!65 &1360159898
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -31,6 +31,8 @@
 
 ## Estado de optimización
 
+- El Terrain junto a la recta larga del retorno (487 m, desde `(255.16, 0, 432.41)` hasta `(255.16, 0, -55)`) tiene una transición localizada de 141 m por lado, con fundido de 60 m en los extremos. La franja anterior de 20 m producía paredes de hasta ~80 m junto al camino. `Circuit01StraightTerrainRepair.cs` aplica la corrección solo fuera del corredor de 14 m, protege otros tramos y plataformas del público, y vuelve a apoyar las rocas afectadas. No regenerar globalmente el Terrain ni volver a ejecutar `FitTerrain` del recorte, porque restauraría el corte. El informe y respaldo están en `Logs/straight-terrain-repair.txt` y `Logs/SceneBackups/StraightTerrain_20260923_182450/`.
+
 - `Circuit01CrowdSetup.cs` agregó 80 espectadores estáticos en cuatro grupos de 20, además de los 12 anteriores. Buscar `Large Rally Crowds - Outside Barriers` en Hierarchy. Poses existentes de Quaternius, posición/yaw/escala y ropa variadas; mallas combinadas por material y por zona: 28 MeshRenderers, sin colliders, Rigidbody ni Animator adicionales, sombras proyectadas desactivadas y culling por LODGroup. No se ha medido todavía un framerate comparativo. Separación mínima validada del cuerpo completo a barreras: 5.38 m. Posiciones individuales originales registradas en `Assets/Art/Environment/QuaterniusPeople/LargeCrowdPlacements.txt`; se hornearon en las mallas, no hay un GameObject por persona. Al cambiar la pista, revalidar tanto esta raíz como el público anterior.
 
 - El recorte se aplicó con `Circuit01ShortLoopSetup.cs`; el terreno se ajustó al nuevo retorno, se regeneraron las barreras y se retiraron/desactivaron 55 colocaciones de vegetación del nuevo margen de escape. Se conservó el ambiente lejano. Los conteos de vegetación siguientes son previos al recorte; no asumir que todos siguen activos. Respaldo local del circuito largo: `Logs/SceneBackups/ShortLoop_20260921_105154/`.
@@ -46,6 +48,17 @@
 - Se auditaron 32 texturas de ambiente y ninguna supera 2048 px. Se limitaron a 1024 px y con compresión las texturas de pasto y cinco texturas del sample de agua (`FlipbookTest`, `foam_detail_tiling`, `foam_mask`, `ocean_foam_blend_ramp`, `puddle_norm`).
 - `Assets/Editor/Circuit01PerformanceSetup.cs` contiene la automatización de optimización y `Assets/Editor/Circuit01EnvironmentSetup.cs` vuelve a convertir la vegetación a Terrain Details si se reconstruye el ambiente.
 - La revisión e incorporación de LOD adicionales sigue siendo trabajo de optimización en curso; no afirmar que está terminada sin volver a medir la escena.
+
+## Assets reutilizables para nuevos circuitos
+
+Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuentes y licencias están documentadas en `Assets/Art/Environment/ASSET_SOURCES.md` y `Assets/Art/Environment/DOWNLOAD_MANIFEST.json`.
+
+- **Texturas de terreno desértico:** fuentes PBR de Poly Haven en `Assets/Art/Environment/PolyHaven/`, en las carpetas `dry_ground_01/`, `gravelly_sand/` y `rock_boulder_dry/`. Para configurar un Terrain, reutilizar las capas `Assets/Art/Environment/Terrain/dry_ground_01.terrainlayer`, `gravelly_sand.terrainlayer` y `rock_boulder_dry.terrainlayer`. Los mapas adaptados/empaquetados están en `Assets/Art/Environment/PackedTextures/`; el Terrain actual es `Assets/Art/Environment/Terrain/Circuit01_AridTerrain.asset`.
+- **Vegetación árida:** prefabs listos en `Assets/Art/Environment/Prefabs/`: `quiver_tree_01_optimized.prefab`, `searsia_lucida_optimized.prefab`, `wild_rooibos_bush_upright.prefab` y `grass_medium_01_upright.prefab`. Los modelos y mapas fuente están en las subcarpetas con el mismo nombre bajo `Assets/Art/Environment/PolyHaven/`.
+- **Personas/espectadores:** pack Quaternius LowPoly Posed Humans en `Assets/Art/Environment/QuaterniusPeople/`. Incluye FBX, prefabs, mallas combinadas y materiales; licencia en `Assets/Art/Environment/QuaterniusPeople/License.txt` y fuente en `SOURCE.md`. Para grupos grandes, reutilizar las mallas combinadas que ya están allí.
+- **Material y shader de agua:** material listo de los charcos: `Assets/Art/Environment/Materials/Puddles - Unity sample.mat`. Usa el Shader Graph URP `Assets/Art/Environment/UnityWaterSample/ProductionReady/Environment/Water/WaterSimple_FoamMask.shadergraph`; sus dependencias viven bajo `Assets/Art/Environment/UnityWaterSample/`. Licencia del sample en `Assets/Art/Environment/UnityWaterSample/LICENSE.md`.
+- **Fardos de heno:** no hay un modelo importado independiente. `Assets/Editor/Circuit01LoopSetup.cs`, método `CreateProps()`, genera cilindros ProBuilder en la escena y les agrega `CapsuleCollider` y `Rigidbody`. Reutilizar el material `Assets/Scenes/Circuit_01_HayPlaceholder.mat` y esa rutina para mantener su forma y comportamiento.
+- **Checkpoints y timer:** la lógica principal está en `Assets/Scripts/RallyCheckpointManager.cs` (orden de checkpoints, cronómetro y reinicio con R) y `Assets/Scripts/RallyCheckpointTrigger.cs` (trigger individual). `Assets/Editor/Circuit01CheckpointSetup.cs` instala los gates; para la geometría cerrada actual, `Circuit01LoopSetup.RebuildCheckpoints()` los reconstruye siguiendo el loop. HUD: `Assets/Scripts/RallyRaceHud.cs`; flujo de meta/resultados: `Assets/Scripts/RallyRaceFlow.cs`.
 
 ## Reglas de trabajo
 
