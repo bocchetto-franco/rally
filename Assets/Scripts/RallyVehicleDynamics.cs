@@ -57,6 +57,12 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float rearGripIncreaseFullKph = 150f;
     [SerializeField, Min(1f)] private float rearGripMultiplierAtFullSpeed = 1.40f;
 
+    [Header("Arcade spin stability assist")]
+    [Tooltip("Local yaw rate in radians per second before the anti-spin assistance begins. Normal controlled drifts below this rate are untouched.")]
+    [SerializeField, Min(0.1f)] private float spinAssistYawRateThreshold = 1.75f;
+    [Tooltip("Maximum counter-yaw angular acceleration in radians per second squared. The assistance ramps in progressively above the threshold.")]
+    [SerializeField, Min(0f)] private float spinAssistCorrectionStrength = 4.5f;
+
     [Header("Service brake and handbrake")]
     [SerializeField] private float frontServiceBrakeTorque = 4200f;
     [SerializeField] private float rearServiceBrakeTorque = 1800f;
@@ -112,6 +118,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         rearForwardExtremumValue = 1.05f;
         rearForwardAsymptoteValue = 0.76f;
         rearSideAsymptoteSlip = 0.72f;
+        spinAssistYawRateThreshold = 1.75f;
+        spinAssistCorrectionStrength = 4.5f;
         frontServiceBrakeTorque = 4200f;
         rearServiceBrakeTorque = 1800f;
         serviceBrakeMinimumForwardSpeedKph = 3f;
@@ -156,6 +164,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         if (!frontGrounded || !rearGrounded)
             return;
 
+        ApplySpinStabilityAssist();
+
         float minimumDownforceSpeed = minimumDownforceSpeedKph / 3.6f;
         float speedSquaredAboveThreshold = Mathf.Max(
             0f,
@@ -163,6 +173,27 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         float force = Mathf.Min(maximumDownforce, downforceCoefficient * speedSquaredAboveThreshold);
         if (force > 0f)
             vehicleBody.AddForceAtPosition(Vector3.down * force, vehicleBody.worldCenterOfMass, ForceMode.Force);
+    }
+
+    private void ApplySpinStabilityAssist()
+    {
+        Vector3 localAngularVelocity = vehicleBody.transform.InverseTransformDirection(vehicleBody.angularVelocity);
+        float correction = CalculateSpinAssistAngularAcceleration(localAngularVelocity.y);
+        if (!Mathf.Approximately(correction, 0f))
+            vehicleBody.AddTorque(vehicleBody.transform.up * correction, ForceMode.Acceleration);
+    }
+
+    private float CalculateSpinAssistAngularAcceleration(float localYawRate)
+    {
+        float threshold = Mathf.Max(0.1f, spinAssistYawRateThreshold);
+        float excessiveYaw = Mathf.Abs(localYawRate) - threshold;
+        if (excessiveYaw <= 0f || spinAssistCorrectionStrength <= 0f)
+            return 0f;
+
+        // Reach full correction only at twice the threshold. SmoothStep keeps
+        // the intervention imperceptible at onset while still catching a spin.
+        float blend = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(excessiveYaw / threshold));
+        return -Mathf.Sign(localYawRate) * spinAssistCorrectionStrength * blend;
     }
 
     private void LateUpdate()

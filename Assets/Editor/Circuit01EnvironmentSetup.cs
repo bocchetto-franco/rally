@@ -52,7 +52,7 @@ public static class Circuit01EnvironmentSetup
             var road = GameObject.Find("Rally_Road_Start_to_Finish").GetComponent<ProBuilderMesh>();
             var shoulders = GameObject.Find("Loop Runoff Shoulders").GetComponent<ProBuilderMesh>();
             var puddles = Object.FindObjectsByType<RallyPuddleSlowZone>();
-            if (puddles.Length != 4) throw new InvalidOperationException("Expected four existing puddles.");
+            if (puddles.Length != 1) throw new InvalidOperationException("Expected the single puddle retained by the short loop.");
             string before = GameplaySignature(scene);
             var roadPositions = road.positions.ToArray();
             var shoulderPositions = shoulders.positions.ToArray();
@@ -313,10 +313,10 @@ public static class Circuit01EnvironmentSetup
         string path=Root+"/Materials/Puddles - Unity sample.mat";
         var mat=AssetDatabase.LoadAssetAtPath<Material>(path);
         if(mat==null){mat=new Material(template);AssetDatabase.CreateAsset(mat,path);}
-        mat.SetColor("_Color",new Color(.37f,.42f,.38f,0));mat.SetColor("_DepthColor",new Color(.11f,.15f,.12f,0));
-        mat.SetFloat("_OpaqueDepth",.35f);mat.SetFloat("_RefractionStrength",.006f);
-        mat.SetVector("_RippleSpeed",new Vector4(-.035f,.014f,-.02f,-.025f));
-        mat.SetVector("_RippleScale",new Vector4(.45f,.35f,.17f,.4f));
+        mat.SetColor("_Color",new Color(.32f,.46f,.50f,0));mat.SetColor("_DepthColor",new Color(.045f,.11f,.13f,0));
+        mat.SetFloat("_OpaqueDepth",.65f);mat.SetFloat("_RefractionStrength",.01f);
+        mat.SetVector("_RippleSpeed",new Vector4(-.06f,.018f,-.035f,-.045f));
+        mat.SetVector("_RippleScale",new Vector4(.32f,.26f,.13f,.30f));
         foreach(var zone in puddles)zone.GetComponent<Renderer>().sharedMaterial=mat;
         foreach(var camera in Object.FindObjectsByType<Camera>())
         {var data=camera.GetUniversalAdditionalCameraData();data.requiresDepthTexture=true;data.requiresColorTexture=true;}
@@ -357,7 +357,7 @@ public static class Circuit01EnvironmentSetup
         var car=GameObject.Find("Porsche 911 SC Rally");
         if(car==null || !car.activeInHierarchy || car.transform.position.z>10)throw new InvalidOperationException("Porsche must remain active at the start.");
         if(ShaderUtil.ShaderHasError(puddles[0].GetComponent<Renderer>().sharedMaterial.shader))throw new InvalidOperationException("Water shader has compile errors.");
-        return "Terrain samples checked: "+checks+"; maximum gap below road/shoulder: "+maxGap.ToString("F3")+"m; 4 puddles preserved; Porsche active at start; official water shader imported.\nTerrain size: "+terrain.terrainData.size;
+        return "Terrain samples checked: "+checks+"; maximum gap below road/shoulder: "+maxGap.ToString("F3")+"m; one short-loop puddle preserved; Porsche active at start; official water shader imported.\nTerrain size: "+terrain.terrainData.size;
     }
     [MenuItem("Tools/Rally/Environment/Capture Previews")]
     public static void Preview()
