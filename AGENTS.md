@@ -60,6 +60,26 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - **Fardos de heno:** no hay un modelo importado independiente. `Assets/Editor/Circuit01LoopSetup.cs`, método `CreateProps()`, genera cilindros ProBuilder en la escena y les agrega `CapsuleCollider` y `Rigidbody`. Reutilizar el material `Assets/Scenes/Circuit_01_HayPlaceholder.mat` y esa rutina para mantener su forma y comportamiento.
 - **Checkpoints y timer:** la lógica principal está en `Assets/Scripts/RallyCheckpointManager.cs` (orden de checkpoints, cronómetro y reinicio con R) y `Assets/Scripts/RallyCheckpointTrigger.cs` (trigger individual). `Assets/Editor/Circuit01CheckpointSetup.cs` instala los gates; para la geometría cerrada actual, `Circuit01LoopSetup.RebuildCheckpoints()` los reconstruye siguiendo el loop. HUD: `Assets/Scripts/RallyRaceHud.cs`; flujo de meta/resultados: `Assets/Scripts/RallyRaceFlow.cs`.
 
+## Circuitos adicionales (geometría y ambientación)
+
+- `Assets/Scenes/Circuit_02.unity`: loop desértico independiente de aproximadamente 1631 m, dos horquillas de 180°, chicana, una recta larga de 150 m, anchos de 7–12 m y tres desniveles (+8, +12 y -5 m). Reutiliza exclusivamente los assets áridos existentes. Terrain, mallas de público y mapa de recorrido: `Assets/Art/Environment/Circuit02/`. Generador: `Assets/Editor/Circuit02Builder.cs`.
+- `Assets/Scenes/Circuit_03.unity`: loop de bosque/montaña independiente de aproximadamente 1700 m, dos horquillas de 180° (radios 28/22 m), chicana y curvas encadenadas, una recta larga de 130 m y tres desniveles más pronunciados (+20, +28 y -10 m). Tiene 380 coníferas, 240 arbustos, 180 plantas bajas y 50 rocas low-poly con mallas/materiales compartidos, instancing y descarte por distancia. Generadores: `Assets/Editor/Circuit03Builder.cs` y `Circuit03ForestAssets.cs`.
+- Ambos tienen cuatro charcos de 6 × 10 m sobre hondonadas de 0.28 m, fardos visuales y cuatro grupos de 20 espectadores combinados por material. El público queda fuera de las barreras; separación mínima del cuerpo completo medida: 14.42 m en Circuit_02 y 14.39 m en Circuit_03.
+- Por pedido explícito, **no tienen checkpoints, timer, lógica de charcos ni física de fardos**. No agregar esos sistemas automáticamente. Los Porsche de prueba están activos en la salida y conservan su configuración de Circuit_01.
+- Para conducirlos desde el editor: **Tools → Rally → Play Circuit 02/03 - Free Drive**. Al salir se restaura la escena de inicio anterior. El frontend y Build Settings existentes siguen sin modificarse: todavía no ofrecen estas pistas como carreras.
+- No reemplazar ni regenerar el Terrain de Circuit_01. Cada escena nueva tiene su propio TerrainData. `Circuit02Layout.json` / `Circuit03Layout.json`, junto a sus respectivos terrenos, documentan línea central, distancias, anchos, charcos y público para conectar gameplay más adelante.
+- No reutilizar en Circuit_02/03 el bake de iluminación/occlusion de Circuit_01. Las cámaras nuevas tienen occlusion desactivado hasta hacer un bake propio; no cambiar la configuración de la cámara original.
+
+### Assets de bosque reutilizables (Circuit_03)
+
+- Suelos nuevos CC0 de Poly Haven: `Assets/Art/Forest/PolyHaven/mud_forest/`, `forest_floor/` y `mossy_rock/`. Color y normales de 2K comprimidos; **no son texturas del desierto**. Capas listas: `Assets/Art/Forest/Terrain/*.terrainlayer`.
+- Camino: `Assets/Art/Forest/Materials/Wet forest road.mat`; banquina: `Forest floor.mat`; Terrain: `Forest Terrain.mat`, en esa misma carpeta.
+- Cielo: `Assets/Art/Forest/Materials/Overcast sky.mat`, con HDRI CC0 `Assets/Art/Forest/PolyHaven/kloofendal_overcast/kloofendal_overcast_2k.hdr`.
+- Vegetación: Kenney Nature Kit CC0 en `Assets/Art/Forest/KenneyNature/`, licencia original incluida. Prefabs URP preparados en `Assets/Art/Forest/Prefabs/{PineA,PineB,PineC,Bush,Fern,Rock}.prefab`. `Fern` es el nombre interno del prefab de planta baja `plant_flatShort`, no un asset botánico específico.
+- Terrain de la escena: `Assets/Art/Forest/Circuit03/Circuit03_ForestTerrain.asset`. Fuentes/licencias/checksums y guía de uso en `Assets/Art/Forest/ASSET_SOURCES.md`, `DOWNLOAD_MANIFEST.json` y `README.md`.
+- El público, material de agua y fardos usan las rutas compartidas ya documentadas arriba. No cambiar el material de agua compartido para afinar una sola escena.
+- Se verificaron cierre, raycasts del camino, ajuste de altura del Terrain, depresiones y conservación de tuning. Informes y renders en `Logs/circuit02-build.txt`, `Logs/circuit03-build.txt` y `Logs/Circuit02_Preview_*.png` / `Circuit03_Preview_*.png`. No hay todavía medición comparativa de FPS ni validación manual de una vuelta completa.
+
 ## Reglas de trabajo
 
 - Cada vez que se cree o actualice una pista, dejar el Porsche principal activo al inicio, orientado hacia el recorrido y apoyado correctamente sobre el camino, con controles y cámara de seguimiento funcionando. Verificar su posición antes de guardar la escena; no dejar pistas de prueba sin auto salvo pedido explícito.

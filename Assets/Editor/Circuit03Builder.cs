@@ -14,12 +14,13 @@ using Object = UnityEngine.Object;
 
 // Explicit editor operation: creates an independent scene using the existing asset library.
 [InitializeOnLoad]
-public static class Circuit02Builder
+public static class Circuit03Builder
 {
-    public const string ScenePath = "Assets/Scenes/Circuit_02.unity";
+    public const string ScenePath = "Assets/Scenes/Circuit_03.unity";
     const string SourceScene = "Assets/Scenes/Circuit_01.unity";
     const string Env = "Assets/Art/Environment/";
-    const string Output = Env + "Circuit02";
+    const string Forest = "Assets/Art/Forest/";
+    const string Output = Forest + "Circuit03";
     const string People = Env + "QuaterniusPeople/";
     sealed class Section { public Vector3 origin; public float yaw, curvature, length, start; }
     struct Sample { public Vector3 p, right; public float d, width; }
@@ -27,7 +28,7 @@ public static class Circuit02Builder
     sealed class Crowd { public Vector3 center, target, outward; public float height; }
     [Serializable] sealed class Layout
     {
-        public string scene = "Circuit_02", notes = "Geometry/environment only. No checkpoints, timer, water triggers or dynamic hay logic.";
+        public string scene = "Circuit_03", notes = "Geometry/environment only. No checkpoints, timer, water triggers or dynamic hay logic.";
         public float lengthMeters;
         public Vector3[] centerline, puddleCenters, crowdCenters;
         public float[] distances, roadWidths;
@@ -42,25 +43,25 @@ public static class Circuit02Builder
     static ProBuilderMesh road;
     static System.Random random;
 
-    static Circuit02Builder()
+    static Circuit03Builder()
     {
         EditorApplication.playModeStateChanged += state =>
         {
-            if(state!=PlayModeStateChange.EnteredEditMode || !SessionState.GetBool("Circuit02.FreeDrivePending",false))return;
-            string previous=SessionState.GetString("Circuit02.PreviousPlayStartScene","");
+            if(state!=PlayModeStateChange.EnteredEditMode || !SessionState.GetBool("Circuit03.FreeDrivePending",false))return;
+            string previous=SessionState.GetString("Circuit03.PreviousPlayStartScene","");
             EditorSceneManager.playModeStartScene=string.IsNullOrEmpty(previous)?null:AssetDatabase.LoadAssetAtPath<SceneAsset>(previous);
-            SessionState.SetBool("Circuit02.FreeDrivePending",false);
+            SessionState.SetBool("Circuit03.FreeDrivePending",false);
         };
     }
 
-    [MenuItem("Tools/Rally/Play Circuit 02 - Free Drive")]
+    [MenuItem("Tools/Rally/Play Circuit 03 - Free Drive")]
     public static void PlayFreeDrive()
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode)return;
         if(!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())return;
         EditorSceneManager.OpenScene(ScenePath);
-        SessionState.SetString("Circuit02.PreviousPlayStartScene",AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene));
-        SessionState.SetBool("Circuit02.FreeDrivePending",true);
+        SessionState.SetString("Circuit03.PreviousPlayStartScene",AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene));
+        SessionState.SetBool("Circuit03.FreeDrivePending",true);
         EditorSceneManager.playModeStartScene=Asset<SceneAsset>(ScenePath);
         EditorApplication.isPlaying=true;
     }
@@ -71,16 +72,16 @@ public static class Circuit02Builder
     static GameObject Root(string name, Transform parent=null)
     { var go=new GameObject(name); if(parent!=null)go.transform.SetParent(parent,false); return go; }
 
-    [MenuItem("Tools/Rally/Create Circuit 02")]
+    [MenuItem("Tools/Rally/Create Circuit 03")]
     public static void Build()
     {
         if(EditorApplication.isPlayingOrWillChangePlaymode || SceneManager.GetActiveScene().isDirty)
-            throw new Exception("Save the active scene and leave Play before creating Circuit_02.");
-        if(File.Exists(ScenePath) || Directory.Exists(Output))throw new Exception("Circuit_02 already exists; refusing to overwrite it.");
+            throw new Exception("Save the active scene and leave Play before creating Circuit_03.");
+        if(File.Exists(ScenePath) || Directory.Exists(Output))throw new Exception("Circuit_03 already exists; refusing to overwrite it.");
         string sourceHash=Hash(SourceScene), terrainPath=Env+"Terrain/Circuit01_AridTerrain.asset", terrainHash=Hash(terrainPath);
         var scene=EditorSceneManager.OpenScene(SourceScene);
         var sourceTerrain=Object.FindObjectsByType<Terrain>().Single();
-        var detailPrototypes=sourceTerrain.terrainData.detailPrototypes;
+        var detailPrototypes=new DetailPrototype[0];
         var car=GameObject.Find("Porsche 911 SC Rally");
         var tuning=car.GetComponentsInChildren<Component>(true).Where(c=>c is Rigidbody || c is WheelCollider || c is JrsVehicleController).ToArray();
         var signature=tuning.Select(EditorJsonUtility.ToJson).ToArray();
@@ -89,10 +90,11 @@ public static class Circuit02Builder
         var keep=new HashSet<string>{"Porsche 911 SC Rally","Circuit Keyboard Input","Main Camera","Directional Light","Porsche Rally Dynamics"};
         foreach(var root in scene.GetRootGameObjects())if(!keep.Contains(root.name))Object.DestroyImmediate(root);
         Directory.CreateDirectory(Output); AssetDatabase.Refresh();
-        DefineRoute(); random=new System.Random(230926);
-        var environment=Root("Circuit 02 - Desert Rallycross");
-        road=RoadStrip("Circuit02_Road",false,environment.transform);
-        RoadStrip("Circuit02_Runoff",true,environment.transform);
+        Circuit03ForestAssets.Build();
+        DefineRoute(); random=new System.Random(240926);
+        var environment=Root("Circuit 03 - Forest Mountain Rally");
+        road=RoadStrip("Circuit03_Road",false,environment.transform);
+        RoadStrip("Circuit03_Runoff",true,environment.transform);
         PlanCrowds(); terrain=BuildTerrain(environment.transform,detailPrototypes);
         BuildWalls(environment.transform);
         BuildWater(environment.transform);
@@ -105,35 +107,35 @@ public static class Circuit02Builder
         if(dynamicsBefore!=EditorJsonUtility.ToJson(dynamics))throw new Exception("Vehicle assistance settings changed.");
         Validate();
         var layout=new Layout{lengthMeters=length, centerline=route.Select(s=>Surface(s.p)).ToArray(),distances=route.Select(s=>s.d).ToArray(),roadWidths=route.Select(s=>s.width).ToArray(),puddleCenters=basins.Select(b=>b.sample.p-Vector3.up*.1f).ToArray(),crowdCenters=crowds.Select(c=>c.center).ToArray()};
-        File.WriteAllText(Output+"/Circuit02Layout.json",JsonUtility.ToJson(layout,true));
+        File.WriteAllText(Output+"/Circuit03Layout.json",JsonUtility.ToJson(layout,true));
         AssetDatabase.Refresh();AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(scene);
-        if(!EditorSceneManager.SaveScene(scene))throw new Exception("Cannot save Circuit_02.");
+        if(!EditorSceneManager.SaveScene(scene))throw new Exception("Cannot save Circuit_03.");
         if(sourceHash!=Hash(SourceScene)||terrainHash!=Hash(terrainPath))throw new Exception("Circuit_01 source files changed.");
         Directory.CreateDirectory("Logs");
-        File.WriteAllText("Logs/circuit02-build.txt",$"PASS: Circuit_02 saved. Length {length:F1}m; two 180-degree hairpins R24m; four-arc chicane; one 150m straight; remaining straights <=90m; three hills (+8,+12,-5m); width 7-12m. Four water basins, 0.28m depression, visual only. 80 spectators in four combined crowds; minimum full-body barrier clearance {crowdClearance:F2}m. 80 trees, 65 rocks, 1330 Terrain Details. No checkpoint/timer/water-zone components; hay without physics. Source Circuit_01 and terrain hashes unchanged; Porsche tuning unchanged; road collider and basin raycasts passed.\n"+DateTime.Now.ToString("O"));
-        Debug.Log("CIRCUIT02_COMPLETE: "+length.ToString("F1")+"m");
+        File.WriteAllText("Logs/circuit03-build.txt",$"PASS: Circuit_03 saved. Length {length:F1}m; two 180-degree hairpins R28/22m; four-arc chicane; one 130m straight; remaining straights <=110m; three hills (+20,+28,-10m); width 7-12m. Four water basins, 0.28m depression, visual only. 80 spectators in four combined crowds; minimum full-body barrier clearance {crowdClearance:F2}m. 380 pines, 240 bushes, 180 ferns and 50 rocks; instanced shared materials and distance culling. No checkpoint/timer/water-zone components; hay without physics. Source Circuit_01 and terrain hashes unchanged; Porsche tuning unchanged; road collider and basin raycasts passed.\n"+DateTime.Now.ToString("O"));
+        Debug.Log("CIRCUIT03_COMPLETE: "+length.ToString("F1")+"m");
     }
 
     static void DefineRoute()
     {
         sections.Clear();route.Clear();basins.Clear();crowds.Clear();walls.Clear();length=0;
         Vector3 p=Vector3.zero; float heading=0;
-        Add(150,0,ref p,ref heading); Turn(180,24,ref p,ref heading);
-        Add(90,0,ref p,ref heading); Turn(-180,24,ref p,ref heading);
-        Add(90,0,ref p,ref heading); Turn(90,60,ref p,ref heading);
-        Add(40,0,ref p,ref heading);
-        foreach(float angle in new[]{25f,-25,-25,25})Turn(angle,40,ref p,ref heading);
-        Turn(90,60,ref p,ref heading);
-        Winding(p.z+140,35,2,ref p,ref heading);
-        Turn(90,60,ref p,ref heading);
-        Winding(p.x-60,28,2,ref p,ref heading);
-        Turn(90,60,ref p,ref heading);
-        Winding(-p.z,18,1,ref p,ref heading);
+        Add(130,0,ref p,ref heading); Turn(180,28,ref p,ref heading);
+        Add(80,0,ref p,ref heading); Turn(-180,22,ref p,ref heading);
+        Winding(110,25,1,ref p,ref heading); Turn(90,55,ref p,ref heading);
+        Add(30,0,ref p,ref heading);
+        foreach(float angle in new[]{32f,-32,-32,32})Turn(angle,36,ref p,ref heading);
+        Turn(90,70,ref p,ref heading);
+        Winding(p.z+160,40,2,ref p,ref heading);
+        Turn(90,65,ref p,ref heading);
+        Winding(p.x-65,32,2,ref p,ref heading);
+        Turn(90,65,ref p,ref heading);
+        Winding(-p.z,25,1,ref p,ref heading);
         if(p.magnitude>.01f)throw new Exception("Route does not close: "+p);
         var distances=new SortedSet<float>{0,length};
         foreach(var s in sections){int count=Mathf.CeilToInt(s.length/1f);for(int i=0;i<=count;i++)distances.Add(s.start+s.length*i/count);}
         foreach(float d in distances)route.Add(At(d));
-        foreach(float d in new[]{85f,435f,935f,1390f})basins.Add(new Basin{sample=At(d),id=basins.Count+1});
+        foreach(float d in new[]{60f,480f,1000f,1500f})basins.Add(new Basin{sample=At(d),id=basins.Count+1});
     }
     static void Add(float distance,float curvature,ref Vector3 p,ref float heading)
     {
@@ -157,7 +159,7 @@ public static class Circuit02Builder
     {
         var s=sections.FirstOrDefault(v=>d<=v.start+v.length+.00001f)??sections.Last();
         Position(s,Mathf.Clamp(d-s.start,0,s.length),out var p,out float heading);
-        p.y=Hill(d,120,300,8)+Hill(d,540,800,12)+Hill(d,1020,1300,-5);
+        p.y=Hill(d,110,370,20)+Hill(d,560,890,28)+Hill(d,1110,1420,-10);
         if(d>=length-.00001f)p=Vector3.zero;
         float width=12;
         foreach(var bend in sections.Where(v=>Mathf.Abs(v.curvature)>.0001f))
@@ -199,7 +201,7 @@ public static class Circuit02Builder
         }
         var mesh=ProBuilderMesh.Create(v,f);mesh.name=name;mesh.transform.SetParent(parent,false);
         mesh.textures=v.Select(p=>new Vector2(p.x/6,p.z/6)).ToArray();mesh.ToMesh();mesh.Refresh();
-        mesh.GetComponent<Renderer>().sharedMaterial=Asset<Material>(Env+"Materials/"+(shoulders?"Shoulder - dry earth":"Road - dry gravel")+".mat");
+        mesh.GetComponent<Renderer>().sharedMaterial=Asset<Material>(Forest+"Materials/"+(shoulders?"Forest floor":"Wet forest road")+".mat");
         var collider=mesh.GetComponent<MeshCollider>();
         if(collider==null)collider=mesh.gameObject.AddComponent<MeshCollider>();
         collider.sharedMesh=mesh.GetComponent<MeshFilter>().sharedMesh;
@@ -225,8 +227,8 @@ public static class Circuit02Builder
     {
         Nearest(p,out float distance,out float y,out float hw);
         float ridge=1-Mathf.Abs(2*Mathf.PerlinNoise(p.x*.008f+13,p.z*.008f+37)-1);
-        float mountain=16+Mathf.PerlinNoise(p.x*.003f+71,p.z*.003f+26)*84+ridge*20;
-        return Mathf.Lerp(y-.18f,mountain,Mathf.SmoothStep(0,1,Mathf.Max(0,distance-hw-7)/165))-Drop(p);
+        float mountain=24+Mathf.PerlinNoise(p.x*.003f+71,p.z*.003f+26)*110+ridge*35;
+        return Mathf.Lerp(y-.18f,mountain,Mathf.SmoothStep(0,1,Mathf.Max(0,distance-hw-7)/210))-Drop(p);
     }
     static void PlanCrowds()
     {
@@ -242,7 +244,7 @@ public static class Circuit02Builder
     {
         var bounds=new Bounds(route[0].p,Vector3.zero);foreach(var s in route)bounds.Encapsulate(s.p);bounds.Expand(new Vector3(640,0,640));
         var origin=new Vector3(bounds.min.x,-35,bounds.min.z);var size=new Vector3(Mathf.Ceil(bounds.size.x),230,Mathf.Ceil(bounds.size.z));
-        const int n=1025;var data=new TerrainData{name="Circuit02_AridTerrain",heightmapResolution=n,size=size};
+        const int n=1025;var data=new TerrainData{name="Circuit03_ForestTerrain",heightmapResolution=n,size=size};
         var heights=new float[n,n];
         for(int z=0;z<n;z++)for(int x=0;x<n;x++)
         {
@@ -250,7 +252,7 @@ public static class Circuit02Builder
             foreach(var crowd in crowds){float d=Vector2.Distance(new Vector2(p.x,p.z),new Vector2(crowd.center.x,crowd.center.z));h=Mathf.Lerp(crowd.height,h,Mathf.SmoothStep(0,1,(d-9)/9));}
             heights[z,x]=(h-origin.y)/size.y;
         }
-        data.SetHeights(0,0,heights);data.terrainLayers=new[]{"dry_ground_01","gravelly_sand","rock_boulder_dry"}.Select(id=>Asset<TerrainLayer>(Env+"Terrain/"+id+".terrainlayer")).ToArray();
+        data.SetHeights(0,0,heights);data.terrainLayers=new[]{"mud_forest","forest_floor","mossy_rock"}.Select(id=>Asset<TerrainLayer>(Forest+"Terrain/"+id+".terrainlayer")).ToArray();
         data.alphamapResolution=512;data.baseMapResolution=1024;var maps=new float[512,512,3];
         for(int z=0;z<512;z++)for(int x=0;x<512;x++)
         {
@@ -261,14 +263,14 @@ public static class Circuit02Builder
             maps[z,x,0]=1-rock-sand;maps[z,x,1]=sand;maps[z,x,2]=rock;
         }
         data.SetAlphamaps(0,0,maps);data.SetDetailResolution(512,32);data.detailPrototypes=details;
-        AssetDatabase.CreateAsset(data,Output+"/Circuit02_AridTerrain.asset");
-        var go=Terrain.CreateTerrainGameObject(data);go.name="Circuit02_Terrain";go.transform.SetParent(parent,false);go.transform.position=origin;
-        var t=go.GetComponent<Terrain>();t.materialTemplate=Asset<Material>(Env+"Materials/Terrain - URP desert.mat");t.drawInstanced=true;t.heightmapPixelError=3;t.basemapDistance=400;t.detailObjectDistance=180;t.detailObjectDensity=1;
+        AssetDatabase.CreateAsset(data,Output+"/Circuit03_ForestTerrain.asset");
+        var go=Terrain.CreateTerrainGameObject(data);go.name="Circuit03_Terrain";go.transform.SetParent(parent,false);go.transform.position=origin;
+        var t=go.GetComponent<Terrain>();t.materialTemplate=Asset<Material>(Forest+"Materials/Forest Terrain.mat");t.drawInstanced=true;t.heightmapPixelError=3;t.basemapDistance=400;t.detailObjectDistance=180;t.detailObjectDensity=1;
         return t;
     }
     static void BuildWalls(Transform parent)
     {
-        var root=Root("Circuit 02 - Soft Track Boundaries",parent);var mat=Asset<PhysicsMaterial>("Assets/Scenes/Circuit_01_SoftBoundary.physicMaterial");
+        var root=Root("Circuit 03 - Soft Track Boundaries",parent);var mat=Asset<PhysicsMaterial>("Assets/Scenes/Circuit_01_SoftBoundary.physicMaterial");
         for(int i=0;i<route.Count-1;i+=4)
         {
             var a=route[i];var b=route[Mathf.Min(i+4,route.Count-1)];
@@ -282,7 +284,7 @@ public static class Circuit02Builder
     }
     static void BuildWater(Transform parent)
     {
-        var root=Root("Circuit 02 - Water Basins (visual only)",parent);
+        var root=Root("Circuit 03 - Water Basins (visual only)",parent);
         foreach(var b in basins)
         {
             var v=new List<Vector3>{Vector3.zero};var f=new List<Face>();const int count=48,rings=16;
@@ -305,7 +307,7 @@ public static class Circuit02Builder
     }
     static void BuildHay(Transform parent)
     {
-        var root=Root("Circuit 02 - Hay Bales (visual only)",parent);int id=0;
+        var root=Root("Circuit 03 - Hay Bales (visual only)",parent);int id=0;
         foreach(var bend in sections.Where(s=>Mathf.Abs(s.curvature*s.length*Mathf.Rad2Deg)>=89))for(int i=0;i<3;i++)
         {
             var s=At(bend.start+bend.length*(.35f+i*.15f));var p=s.p-Mathf.Sign(bend.curvature)*s.right*(s.width/2+3);
@@ -318,7 +320,7 @@ public static class Circuit02Builder
     static Bounds BoundsOf(GameObject go){var rs=go.GetComponentsInChildren<Renderer>();var b=rs[0].bounds;foreach(var r in rs)b.Encapsulate(r.bounds);return b;}
     static void BuildCrowds(Transform parent)
     {
-        var root=Root("Circuit 02 - Crowds Outside Boundaries",parent);crowdClearance=float.MaxValue;
+        var root=Root("Circuit 03 - Crowds Outside Boundaries",parent);crowdClearance=float.MaxValue;
         string[] names={"Male_Standing_Waving","Female_Standing_CoveringEyes","Male_Standing","Female_Standing_Hips"};
         for(int index=0;index<crowds.Count;index++)
         {
@@ -370,43 +372,41 @@ public static class Circuit02Builder
     }
     static void BuildVegetation(Transform parent)
     {
-        var root=Root("Circuit 02 - Trees and Rocks",parent);var placed=new List<Vector3>();
-        foreach(bool tree in new[]{true,false})
+        var root=Root("Circuit 03 - Forest",parent);var placed=new List<Vector3>();
+        string[] names={"PineA","PineB","PineC","Bush","Fern","Rock"};
+        int[] targets={140,140,100,240,180,50};
+        for(int kind=0;kind<names.Length;kind++)
         {
-            int count=0,target=tree?80:65;var prefab=Asset<GameObject>(Env+"Prefabs/"+(tree?"quiver_tree_01_optimized":"namaqualand_rocks_01")+".prefab");
-            for(int attempt=0;attempt<30000&&count<target;attempt++)
+            int count=0;var prefab=Asset<GameObject>(Forest+"Prefabs/"+names[kind]+".prefab");
+            for(int attempt=0;attempt<50000&&count<targets[kind];attempt++)
             {
-                var p=Candidate();if(!Plantable(p,tree?12:10)||placed.Any(q=>Vector2.Distance(new Vector2(p.x,p.z),new Vector2(q.x,q.z))<5))continue;
-                var go=(GameObject)PrefabUtility.InstantiatePrefab(prefab,root.transform);go.name=(tree?"Quiver_":"Rocks_")+(++count).ToString("000");p.y=Ground(p);var n=p-terrain.transform.position;var d=terrain.terrainData;
-                go.transform.SetPositionAndRotation(p,Quaternion.FromToRotation(Vector3.up,d.GetInterpolatedNormal(n.x/d.size.x,n.z/d.size.z))*Quaternion.Euler(0,(float)random.NextDouble()*360,0));go.transform.localScale*=.8f+(float)random.NextDouble()*.4f;
-                var bounds=BoundsOf(go);go.transform.position+=Vector3.up*(p.y-bounds.min.y-.035f);placed.Add(p);
-                if(tree&&go.GetComponent<LODGroup>()==null){var lod=go.AddComponent<LODGroup>();lod.SetLODs(new[]{new LOD(.012f,go.GetComponentsInChildren<Renderer>())});lod.RecalculateBounds();}
+                var p=Candidate();bool tree=kind<3;float spacing=tree?6:2.3f;
+                if(!Plantable(p,tree?14:10)||placed.Any(q=>Vector2.Distance(new Vector2(p.x,p.z),new Vector2(q.x,q.z))<spacing))continue;
+                var go=(GameObject)PrefabUtility.InstantiatePrefab(prefab,root.transform);go.name=names[kind]+"_"+(++count).ToString("000");
+                p.y=Ground(p);var n=p-terrain.transform.position;var d=terrain.terrainData;
+                var normal=Vector3.Slerp(Vector3.up,d.GetInterpolatedNormal(n.x/d.size.x,n.z/d.size.z),tree?.2f:.8f);
+                go.transform.SetPositionAndRotation(p,Quaternion.FromToRotation(Vector3.up,normal)*Quaternion.Euler(0,(float)random.NextDouble()*360,0));
+                go.transform.localScale*=.75f+(float)random.NextDouble()*.5f;
+                var bounds=BoundsOf(go);go.transform.position+=Vector3.up*(p.y-bounds.min.y-.03f);
+                Nearest(bounds.center,out float clearance,out _,out float hw);
+                if(clearance-hw-new Vector2(bounds.extents.x,bounds.extents.z).magnitude<8){Object.DestroyImmediate(go);count--;continue;}
+                placed.Add(p);
+                var lod=go.AddComponent<LODGroup>();lod.SetLODs(new[]{new LOD(tree?.012f:.025f,go.GetComponentsInChildren<Renderer>())});lod.RecalculateBounds();
             }
-            if(count!=target)throw new Exception("Cannot place enough vegetation safely.");
+            if(count!=targets[kind])throw new Exception("Cannot safely place "+names[kind]);
         }
-        var data=terrain.terrainData;
-        for(int layer=0;layer<data.detailPrototypes.Length;layer++)
-        {
-            string name=data.detailPrototypes[layer].prototype.name;int target=name.Contains("searsia")?800:name.Contains("rooibos")?180:350,count=0;
-            var cells=new int[data.detailHeight,data.detailWidth];
-            for(int attempt=0;attempt<50000&&count<target;attempt++)
-            {
-                var q=Candidate()-terrain.transform.position;int x=Mathf.FloorToInt(q.x/data.size.x*data.detailWidth),z=Mathf.FloorToInt(q.z/data.size.z*data.detailHeight);
-                if(x<0||z<0||x>=data.detailWidth||z>=data.detailHeight||cells[z,x]!=0)continue;
-                var p=terrain.transform.position+new Vector3((x+.5f)*data.size.x/data.detailWidth,0,(z+.5f)*data.size.z/data.detailHeight);
-                if(!Plantable(p,12))continue;cells[z,x]=1;count++;
-            }
-            if(count!=target)throw new Exception("Cannot fill Terrain Details safely.");data.SetDetailLayer(0,0,layer,cells);
-        }
-        EditorUtility.SetDirty(data);
+        // GPU instancing uses shared meshes/materials, no individual scripts or colliders.
     }
     static void BuildLighting(Transform parent)
     {
         // Circuit_01's baked visibility/lighting is not valid for a different layout.
         Lightmapping.lightingDataAsset=null;LightmapSettings.lightmaps=Array.Empty<LightmapData>();
         foreach(var camera in Object.FindObjectsByType<Camera>())camera.useOcclusionCulling=false;
-        RenderSettings.skybox=Asset<Material>(Env+"Materials/Sky - warm procedural desert.mat");
-        var probe=Root("Desert sky reflection",parent).AddComponent<ReflectionProbe>();probe.mode=ReflectionProbeMode.Realtime;probe.refreshMode=ReflectionProbeRefreshMode.OnAwake;probe.resolution=128;probe.cullingMask=0;probe.clearFlags=ReflectionProbeClearFlags.Skybox;probe.size=new Vector3(2000,500,2000);probe.center=new Vector3(150,100,0);
+        RenderSettings.skybox=Asset<Material>(Forest+"Materials/Overcast sky.mat");
+        RenderSettings.ambientMode=AmbientMode.Trilight;RenderSettings.ambientSkyColor=new Color(.47f,.53f,.58f);RenderSettings.ambientEquatorColor=new Color(.34f,.39f,.38f);RenderSettings.ambientGroundColor=new Color(.21f,.24f,.22f);
+        RenderSettings.fog=true;RenderSettings.fogMode=FogMode.ExponentialSquared;RenderSettings.fogColor=new Color(.58f,.65f,.68f);RenderSettings.fogDensity=.001f;
+        var sun=GameObject.Find("Directional Light").GetComponent<Light>();sun.color=new Color(.87f,.94f,1);sun.intensity=1.2f;sun.transform.rotation=Quaternion.Euler(42,-35,0);
+        var probe=Root("Overcast sky reflection",parent).AddComponent<ReflectionProbe>();probe.mode=ReflectionProbeMode.Realtime;probe.refreshMode=ReflectionProbeRefreshMode.OnAwake;probe.resolution=128;probe.cullingMask=0;probe.clearFlags=ReflectionProbeClearFlags.Skybox;probe.size=new Vector3(2000,500,2000);probe.center=new Vector3(150,100,0);
         foreach(var camera in Object.FindObjectsByType<Camera>()){camera.clearFlags=CameraClearFlags.Skybox;var urp=camera.GetUniversalAdditionalCameraData();urp.requiresDepthTexture=true;urp.requiresColorTexture=true;urp.renderPostProcessing=false;}
     }
     static void PositionCar(GameObject car)
@@ -432,8 +432,8 @@ public static class Circuit02Builder
         }
         foreach(var b in basins)if(!col.Raycast(new Ray(b.sample.p+Vector3.up*5,Vector3.down),out var hit,10)||b.sample.p.y-hit.point.y<.23f)throw new Exception("Missing basin depression.");
         if(Object.FindObjectsByType<RallyCheckpointManager>().Length!=0||Object.FindObjectsByType<RallyCheckpointTrigger>().Length!=0||Object.FindObjectsByType<RallyPuddleSlowZone>().Length!=0||Object.FindObjectsByType<RallyRaceFlow>().Length!=0||Object.FindObjectsByType<RallyRaceHud>().Length!=0)throw new Exception("Race logic unexpectedly retained.");
-        if(GameObject.Find("Circuit 02 - Hay Bales (visual only)").GetComponentsInChildren<Rigidbody>().Length!=0)throw new Exception("Hay physics unexpectedly present.");
-        Debug.Log("Circuit02 road/terrain fit: maximum gap "+maxGap);
+        if(GameObject.Find("Circuit 03 - Hay Bales (visual only)").GetComponentsInChildren<Rigidbody>().Length!=0)throw new Exception("Hay physics unexpectedly present.");
+        Debug.Log("Circuit03 road/terrain fit: maximum gap "+maxGap);
     }
     // Only our disposable generation checkout may reset incomplete generated output.
     public static void RebuildStaging()
@@ -442,18 +442,18 @@ public static class Circuit02Builder
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
         AssetDatabase.DeleteAsset(ScenePath);AssetDatabase.DeleteAsset(Output);Build();
     }
-    [MenuItem("Tools/Rally/Preview Circuit 02")]
+    [MenuItem("Tools/Rally/Preview Circuit 03")]
     public static void Preview()
     {
         EditorSceneManager.OpenScene(ScenePath);Directory.CreateDirectory("Logs");
-        var go=Root("Temporary Circuit02 preview");var camera=go.AddComponent<Camera>();camera.clearFlags=CameraClearFlags.Skybox;camera.farClipPlane=1600;camera.fieldOfView=58;
+        var go=Root("Temporary Circuit03 preview");var camera=go.AddComponent<Camera>();camera.clearFlags=CameraClearFlags.Skybox;camera.farClipPlane=1600;camera.fieldOfView=58;
         var urp=camera.GetUniversalAdditionalCameraData();urp.requiresColorTexture=true;urp.requiresDepthTexture=true;
-        Vector3[] positions={new Vector3(660,540,-620),new Vector3(-40,14,102),new Vector3(115,10,28),new Vector3(-13,5,72)};
-        Vector3[] targets={new Vector3(150,0,0),new Vector3(22,6,170),new Vector3(72,0,43),new Vector3(0,-.1f,85)};
+        Vector3[] positions={new Vector3(660,540,-620),new Vector3(-40,14,102),new Vector3(115,10,28),new Vector3(-13,5,47)};
+        Vector3[] targets={new Vector3(150,0,0),new Vector3(22,6,170),new Vector3(72,0,43),new Vector3(0,-.1f,60)};
         for(int i=0;i<positions.Length;i++)
         {
             camera.transform.position=positions[i];camera.transform.LookAt(targets[i]);var rt=new RenderTexture(1600,1000,24);camera.targetTexture=rt;camera.Render();var prior=RenderTexture.active;RenderTexture.active=rt;
-            var tex=new Texture2D(1600,1000,TextureFormat.RGB24,false);tex.ReadPixels(new Rect(0,0,1600,1000),0,0);tex.Apply();File.WriteAllBytes("Logs/Circuit02_Preview_"+i+".png",tex.EncodeToPNG());
+            var tex=new Texture2D(1600,1000,TextureFormat.RGB24,false);tex.ReadPixels(new Rect(0,0,1600,1000),0,0);tex.Apply();File.WriteAllBytes("Logs/Circuit03_Preview_"+i+".png",tex.EncodeToPNG());
             RenderTexture.active=prior;camera.targetTexture=null;rt.Release();Object.DestroyImmediate(rt);Object.DestroyImmediate(tex);
         }
         Object.DestroyImmediate(go);

@@ -1,0 +1,58 @@
+[
+  {
+    "asset": "forest_floor",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forest_floor/forest_floor_diff_2k.jpg",
+    "md5": "a93f845fca105e6cabc82853161ff7b6",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/forest_floor"
+  },
+  {
+    "asset": "forest_floor",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forest_floor/forest_floor_nor_gl_2k.jpg",
+    "md5": "41e49ec58f74a749e325f59290266e9d",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/forest_floor"
+  },
+  {
+    "asset": "mud_forest",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/mud_forest/mud_forest_diff_2k.jpg",
+    "md5": "e78c6eae192daae3d00a677a588d1739",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/mud_forest"
+  },
+  {
+    "asset": "mud_forest",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/mud_forest/mud_forest_nor_gl_2k.jpg",
+    "md5": "17635ab324ff50542465d7a4284502e3",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/mud_forest"
+  },
+  {
+    "asset": "mossy_rock",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/mossy_rock/mossy_rock_diff_2k.jpg",
+    "md5": "8e55bbeeef1db0d2d0cae85515812c46",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/mossy_rock"
+  },
+  {
+    "asset": "mossy_rock",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/mossy_rock/mossy_rock_nor_gl_2k.jpg",
+    "md5": "e6b611c8a6f8e3276e7f5491c8e66a0f",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/mossy_rock"
+  },
+  {
+    "asset": "kloofendal_overcast",
+    "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/kloofendal_overcast_2k.hdr",
+    "md5": "69d4466c74c4d62704db12a6a20dd434",
+    "license": "CC0",
+    "source": "https://polyhaven.com/a/kloofendal_overcast"
+  },
+  {
+    "asset": "Kenney Nature Kit 2.1",
+    "url": "https://kenney.nl/media/pages/assets/nature-kit/37ac38a37b-1677698939/kenney_nature-kit.zip",
+    "sha256": "fa7974a0d342bfe63c38664ba9f8ec1a4aab8ea25f099bdc56870e33588c4d9d",
+    "license": "CC0",
+    "source": "https://kenney.nl/assets/nature-kit"
+  }
+]
