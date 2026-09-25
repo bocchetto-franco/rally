@@ -13,11 +13,11 @@
 
 - Ya existe un frontend funcional antes de la carrera. Al entrar en Play, el proyecto debe comenzar en `Assets/Scenes/MainMenu.unity` mediante `EditorSceneManager.playModeStartScene`.
 - El botón **Jugar** de `MainMenu` abre `Assets/Scenes/VehicleCircuitSelection.unity`.
-- La selección actual ofrece un único auto, **Porsche 911 SC Rally**, y un único circuito, **Circuit 01**. `RallyGameSession` conserva ambas selecciones en PlayerPrefs (`Rally.SelectedVehicle` y `Rally.SelectedCircuit`).
-- El botón para iniciar la carrera guarda la selección y carga `Assets/Scenes/Circuit_01.unity`.
+- La selección ofrece un único auto, **Porsche 911 SC Rally**, y tres circuitos: **Circuit_01**, **Circuit_02** y **Circuit_03**. `RallyGameSession` conserva ambas selecciones en PlayerPrefs (`Rally.SelectedVehicle` y `Rally.SelectedCircuit`).
+- Cada botón de pista actualiza la selección; **Comenzar carrera** carga la escena correspondiente. `Circuit_01` conserva su carrera con checkpoints/resultados. `Circuit_02` y `Circuit_03` se ofrecen como recorridos libres hasta que se agregue su gameplay de carrera.
 - En `Circuit_01`, el GameObject `Race Flow` usa `RallyRaceFlow`: al finalizar congela el Porsche, deshabilita el control y la dinámica adicional, pausa con `Time.timeScale = 0` y muestra un Canvas con tiempo final, reinicio, ranking y regreso a selección. El ranking guarda los cinco mejores tiempos por circuito en PlayerPrefs bajo `Rally.BestTimes.*`. Los botones restauran `Time.timeScale = 1` antes de cambiar o recargar escena.
 - Desde resultados se puede repetir la carrera, volver a selección o regresar al menú principal.
-- El orden esperado en Build Settings es: `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `RaceResults`.
+- El orden esperado en Build Settings es: `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `Circuit_02`, `Circuit_03`, `RaceResults`.
 - La configuración y reparación de este flujo se centraliza en `Assets/Editor/RallyFrontendSetup.cs` y su comportamiento en `Assets/Scripts/RallyMenuController.cs`. No cambiar los nombres de escena sin actualizar ambas partes.
 
 ## Estado de `Circuit_01`
@@ -66,7 +66,7 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - `Assets/Scenes/Circuit_03.unity`: loop de bosque/montaña independiente de aproximadamente 1700 m, dos horquillas de 180° (radios 28/22 m), chicana y curvas encadenadas, una recta larga de 130 m y tres desniveles más pronunciados (+20, +28 y -10 m). Tiene 380 coníferas, 240 arbustos, 180 plantas bajas y 50 rocas low-poly con mallas/materiales compartidos, instancing y descarte por distancia. Generadores: `Assets/Editor/Circuit03Builder.cs` y `Circuit03ForestAssets.cs`.
 - Ambos tienen cuatro charcos de 6 × 10 m sobre hondonadas de 0.28 m, fardos visuales y cuatro grupos de 20 espectadores combinados por material. El público queda fuera de las barreras; separación mínima del cuerpo completo medida: 14.42 m en Circuit_02 y 14.39 m en Circuit_03.
 - Por pedido explícito, **no tienen checkpoints, timer, lógica de charcos ni física de fardos**. No agregar esos sistemas automáticamente. Los Porsche de prueba están activos en la salida y conservan su configuración de Circuit_01.
-- Para conducirlos desde el editor: **Tools → Rally → Play Circuit 02/03 - Free Drive**. Al salir se restaura la escena de inicio anterior. El frontend y Build Settings existentes siguen sin modificarse: todavía no ofrecen estas pistas como carreras.
+- Para conducirlos desde el editor: **Tools → Rally → Play Circuit 02/03 - Free Drive**. Al salir se restaura la escena de inicio anterior. El frontend también ofrece ambas pistas como recorridos libres. Todavía no tienen resultados ni cronómetro.
 - No reemplazar ni regenerar el Terrain de Circuit_01. Cada escena nueva tiene su propio TerrainData. `Circuit02Layout.json` / `Circuit03Layout.json`, junto a sus respectivos terrenos, documentan línea central, distancias, anchos, charcos y público para conectar gameplay más adelante.
 - No reutilizar en Circuit_02/03 el bake de iluminación/occlusion de Circuit_01. Las cámaras nuevas tienen occlusion desactivado hasta hacer un bake propio; no cambiar la configuración de la cámara original.
 
@@ -109,7 +109,7 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - `Assets/Art/Environment/`: assets ambientales, texturas, materiales y prefabs usados en el paisaje árido.
 - `Assets/Editor/`: herramientas de configuración del frontend, circuito, ambiente y optimización.
 - `Assets/JS Vehicle Physics Controller/`: asset principal de físicas del vehículo, con modelos, audio, materiales, postprocesado, prefabs, escenas, scripts, skyboxes y UI. No alterar el auto de policía original.
-- `Assets/Scenes/`: escenas propias, incluidas `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `RaceResults` y escenas auxiliares como `Circuit_Test_01`.
+- `Assets/Scenes/`: escenas propias, incluidas `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `Circuit_02`, `Circuit_03`, `RaceResults` y escenas auxiliares como `Circuit_Test_01`.
 - `Assets/Scripts/`: lógica propia de menú y selección, flujo de carrera, checkpoints, timer, HUD, reinicio, charcos y comportamiento adicional del vehículo.
 - `Assets/Settings/`: configuración de URP, renderers, perfiles de volumen y ajustes globales de render.
 - `Assets/TutorialInfo/`: recursos y archivos informativos generados por la plantilla o tutorial de Unity.

@@ -12,10 +12,12 @@ public static class RallyFrontendSetup
     const string MainMenuPath = "Assets/Scenes/MainMenu.unity";
     const string SelectionPath = "Assets/Scenes/VehicleCircuitSelection.unity";
     const string RacePath = "Assets/Scenes/Circuit_01.unity";
+    const string Race02Path = "Assets/Scenes/Circuit_02.unity";
+    const string Race03Path = "Assets/Scenes/Circuit_03.unity";
     const string ResultsPath = "Assets/Scenes/RaceResults.unity";
     const string RaceFlowName = "Race Flow";
 
-    static readonly string[] BuildScenePaths = { MainMenuPath, SelectionPath, RacePath, ResultsPath };
+    static readonly string[] BuildScenePaths = { MainMenuPath, SelectionPath, RacePath, Race02Path, Race03Path, ResultsPath };
     static bool busy;
 
     static RallyFrontendSetup() => EditorApplication.delayCall += InstallOnce;
@@ -33,8 +35,10 @@ public static class RallyFrontendSetup
         bool scenesMissing = !File.Exists(MainMenuPath) || !File.Exists(SelectionPath) || !File.Exists(ResultsPath);
         bool buildSettingsMissing = !BuildScenePaths.SequenceEqual(EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(scene => scene.path));
         bool raceFlowMissing = SceneManager.GetActiveScene().path == RacePath && GameObject.Find(RaceFlowName) == null;
-        if (scenesMissing || buildSettingsMissing || raceFlowMissing)
+        if (scenesMissing || raceFlowMissing)
             BuildAll();
+        else if (buildSettingsMissing)
+            EditorBuildSettings.scenes = BuildScenePaths.Select(path => new EditorBuildSettingsScene(path, true)).ToArray();
 
         // Unity normally starts Play Mode from whichever scene happens to be
         // open in the editor. Circuit/environment tools intentionally leave
@@ -97,7 +101,7 @@ public static class RallyFrontendSetup
             // Leave the project at the real entry point so pressing Play tests
             // the complete frontend flow instead of starting inside the race.
             EditorSceneManager.OpenScene(MainMenuPath, OpenSceneMode.Single);
-            Debug.Log("RALLY_FRONTEND_OK: MainMenu -> VehicleCircuitSelection -> Circuit_01 -> RaceResults; build settings updated.");
+            Debug.Log("RALLY_FRONTEND_OK: MainMenu -> VehicleCircuitSelection -> Circuit_01/02/03 -> RaceResults; build settings updated.");
         }
         catch (Exception exception)
         {

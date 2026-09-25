@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Circuit_01.unity
     guid: b22d30c455b51a24898e2d1235879c48
   - enabled: 1
+    path: Assets/Scenes/Circuit_02.unity
+    guid: d3e7371f29dbde04d9f464987b91a871
+  - enabled: 1
+    path: Assets/Scenes/Circuit_03.unity
+    guid: efc1c8e73f78f334cae19f09f56dd1b3
+  - enabled: 1
     path: Assets/Scenes/RaceResults.unity
     guid: 2b28c158fbf72ce4fb3570680aac98bb
   m_configObjects:
