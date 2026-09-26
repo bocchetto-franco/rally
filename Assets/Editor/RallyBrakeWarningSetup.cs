@@ -9,6 +9,7 @@ using UnityEngine.ProBuilder;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
+[InitializeOnLoad]
 public static class RallyBrakeWarningSetup
 {
     const string RootName = "Rally Brake Warnings";
@@ -23,6 +24,25 @@ public static class RallyBrakeWarningSetup
     sealed class Layout { public Vector3[] centerline; public float[] distances; public float[] roadWidths; }
     sealed class Route { public readonly List<Vector3> points = new List<Vector3>(); public readonly List<float> distance = new List<float>(); public readonly List<float> width = new List<float>(); public float length; }
     sealed class Curve { public float start, end, angle, radius; }
+
+    static RallyBrakeWarningSetup()
+    {
+        EditorApplication.update += ProcessRequest;
+    }
+
+    static void ProcessRequest()
+    {
+        const string request = "Logs/brake-warning-request.txt";
+        if (EditorApplication.isCompiling || EditorApplication.isUpdating || EditorApplication.isPlayingOrWillChangePlaymode || !File.Exists(request)) return;
+        EditorApplication.update -= ProcessRequest;
+        File.Move(request, request + ".consumed-" + DateTime.Now.Ticks);
+        try { InstallAll(); }
+        catch (Exception exception)
+        {
+            File.WriteAllText("Logs/brake-warning-error.txt", exception.ToString());
+            Debug.LogException(exception);
+        }
+    }
 
     [MenuItem("Tools/Rally/Install Brake Warnings In All Circuits")]
     public static void InstallAll()

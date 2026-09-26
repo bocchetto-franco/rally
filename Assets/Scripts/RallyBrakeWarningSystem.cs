@@ -100,6 +100,6 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         warningText.fontSize = 42f;
         warningText.fontStyle = FontStyles.Bold;
         warningText.color = new Color(1f, .72f, .08f, 1f);
-        warningText.enableWordWrapping = false;
+        warningText.textWrappingMode = TextWrappingModes.NoWrap;
     }
 }
