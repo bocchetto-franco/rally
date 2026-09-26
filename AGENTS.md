@@ -6,7 +6,7 @@
 - El pipeline de render es Universal Render Pipeline (URP).
 - El auto principal es el Porsche de `Assets/auto/`. El auto de policía original permanece desactivado en la escena como referencia y alternativa de recuperación.
 - La escena de desarrollo para probar el auto es `Assets/JS Vehicle Physics Controller/Scene AMR/PC Controller Scene AMR 01.unity`.
-- La primera pista jugable es `Assets/Scenes/Circuit_01.unity`.
+- Hay tres circuitos jugables y seleccionables: `Circuit_01`, `Circuit_02` y `Circuit_03` (`Assets/Scenes/Circuit_0X.unity`). `Circuit_01` es un loop desértico recortado; `Circuit_02` es otro loop desértico de estilo similar; `Circuit_03` es un circuito de bosque/montaña con sus propias texturas y vegetación. No reutilizar en `Circuit_03` los assets desérticos.
 - `Active Input Handling` está configurado como `Both` en Player Settings; no cambiarlo.
 
 ## Flujo de escenas y carrera
@@ -14,9 +14,10 @@
 - Ya existe un frontend funcional antes de la carrera. Al entrar en Play, el proyecto debe comenzar en `Assets/Scenes/MainMenu.unity` mediante `EditorSceneManager.playModeStartScene`.
 - El botón **Jugar** de `MainMenu` abre `Assets/Scenes/VehicleCircuitSelection.unity`.
 - La selección ofrece un único auto, **Porsche 911 SC Rally**, y tres circuitos: **Circuit_01**, **Circuit_02** y **Circuit_03**. `RallyGameSession` conserva ambas selecciones en PlayerPrefs (`Rally.SelectedVehicle` y `Rally.SelectedCircuit`).
-- Cada botón de pista actualiza la selección; **Comenzar carrera** carga la escena correspondiente. `Circuit_01` conserva su carrera con checkpoints/resultados. `Circuit_02` y `Circuit_03` se ofrecen como recorridos libres hasta que se agregue su gameplay de carrera.
+- La selección incluye los tres circuitos; cada botón actualiza la pista y **Comenzar carrera** carga la escena correcta. `Circuit_01` tiene carrera cronometrada, checkpoints y resultados. `Circuit_02` y `Circuit_03` son jugables en modo recorrido libre; todavía no tienen checkpoints, timer ni resultados.
 - En `Circuit_01`, el GameObject `Race Flow` usa `RallyRaceFlow`: al finalizar congela el Porsche, deshabilita el control y la dinámica adicional, pausa con `Time.timeScale = 0` y muestra un Canvas con tiempo final, reinicio, ranking y regreso a selección. El ranking guarda los cinco mejores tiempos por circuito en PlayerPrefs bajo `Rally.BestTimes.*`. Los botones restauran `Time.timeScale = 1` antes de cambiar o recargar escena.
 - Desde resultados se puede repetir la carrera, volver a selección o regresar al menú principal.
+- Al completar una vuelta en `Circuit_01`, aparece el menú de fin de carrera con el tiempo, **Reiniciar**, **Ver tiempos** (cinco mejores guardados por pista mediante PlayerPrefs) y **Volver al menú**, que retorna a la selección de auto/pista.
 - El orden esperado en Build Settings es: `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `Circuit_02`, `Circuit_03`, `RaceResults`.
 - La configuración y reparación de este flujo se centraliza en `Assets/Editor/RallyFrontendSetup.cs` y su comportamiento en `Assets/Scripts/RallyMenuController.cs`. No cambiar los nombres de escena sin actualizar ambas partes.
 
@@ -87,6 +88,7 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - El auto principal utiliza el asset de físicas de `Assets/JS Vehicle Physics Controller/`. Reutilizar y configurar ese sistema; no reescribir las físicas desde cero.
 - Los cuatro WheelColliders y la física del Porsche fueron afinados manualmente durante muchas iteraciones para un feeling específico de rally arcade: alto derrape lateral trasero, `Mass` ajustada, `Angular Damping` aumentado, mayor `Steer Angle`, respuesta de dirección más rápida y curvas de `Sideways Friction` y `Forward Friction` personalizadas.
 - No revertir ni modificar `Mass`, `Angular Damping`, `Sideways Friction`, `Forward Friction`, `Steer Angle` o la velocidad de respuesta del volante sin una petición explícita del usuario.
+- La asistencia de estabilización anti-trompo de `RallyVehicleDynamics` es parte del tuning intencional del Porsche. No desactivarla ni revertir su umbral o fuerza correctiva sin petición explícita.
 - Nunca modificar ni borrar el auto de policía original incluido dentro de la carpeta del asset. Para hacer pruebas o variantes, desactivarlo o duplicarlo.
 - Mantener URP y usar shaders y materiales compatibles con URP.
 - No romper la geometría, los checkpoints, los triggers de charcos ni la física de los fardos al trabajar únicamente sobre arte o rendimiento.
@@ -102,7 +104,9 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 
 ## Pendientes conocidos
 
-- Continuar midiendo rendimiento y aplicar LOD donde aporte una mejora comprobable sin una pérdida visual notoria.
+- Medir el rendimiento en ejecución y evaluar LOD con mallas de menor detalle donde aporte una mejora comprobable sin pérdida visual notoria.
+- Próximo desarrollo: IA de rivales controlados por bots, con waypoints y comportamiento de manejo.
+- Próximo desarrollo: avisos de frenada estilo rally (notas del copiloto) antes de curvas; todavía no implementados.
 
 ## Estructura actual de `Assets`
 
