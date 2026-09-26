@@ -43,6 +43,15 @@ public sealed class RallyRaceFlow : MonoBehaviour
     {
         finishHandled = true;
         elapsedTime = Mathf.Max(0f, elapsedTime);
+        string sceneName = SceneManager.GetActiveScene().name;
+        for (int i = 0; i < RallyGameSession.CircuitScenes.Length; i++)
+        {
+            if (RallyGameSession.CircuitScenes[i] == sceneName)
+            {
+                RallyGameSession.SelectCircuit(i);
+                break;
+            }
+        }
         RallyGameSession.RecordResult(elapsedTime);
         SaveBestTime(elapsedTime);
         FreezeVehicle();
@@ -93,7 +102,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
 
     static string CircuitKey
     {
-        get { string circuit = string.IsNullOrWhiteSpace(RallyGameSession.SelectedCircuit) ? RallyGameSession.CircuitName : RallyGameSession.SelectedCircuit; return BestTimesPrefix + circuit.Replace(" ", "_"); }
+        get { return BestTimesPrefix + SceneManager.GetActiveScene().name; }
     }
 
     static void SaveBestTime(float elapsedTime)
@@ -115,7 +124,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
     static string BestTimesLabel()
     {
         List<float> times = LoadBestTimes();
-        return times.Count == 0 ? "TODAVÍA NO HAY TIEMPOS GUARDADOS" : "MEJORES TIEMPOS  •  CIRCUIT 01\n" + string.Join("     ", times.Select((time, index) => $"{index + 1}. {RallyGameSession.FormatTime(time)}"));
+        return times.Count == 0 ? "TODAVÍA NO HAY TIEMPOS GUARDADOS" : "MEJORES TIEMPOS  •  " + SceneManager.GetActiveScene().name.ToUpperInvariant() + "\n" + string.Join("     ", times.Select((time, index) => $"{index + 1}. {RallyGameSession.FormatTime(time)}"));
     }
 
     static void EnsureEventSystem() { if (FindAnyObjectByType<EventSystem>() == null) new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule)); }

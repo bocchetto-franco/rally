@@ -12,8 +12,8 @@ public sealed class RallyBotController : MonoBehaviour
     [SerializeField, Min(2f)] private float waypointReachDistance = 6f;
 
     [Header("Difficulty")]
-    [SerializeField, Min(10f)] private float maxSpeedKph = 95f;
-    [SerializeField, Range(0f, 1f)] private float cornerBrakingAggressiveness = 0.7f;
+    [SerializeField, Min(10f)] private float maxSpeedKph = 80f;
+    [SerializeField, Range(0f, 1f)] private float cornerBrakingAggressiveness = 0.95f;
 
     private Transform[] waypoints;
     private int targetIndex;
@@ -22,6 +22,7 @@ public sealed class RallyBotController : MonoBehaviour
     public float VerticalInput { get; private set; }
     public float HorizontalInput { get; private set; }
     public bool Braking => VerticalInput < -0.1f;
+    public int CurrentWaypointIndex => targetIndex;
 
     public void Configure(JrsVehicleController controller, Rigidbody body, Transform route = null)
     {
@@ -30,6 +31,12 @@ public sealed class RallyBotController : MonoBehaviour
         waypointRoot = route;
         routeReady = false;
         waypoints = null;
+    }
+
+    public void SetDifficulty(float speedKph, float brakingAggressiveness)
+    {
+        maxSpeedKph = Mathf.Max(10f, speedKph);
+        cornerBrakingAggressiveness = Mathf.Clamp01(brakingAggressiveness);
     }
 
     private void Awake()
@@ -61,20 +68,33 @@ public sealed class RallyBotController : MonoBehaviour
         Vector3 toTarget = Vector3.ProjectOnPlane(waypoints[targetIndex].position - position, Vector3.up);
         float steeringAngle = toTarget.sqrMagnitude > 0.01f
             ? Vector3.SignedAngle(forward, toTarget, Vector3.up) : 0f;
-        HorizontalInput = Mathf.Clamp(steeringAngle / 32f, -1f, 1f);
+        float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
+        float steeringDenominator = Mathf.Lerp(36f, 55f, Mathf.Clamp01(speedKph / maxSpeedKph));
+        float requestedSteering = Mathf.Clamp(steeringAngle / steeringDenominator, -1f, 1f);
+        HorizontalInput = Mathf.MoveTowards(HorizontalInput, requestedSteering, 3f * Time.fixedDeltaTime);
 
-        // Look one segment ahead so the car brakes before arriving at a hairpin.
-        int next = (targetIndex + 1) % waypoints.Length;
-        int afterNext = (next + 1) % waypoints.Length;
-        Vector3 firstLeg = Vector3.ProjectOnPlane(waypoints[next].position - waypoints[targetIndex].position, Vector3.up);
-        Vector3 secondLeg = Vector3.ProjectOnPlane(waypoints[afterNext].position - waypoints[next].position, Vector3.up);
-        float upcomingTurn = firstLeg.sqrMagnitude > 0.01f && secondLeg.sqrMagnitude > 0.01f
-            ? Vector3.Angle(firstLeg, secondLeg) : 0f;
-        float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(steeringAngle), upcomingTurn * 1.4f) / 75f);
-        float minimumCornerSpeed = Mathf.Min(28f, maxSpeedKph);
+        // Accumulate heading changes over up to 90 m of road, not just the next
+        // waypoint. Closely spaced hairpin points would otherwise look harmless.
+        float lookAhead = Mathf.Lerp(45f, 90f, Mathf.Clamp01(speedKph / maxSpeedKph));
+        float upcomingTurn = 0f;
+        float distanceAhead = toTarget.magnitude;
+        Vector3 previousLeg = Vector3.zero;
+        for (int step = 0; step < waypoints.Length - 1 && distanceAhead < lookAhead; step++)
+        {
+            int from = (targetIndex + step) % waypoints.Length;
+            int to = (from + 1) % waypoints.Length;
+            Vector3 leg = Vector3.ProjectOnPlane(waypoints[to].position - waypoints[from].position, Vector3.up);
+            if (leg.sqrMagnitude < 0.01f)
+                continue;
+            if (previousLeg.sqrMagnitude > 0.01f)
+                upcomingTurn += Vector3.Angle(previousLeg, leg) * Mathf.Lerp(1f, 0.55f, distanceAhead / lookAhead);
+            distanceAhead += leg.magnitude;
+            previousLeg = leg;
+        }
+        float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(steeringAngle), upcomingTurn) / 90f);
+        float minimumCornerSpeed = Mathf.Min(24f, maxSpeedKph);
         float targetSpeed = Mathf.Lerp(maxSpeedKph, minimumCornerSpeed,
             cornerSeverity * cornerBrakingAggressiveness);
-        float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
 
         VerticalInput = speedKph > targetSpeed + 4f ? -1f : speedKph < targetSpeed - 2f ? 1f : 0f;
     }

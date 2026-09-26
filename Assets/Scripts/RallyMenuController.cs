@@ -246,9 +246,7 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         int selected = Array.IndexOf(RallyGameSession.CircuitNames, RallyGameSession.SelectedCircuit);
         selectedCircuitTitle.text = RallyGameSession.SelectedRaceScene.ToUpperInvariant();
-        selectedCircuitDetails.text = selected == 0
-            ? "RALLYCROSS  •  CRONÓMETRO Y RESULTADOS"
-            : "RECORRIDO LIBRE  •  SISTEMA DE CARRERA PENDIENTE";
+        selectedCircuitDetails.text = "RALLYCROSS  •  CRONÓMETRO Y RESULTADOS";
         for (int i = 0; i < circuitButtons.Length; i++)
         {
             bool active = i == selected;

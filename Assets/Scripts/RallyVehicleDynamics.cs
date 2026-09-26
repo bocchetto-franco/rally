@@ -11,6 +11,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private WheelCollider frontRight;
     [SerializeField] private WheelCollider rearLeft;
     [SerializeField] private WheelCollider rearRight;
+    [SerializeField] private RallyBotGripProfile botGripProfile;
 
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;
@@ -359,6 +360,23 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             return;
 
         MigratePreviousTuningValues();
+        if (botInput != null && botGripProfile != null)
+        {
+            // Only the bot's own RallyVehicleDynamics instance receives this profile.
+            forwardExtremumValue = botGripProfile.frontForwardExtremumValue;
+            forwardAsymptoteValue = botGripProfile.frontForwardAsymptoteValue;
+            rearForwardExtremumValue = botGripProfile.rearForwardExtremumValue;
+            rearForwardAsymptoteValue = botGripProfile.rearForwardAsymptoteValue;
+            forwardStiffness = botGripProfile.forwardStiffness;
+            frontSideExtremumValue = botGripProfile.frontSideExtremumValue;
+            frontSideAsymptoteValue = botGripProfile.frontSideAsymptoteValue;
+            frontSideStiffness = botGripProfile.frontSideStiffness;
+            rearSideExtremumSlip = botGripProfile.rearSideExtremumSlip;
+            rearSideExtremumValue = botGripProfile.rearSideExtremumValue;
+            rearSideAsymptoteSlip = botGripProfile.rearSideAsymptoteSlip;
+            rearSideAsymptoteValue = botGripProfile.rearSideAsymptoteValue;
+            rearSideStiffness = botGripProfile.rearSideStiffness;
+        }
 
         if (rearLeftDriftSmoke == null)
             rearLeftDriftSmoke = controller.rearLeftDustParticleSystem;
