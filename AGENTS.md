@@ -40,14 +40,15 @@
 - Vegetación de `Circuit_01`: 80 árboles Quiver, 850 Searsia Lucida, 180 arbustos rooibos y 195 pastos. Arbustos y pastos usan Terrain Details con `alignToGround = 1`; los árboles siguen la normal del Terrain.
 - `Circuit01VegetationRepair.cs` repara/revalida las plantaciones y aumenta densidad sin tocar gameplay. Conservar la corrección de ejes del FBX al hornear mallas (Quiver tiene rotación raíz de -90° en X); no cancelarla con `worldToLocalMatrix` de la raíz. Comprobar el volumen de la planta y el jitter de Terrain Details contra el camino, no solo su centro.
 
-- Ya se aplicaron manualmente Half Res en texturas, menor distancia de sombras, menor Far Clip Plane y Occlusion Culling baked.
+- Ya se aplicaron manualmente Half Res en texturas, menor distancia de sombras y menor Far Clip Plane. En la revisión posterior se comprobó que ningún `Circuit_0*` tenía un asset de Occlusion Culling baked referenciado; ahora cada uno tiene su propio bake en `Assets/Scenes/Circuit_01/`, `Circuit_02/` y `Circuit_03/` (archivo `OcclusionCullingData.asset`). Rehornear la escena correspondiente después de cambiar su geometría o terreno.
 - En la optimización más reciente, aproximadamente 292 colocaciones superiores de vegetación (195 pastos y 97 arbustos, que expandían a unos 4092 GameObjects) se migraron a Terrain Details. Se conservaron 73 colocaciones de rocas como GameObjects.
 - Los Terrain Details quedaron con resolución `1024`, patch resolution `32`, distancia de dibujo `180 m` y densidad `1`.
 - Se desactivó la feature SSAO del renderer de PC (`Assets/Settings/PC_Renderer.asset`). `Circuit_01` no tiene Volumes de postprocesado y su cámara no usa postprocesado.
 - Solo la luz direccional principal queda activa en tiempo real; las luces auxiliares encontradas en vehículos están desactivadas.
 - Se auditaron 32 texturas de ambiente y ninguna supera 2048 px. Se limitaron a 1024 px y con compresión las texturas de pasto y cinco texturas del sample de agua (`FlipbookTest`, `foam_detail_tiling`, `foam_mask`, `ocean_foam_blend_ramp`, `puddle_norm`).
 - `Assets/Editor/Circuit01PerformanceSetup.cs` contiene la automatización de optimización y `Assets/Editor/Circuit01EnvironmentSetup.cs` vuelve a convertir la vegetación a Terrain Details si se reconstruye el ambiente.
-- La revisión e incorporación de LOD adicionales sigue siendo trabajo de optimización en curso; no afirmar que está terminada sin volver a medir la escena.
+- LOD auditado en los tres circuitos: vegetación y grupos grandes de público ya tenían `LODGroup`; se añadieron grupos de LOD con descarte conservador a 1.5% de altura de pantalla a los cuatro grupos pequeños de espectadores de `Circuit_01`. Esto no reemplaza las mallas por variantes de menor poligonaje; no afirmar una mejora de FPS sin medirla.
+- Los tres Terrain mantienen `Tree Distance = 5000 m` y `Detail Distance = 180 m`. Las nuevas texturas de bosque/Poly Haven son 2K con compresión en el importador; no se modificaron sombras, resolución ni otros ajustes generales de calidad durante esta revisión.
 
 ## Assets reutilizables para nuevos circuitos
 
@@ -68,7 +69,7 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - Por pedido explícito, **no tienen checkpoints, timer, lógica de charcos ni física de fardos**. No agregar esos sistemas automáticamente. Los Porsche de prueba están activos en la salida y conservan su configuración de Circuit_01.
 - Para conducirlos desde el editor: **Tools → Rally → Play Circuit 02/03 - Free Drive**. Al salir se restaura la escena de inicio anterior. El frontend también ofrece ambas pistas como recorridos libres. Todavía no tienen resultados ni cronómetro.
 - No reemplazar ni regenerar el Terrain de Circuit_01. Cada escena nueva tiene su propio TerrainData. `Circuit02Layout.json` / `Circuit03Layout.json`, junto a sus respectivos terrenos, documentan línea central, distancias, anchos, charcos y público para conectar gameplay más adelante.
-- No reutilizar en Circuit_02/03 el bake de iluminación/occlusion de Circuit_01. Las cámaras nuevas tienen occlusion desactivado hasta hacer un bake propio; no cambiar la configuración de la cámara original.
+- No reutilizar el bake de oclusión de Circuit_01 en Circuit_02/03: cada circuito tiene su `Assets/Scenes/Circuit_0X/OcclusionCullingData.asset` propio y su cámara con Occlusion Culling activado. Rehornear por separado cuando cambie la geometría estática.
 
 ### Assets de bosque reutilizables (Circuit_03)
 
