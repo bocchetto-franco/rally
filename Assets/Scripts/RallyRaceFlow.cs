@@ -26,9 +26,11 @@ public sealed class RallyRaceFlow : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (checkpointManager == null) checkpointManager = FindAnyObjectByType<RallyCheckpointManager>();
-        vehicleController = FindAnyObjectByType<JrsVehicleController>();
+        GameObject playerCar = GameObject.Find("Porsche 911 SC Rally");
+        vehicleController = playerCar != null ? playerCar.GetComponent<JrsVehicleController>() : null;
         vehicleBody = vehicleController != null ? vehicleController.GetComponent<Rigidbody>() : null;
-        vehicleDynamics = FindAnyObjectByType<RallyVehicleDynamics>();
+        GameObject playerDynamics = GameObject.Find("Porsche Rally Dynamics");
+        vehicleDynamics = playerDynamics != null ? playerDynamics.GetComponent<RallyVehicleDynamics>() : null;
     }
 
     void Update()

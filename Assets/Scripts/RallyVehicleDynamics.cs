@@ -90,6 +90,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     private bool rearLeftSmokeActive;
     private bool rearRightSmokeActive;
     private JrsInputController inputController;
+    [SerializeField] private RallyBotController botInput;
+
+    public void SetBotInput(RallyBotController input) => botInput = input;
 
     public bool HasConfiguredHighSpeedEffects =>
         rearLeftDriftSmoke != null &&
@@ -268,12 +271,13 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         }
 
         float forwardSpeedKph = Vector3.Dot(vehicleBody.linearVelocity, vehicleBody.transform.forward) * 3.6f;
-        bool reverseInput = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
-                            (inputController != null && inputController.GetVerticalInput() < -0.1f);
+        bool reverseInput = botInput != null ? botInput.Braking :
+            Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
+            (inputController != null && inputController.GetVerticalInput() < -0.1f);
         bool serviceBrake = reverseInput && forwardSpeedKph > serviceBrakeMinimumForwardSpeedKph;
-        bool handbrake = Input.GetKey(KeyCode.Space) ||
+        bool handbrake = botInput == null && (Input.GetKey(KeyCode.Space) ||
                          (inputController != null && inputController.brakeButton != null &&
-                          inputController.brakeButton.IsButtonPressed());
+                          inputController.brakeButton.IsButtonPressed()));
 
         float frontTorque = serviceBrake ? frontServiceBrakeTorque : 0f;
         float rearTorque = serviceBrake ? rearServiceBrakeTorque : 0f;

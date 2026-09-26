@@ -50,6 +50,9 @@ public class JrsVehicleController : MonoBehaviour
     private Quaternion prevRotation; // Previous rotation of the wheel
 
     private JrsInputController mobileInputController;
+    [SerializeField] private RallyBotController botInput;
+
+    public void SetBotInput(RallyBotController input) => botInput = input;
 
     public AudioSource engineAudioSource; // Assign this in the Inspector
     private AudioClip engineSound;
@@ -91,8 +94,10 @@ public class JrsVehicleController : MonoBehaviour
             rb.centerOfMass = transform.InverseTransformPoint(centerOfMassObject.transform.position);
         }
 
-        float v = mobileInputController != null ? mobileInputController.GetVerticalInput() : Input.GetAxis("Vertical") * motorForce;
-        float h = mobileInputController != null ? mobileInputController.GetHorizontalInput() : Input.GetAxis("Horizontal") * maxSteerAngle;
+        float v = botInput != null ? botInput.VerticalInput * motorForce :
+            mobileInputController != null ? mobileInputController.GetVerticalInput() : Input.GetAxis("Vertical") * motorForce;
+        float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
+            mobileInputController != null ? mobileInputController.GetHorizontalInput() : Input.GetAxis("Horizontal") * maxSteerAngle;
 
         // Apply motor torque to the wheels
         frontLeftWheel.motorTorque = v;
@@ -105,7 +110,9 @@ public class JrsVehicleController : MonoBehaviour
         // Update wheel poses
         UpdateWheelPoses();
 
-        if (Input.GetKey(KeyCode.Space) || mobileInputController.brakeButton.IsButtonPressed())
+        if (botInput == null && (Input.GetKey(KeyCode.Space) ||
+            (mobileInputController != null && mobileInputController.brakeButton != null &&
+             mobileInputController.brakeButton.IsButtonPressed())))
         {
             foreach (WheelCollider wheelCollider in wheelCollidersBrake)
             {
@@ -123,8 +130,10 @@ public class JrsVehicleController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float v = mobileInputController != null ? mobileInputController.GetVerticalInput() * motorForce : 0f;
-        float h = mobileInputController != null ? mobileInputController.GetHorizontalInput() * maxSteerAngle : 0f;
+        float v = botInput != null ? botInput.VerticalInput * motorForce :
+            mobileInputController != null ? mobileInputController.GetVerticalInput() * motorForce : 0f;
+        float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
+            mobileInputController != null ? mobileInputController.GetHorizontalInput() * maxSteerAngle : 0f;
 
         // Calculate the current wheel speed in km/h
         float currentSpeedKmph = frontLeftWheel.radius * Mathf.PI * frontLeftWheel.rpm * 60f / 1000f;

@@ -60,7 +60,7 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         JrsVehicleController vehicle = attachedBody != null
             ? attachedBody.GetComponent<JrsVehicleController>()
             : vehicleCollider.GetComponentInParent<JrsVehicleController>();
-        if (vehicle == null)
+        if (vehicle == null || vehicle.GetComponentInParent<RallyBotController>() != null)
             return;
 
         if (attachedBody == null)
@@ -95,7 +95,14 @@ public sealed class RallyCheckpointManager : MonoBehaviour
 
     void CacheInitialVehiclePose()
     {
-        JrsVehicleController vehicle = FindAnyObjectByType<JrsVehicleController>();
+        JrsVehicleController vehicle = null;
+        foreach (JrsVehicleController candidate in FindObjectsByType<JrsVehicleController>(FindObjectsSortMode.None))
+        {
+            if (candidate.GetComponentInParent<RallyBotController>() != null)
+                continue;
+            vehicle = candidate;
+            break;
+        }
         vehicleBody = vehicle != null ? vehicle.GetComponent<Rigidbody>() : null;
         if (vehicleBody == null)
             return;

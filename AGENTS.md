@@ -102,10 +102,17 @@ Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuen
 - Las dos ruedas traseras reutilizan los Particle Systems y el material de polvo incluidos en el asset. Cada emisor se activa independientemente al superar `0.18` de `sidewaysSlip`, se apaga por debajo de `0.12` y requiere al menos `25 km/h`.
 - El humo es solamente visual: no modifica las curvas de fricción ni aplica fuerzas al auto.
 
+## Waypoints de IA
+
+- Las tres escenas contienen una raíz `AI_Waypoints` con GameObjects vacíos ordenados como hijos: `Waypoint_01`, `Waypoint_02`, etc. Circuit_01 tiene 112 puntos; Circuit_02, 132; Circuit_03, 145.
+- Las posiciones se extraen del centro de las mallas actuales del camino, siguiendo desniveles y hondonadas. Separación aproximada: 18 m en rectas, 12 m en curvas abiertas y 8 m en curvas cerradas. Las conexiones entre puntos permanecen dentro del camino.
+- El orden de hijos sigue el sentido de carrera desde la salida. El último conecta con `Waypoint_01` para cerrar el loop, sin duplicar el punto inicial. Al implementar bots, usar el orden de hermanos (`Transform.GetChild`) y volver al índice cero después del último; no ordenar los nombres alfabéticamente.
+- Los waypoints solo tienen Transform: todavía no hay scripts de seguimiento, colliders, renderers ni comportamiento de bots.
+
 ## Pendientes conocidos
 
 - Medir el rendimiento en ejecución y evaluar LOD con mallas de menor detalle donde aporte una mejora comprobable sin pérdida visual notoria.
-- Próximo desarrollo: IA de rivales controlados por bots, con waypoints y comportamiento de manejo.
+- Próximo desarrollo: comportamiento de manejo de los bots sobre los waypoints ya colocados.
 - Próximo desarrollo: avisos de frenada estilo rally (notas del copiloto) antes de curvas; todavía no implementados.
 
 ## Estructura actual de `Assets`
