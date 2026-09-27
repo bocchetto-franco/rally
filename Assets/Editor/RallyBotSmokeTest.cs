@@ -32,6 +32,8 @@ public static class RallyBotSmokeTest
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/" + Scenes[index] + ".unity");
         SessionState.SetString(Prefix + "PlayStart", "");
         SessionState.SetInt(Prefix + "StartWaypoint", -1);
+        SessionState.SetFloat(Prefix + "MaxCrossTrack", 0f);
+        SessionState.SetInt(Prefix + "MaxCrossTrackWaypoint", -1);
         EditorApplication.isPlaying = true;
     }
 
@@ -81,6 +83,9 @@ public static class RallyBotSmokeTest
             FinishScene(index);
             return;
         }
+        RallyBotBoundaryProbe probe = body.GetComponent<RallyBotBoundaryProbe>();
+        if (probe == null)
+            probe = body.gameObject.AddComponent<RallyBotBoundaryProbe>();
         string started = SessionState.GetString(Prefix + "PlayStart", "");
         if (string.IsNullOrEmpty(started))
         {
@@ -89,14 +94,23 @@ public static class RallyBotSmokeTest
             return;
         }
         double elapsed = (DateTime.UtcNow - new DateTime(long.Parse(started), DateTimeKind.Utc)).TotalSeconds;
-        if (elapsed < 30.0)
+        if (bot.CrossTrackDistance > SessionState.GetFloat(Prefix + "MaxCrossTrack", 0f))
+        {
+            SessionState.SetFloat(Prefix + "MaxCrossTrack", bot.CrossTrackDistance);
+            SessionState.SetInt(Prefix + "MaxCrossTrackWaypoint", bot.CurrentWaypointIndex + 1);
+        }
+        if (elapsed < 100.0)
             return;
         int startWaypoint = SessionState.GetInt(Prefix + "StartWaypoint", -1);
-        string status = bot.CurrentWaypointIndex >= startWaypoint + 12 ? "PASS" : "CHECK";
+        string status = bot.CurrentWaypointIndex >= startWaypoint + 12 && probe.BoundaryHits == 0
+            ? "PASS" : "CHECK";
         File.AppendAllText(ResultPath,
             $"{Scenes[index]}: {status}; waypoint {startWaypoint + 1} -> {bot.CurrentWaypointIndex + 1}; " +
             $"bot speed {body.linearVelocity.magnitude * 3.6f:F1} km/h; player timer {manager.FormattedTime}; " +
-            $"checkpoints {manager.CheckpointCount}\n");
+            $"checkpoints {manager.CheckpointCount}; max cross-track " +
+            $"{SessionState.GetFloat(Prefix + "MaxCrossTrack", 0f):F1} m near waypoint " +
+            $"{SessionState.GetInt(Prefix + "MaxCrossTrackWaypoint", -1)}; " +
+            $"boundary hits {probe.BoundaryHits}\n");
         FinishScene(index);
     }
 

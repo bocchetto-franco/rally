@@ -13253,7 +13253,8 @@ MonoBehaviour:
   vehicle: {fileID: 4752136545530248355}
   vehicleBody: {fileID: 4217065990129624688}
   waypointRoot: {fileID: 0}
-  waypointReachDistance: 6
+  waypointReachDistance: 3.5
+  safeCorridorHalfWidth: 1.5
   maxSpeedKph: 80
   cornerBrakingAggressiveness: 0.95
 --- !u!114 &6533994807396338111

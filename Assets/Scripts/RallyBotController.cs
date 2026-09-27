@@ -9,7 +9,8 @@ public sealed class RallyBotController : MonoBehaviour
     [SerializeField] private JrsVehicleController vehicle;
     [SerializeField] private Rigidbody vehicleBody;
     [SerializeField] private Transform waypointRoot;
-    [SerializeField, Min(2f)] private float waypointReachDistance = 6f;
+    [SerializeField, Min(2f)] private float waypointReachDistance = 3.5f;
+    [SerializeField, Min(0.5f)] private float safeCorridorHalfWidth = 1.5f;
 
     [Header("Difficulty")]
     [SerializeField, Min(10f)] private float maxSpeedKph = 80f;
@@ -23,6 +24,7 @@ public sealed class RallyBotController : MonoBehaviour
     public float HorizontalInput { get; private set; }
     public bool Braking => VerticalInput < -0.1f;
     public int CurrentWaypointIndex => targetIndex;
+    public float CrossTrackDistance { get; private set; }
 
     public void Configure(JrsVehicleController controller, Rigidbody body, Transform route = null)
     {
@@ -63,22 +65,45 @@ public sealed class RallyBotController : MonoBehaviour
 
         Vector3 position = vehicleBody.position;
         Vector3 forward = Vector3.ProjectOnPlane(vehicleBody.transform.forward, Vector3.up).normalized;
-        AdvanceTarget(position, forward);
+        AdvanceTarget(position);
 
         Vector3 toTarget = Vector3.ProjectOnPlane(waypoints[targetIndex].position - position, Vector3.up);
-        float steeringAngle = toTarget.sqrMagnitude > 0.01f
-            ? Vector3.SignedAngle(forward, toTarget, Vector3.up) : 0f;
+        int previous = (targetIndex - 1 + waypoints.Length) % waypoints.Length;
+        int next = (targetIndex + 1) % waypoints.Length;
+        Vector3 segmentStart = waypoints[previous].position;
+        Vector3 segmentEnd = waypoints[targetIndex].position;
+        Vector3 pathDirection = Vector3.ProjectOnPlane(segmentEnd - segmentStart, Vector3.up).normalized;
+        if (pathDirection.sqrMagnitude < 0.01f)
+            pathDirection = forward;
+        Vector3 nextDirection = Vector3.ProjectOnPlane(waypoints[next].position - segmentEnd, Vector3.up).normalized;
+        float distanceToWaypoint = toTarget.magnitude;
+        float turnBlend = Mathf.Clamp01((20f - distanceToWaypoint) / 20f) * 0.45f;
+        Vector3 desiredDirection = nextDirection.sqrMagnitude > 0.01f
+            ? Vector3.Slerp(pathDirection, nextDirection, turnBlend).normalized : pathDirection;
+        float headingError = Vector3.SignedAngle(forward, desiredDirection, Vector3.up);
+
+        // Stanley-style correction: steer back toward the centerline instead of
+        // aiming straight at a waypoint and cutting across the inside of bends.
+        Vector3 planarPosition = Vector3.ProjectOnPlane(position, Vector3.up);
+        Vector3 planarStart = Vector3.ProjectOnPlane(segmentStart, Vector3.up);
+        Vector3 closest = planarStart + pathDirection * Mathf.Clamp(
+            Vector3.Dot(planarPosition - planarStart, pathDirection), 0f,
+            Vector3.ProjectOnPlane(segmentEnd - segmentStart, Vector3.up).magnitude);
+        float signedOffset = Vector3.Cross(pathDirection, planarPosition - closest).y;
+        CrossTrackDistance = Mathf.Abs(signedOffset);
         float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
+        float correctionAngle = Mathf.Atan2(5f * signedOffset,
+            12f + speedKph / 3.6f) * Mathf.Rad2Deg;
         float steeringDenominator = Mathf.Lerp(36f, 55f, Mathf.Clamp01(speedKph / maxSpeedKph));
-        float requestedSteering = Mathf.Clamp(steeringAngle / steeringDenominator, -1f, 1f);
+        float requestedSteering = Mathf.Clamp((headingError - correctionAngle) / steeringDenominator, -1f, 1f);
         HorizontalInput = Mathf.MoveTowards(HorizontalInput, requestedSteering, 3f * Time.fixedDeltaTime);
 
-        // Accumulate heading changes over up to 90 m of road, not just the next
+        // Accumulate heading changes over up to 110 m of road, not just the next
         // waypoint. Closely spaced hairpin points would otherwise look harmless.
-        float lookAhead = Mathf.Lerp(45f, 90f, Mathf.Clamp01(speedKph / maxSpeedKph));
+        float lookAhead = Mathf.Lerp(60f, 110f, Mathf.Clamp01(speedKph / maxSpeedKph));
         float upcomingTurn = 0f;
         float distanceAhead = toTarget.magnitude;
-        Vector3 previousLeg = Vector3.zero;
+        Vector3 previousLeg = pathDirection;
         for (int step = 0; step < waypoints.Length - 1 && distanceAhead < lookAhead; step++)
         {
             int from = (targetIndex + step) % waypoints.Length;
@@ -91,10 +116,13 @@ public sealed class RallyBotController : MonoBehaviour
             distanceAhead += leg.magnitude;
             previousLeg = leg;
         }
-        float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(steeringAngle), upcomingTurn) / 90f);
-        float minimumCornerSpeed = Mathf.Min(24f, maxSpeedKph);
+        float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(headingError), upcomingTurn) / 90f);
+        float minimumCornerSpeed = Mathf.Min(18f, maxSpeedKph);
         float targetSpeed = Mathf.Lerp(maxSpeedKph, minimumCornerSpeed,
             cornerSeverity * cornerBrakingAggressiveness);
+        float outsideCorridor = Mathf.Max(0f, CrossTrackDistance - safeCorridorHalfWidth);
+        float recoverySpeed = Mathf.Lerp(maxSpeedKph, 15f, Mathf.Clamp01(outsideCorridor / 2f));
+        targetSpeed = Mathf.Min(targetSpeed, recoverySpeed);
 
         VerticalInput = speedKph > targetSpeed + 4f ? -1f : speedKph < targetSpeed - 2f ? 1f : 0f;
     }
@@ -135,13 +163,17 @@ public sealed class RallyBotController : MonoBehaviour
         return true;
     }
 
-    private void AdvanceTarget(Vector3 position, Vector3 forward)
+    private void AdvanceTarget(Vector3 position)
     {
         for (int i = 0; i < waypoints.Length; i++)
         {
             Vector3 delta = Vector3.ProjectOnPlane(waypoints[targetIndex].position - position, Vector3.up);
             bool reached = delta.sqrMagnitude <= waypointReachDistance * waypointReachDistance;
-            bool justPassed = delta.magnitude < waypointReachDistance * 2f && Vector3.Dot(delta, forward) < -1f;
+            int previous = (targetIndex - 1 + waypoints.Length) % waypoints.Length;
+            Vector3 pathDirection = Vector3.ProjectOnPlane(
+                waypoints[targetIndex].position - waypoints[previous].position, Vector3.up);
+            bool justPassed = delta.magnitude < Mathf.Min(25f, pathDirection.magnitude + 8f) &&
+                Vector3.Dot(-delta, pathDirection) > 0f;
             if (!reached && !justPassed)
                 break;
             targetIndex = (targetIndex + 1) % waypoints.Length;
