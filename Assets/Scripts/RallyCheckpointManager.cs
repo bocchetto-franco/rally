@@ -38,7 +38,7 @@ public sealed class RallyCheckpointManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) || RallyGamepadInput.ResetPressedThisFrame)
             ResetVehicleToLastCheckpoint();
 
         if (running)

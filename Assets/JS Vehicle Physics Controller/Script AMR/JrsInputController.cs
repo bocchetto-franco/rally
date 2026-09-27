@@ -81,11 +81,13 @@ public class JrsInputController : MonoBehaviour
 
     public float GetVerticalInput()
     {
-        return verticalInput;
+        return RallyGamepadInput.GetVerticalInput(verticalInput);
     }
 
     public float GetHorizontalInput()
     {
-        return horizontalInput;
+        return RallyGamepadInput.GetHorizontalInput(horizontalInput);
     }
+
+    public float GetLegacyVerticalInput() => verticalInput;
 }

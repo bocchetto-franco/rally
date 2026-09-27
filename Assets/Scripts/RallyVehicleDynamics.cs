@@ -272,16 +272,18 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         }
 
         float forwardSpeedKph = Vector3.Dot(vehicleBody.linearVelocity, vehicleBody.transform.forward) * 3.6f;
-        bool reverseInput = botInput != null ? botInput.Braking :
-            Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
-            (inputController != null && inputController.GetVerticalInput() < -0.1f);
-        bool serviceBrake = reverseInput && forwardSpeedKph > serviceBrakeMinimumForwardSpeedKph;
+        bool legacyBrake = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
+            (inputController != null && inputController.GetLegacyVerticalInput() < -0.1f);
+        float brakeAmount = botInput != null ? (botInput.Braking ? 1f : 0f) :
+            Mathf.Max(legacyBrake ? 1f : 0f, RallyGamepadInput.Brake);
+        bool serviceBrake = brakeAmount > 0.02f && forwardSpeedKph > serviceBrakeMinimumForwardSpeedKph;
         bool handbrake = botInput == null && (Input.GetKey(KeyCode.Space) ||
+                         RallyGamepadInput.HandbrakePressed ||
                          (inputController != null && inputController.brakeButton != null &&
                           inputController.brakeButton.IsButtonPressed()));
 
-        float frontTorque = serviceBrake ? frontServiceBrakeTorque : 0f;
-        float rearTorque = serviceBrake ? rearServiceBrakeTorque : 0f;
+        float frontTorque = serviceBrake ? frontServiceBrakeTorque * brakeAmount : 0f;
+        float rearTorque = serviceBrake ? rearServiceBrakeTorque * brakeAmount : 0f;
         if (serviceBrake)
         {
             // The original controller treats S as reverse torque. Cancel that

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>Produces driving inputs for the existing Porsche physics, without applying forces itself.</summary>
@@ -11,6 +12,7 @@ public sealed class RallyBotController : MonoBehaviour
     [SerializeField] private Transform waypointRoot;
     [SerializeField, Min(2f)] private float waypointReachDistance = 3.5f;
     [SerializeField, Min(0.5f)] private float safeCorridorHalfWidth = 1.5f;
+    [SerializeField, Range(-1.2f, 1.2f)] private float laneOffsetMeters;
 
     [Header("Difficulty")]
     [SerializeField, Min(10f)] private float maxSpeedKph = 80f;
@@ -19,6 +21,7 @@ public sealed class RallyBotController : MonoBehaviour
     private Transform[] waypoints;
     private int targetIndex;
     private bool routeReady;
+    private static readonly List<RallyBotController> activeBots = new List<RallyBotController>();
 
     public float VerticalInput { get; private set; }
     public float HorizontalInput { get; private set; }
@@ -39,6 +42,43 @@ public sealed class RallyBotController : MonoBehaviour
     {
         maxSpeedKph = Mathf.Max(10f, speedKph);
         cornerBrakingAggressiveness = Mathf.Clamp01(brakingAggressiveness);
+    }
+
+    public void SetLaneOffset(float offsetMeters) =>
+        laneOffsetMeters = Mathf.Clamp(offsetMeters, -1.2f, 1.2f);
+
+    private void OnEnable()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        for (int i = activeBots.Count - 1; i >= 0; i--)
+        {
+            RallyBotController other = activeBots[i];
+            if (other == null || other == this)
+            {
+                activeBots.RemoveAt(i);
+                continue;
+            }
+            IgnoreBodyCollisions(other);
+        }
+        activeBots.Add(this);
+    }
+
+    private void IgnoreBodyCollisions(RallyBotController other)
+    {
+        Collider[] ownColliders = GetComponentsInChildren<Collider>();
+        Collider[] otherColliders = other.GetComponentsInChildren<Collider>();
+        foreach (Collider own in ownColliders)
+        {
+            if (own is WheelCollider)
+                continue;
+            foreach (Collider obstacle in otherColliders)
+            {
+                if (!(obstacle is WheelCollider))
+                    Physics.IgnoreCollision(own, obstacle, true);
+            }
+        }
     }
 
     private void Awake()
@@ -90,9 +130,10 @@ public sealed class RallyBotController : MonoBehaviour
             Vector3.Dot(planarPosition - planarStart, pathDirection), 0f,
             Vector3.ProjectOnPlane(segmentEnd - segmentStart, Vector3.up).magnitude);
         float signedOffset = Vector3.Cross(pathDirection, planarPosition - closest).y;
-        CrossTrackDistance = Mathf.Abs(signedOffset);
+        float laneError = signedOffset - laneOffsetMeters;
+        CrossTrackDistance = Mathf.Abs(laneError);
         float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
-        float correctionAngle = Mathf.Atan2(5f * signedOffset,
+        float correctionAngle = Mathf.Atan2(5f * laneError,
             12f + speedKph / 3.6f) * Mathf.Rad2Deg;
         float steeringDenominator = Mathf.Lerp(36f, 55f, Mathf.Clamp01(speedKph / maxSpeedKph));
         float requestedSteering = Mathf.Clamp((headingError - correctionAngle) / steeringDenominator, -1f, 1f);
@@ -182,6 +223,7 @@ public sealed class RallyBotController : MonoBehaviour
 
     private void OnDisable()
     {
+        activeBots.Remove(this);
         VerticalInput = 0f;
         HorizontalInput = 0f;
     }

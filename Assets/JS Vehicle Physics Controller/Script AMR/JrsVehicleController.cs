@@ -95,9 +95,11 @@ public class JrsVehicleController : MonoBehaviour
         }
 
         float v = botInput != null ? botInput.VerticalInput * motorForce :
-            mobileInputController != null ? mobileInputController.GetVerticalInput() : Input.GetAxis("Vertical") * motorForce;
+            mobileInputController != null ? mobileInputController.GetVerticalInput() :
+            RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical) * motorForce;
         float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
-            mobileInputController != null ? mobileInputController.GetHorizontalInput() : Input.GetAxis("Horizontal") * maxSteerAngle;
+            mobileInputController != null ? mobileInputController.GetHorizontalInput() :
+            RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal) * maxSteerAngle;
 
         // Apply motor torque to the wheels
         frontLeftWheel.motorTorque = v;
@@ -110,7 +112,7 @@ public class JrsVehicleController : MonoBehaviour
         // Update wheel poses
         UpdateWheelPoses();
 
-        if (botInput == null && (Input.GetKey(KeyCode.Space) ||
+        if (botInput == null && (Input.GetKey(KeyCode.Space) || RallyGamepadInput.HandbrakePressed ||
             (mobileInputController != null && mobileInputController.brakeButton != null &&
              mobileInputController.brakeButton.IsButtonPressed())))
         {
@@ -131,9 +133,11 @@ public class JrsVehicleController : MonoBehaviour
     void FixedUpdate()
     {
         float v = botInput != null ? botInput.VerticalInput * motorForce :
-            mobileInputController != null ? mobileInputController.GetVerticalInput() * motorForce : 0f;
+            (mobileInputController != null ? mobileInputController.GetVerticalInput() :
+             RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical)) * motorForce;
         float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
-            mobileInputController != null ? mobileInputController.GetHorizontalInput() * maxSteerAngle : 0f;
+            (mobileInputController != null ? mobileInputController.GetHorizontalInput() :
+             RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal)) * maxSteerAngle;
 
         // Calculate the current wheel speed in km/h
         float currentSpeedKmph = frontLeftWheel.radius * Mathf.PI * frontLeftWheel.rpm * 60f / 1000f;
