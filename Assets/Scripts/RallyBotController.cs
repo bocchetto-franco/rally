@@ -18,6 +18,9 @@ public sealed class RallyBotController : MonoBehaviour
     [SerializeField, Min(10f)] private float maxSpeedKph = 80f;
     [SerializeField, Range(0f, 1f)] private float cornerBrakingAggressiveness = 0.95f;
 
+    private float raceMaxSpeedKph;
+    private float raceCornerBrakingAggressiveness;
+
     private Transform[] waypoints;
     private int targetIndex;
     private bool routeReady;
@@ -27,7 +30,10 @@ public sealed class RallyBotController : MonoBehaviour
     public float HorizontalInput { get; private set; }
     public bool Braking => VerticalInput < -0.1f;
     public int CurrentWaypointIndex => targetIndex;
+    public bool HasRoute => routeReady;
     public float CrossTrackDistance { get; private set; }
+    public float RaceMaxSpeedKph => raceMaxSpeedKph;
+    public float RaceCornerBrakingAggressiveness => raceCornerBrakingAggressiveness;
 
     public void Configure(JrsVehicleController controller, Rigidbody body, Transform route = null)
     {
@@ -42,6 +48,29 @@ public sealed class RallyBotController : MonoBehaviour
     {
         maxSpeedKph = Mathf.Max(10f, speedKph);
         cornerBrakingAggressiveness = Mathf.Clamp01(brakingAggressiveness);
+        if (Application.isPlaying)
+            ApplySelectedDifficulty();
+    }
+
+    private void ApplySelectedDifficulty()
+    {
+        // Retain each bot's serialized speed difference (76/80/84 km/h on the
+        // circuits) while applying one selection consistently to every bot.
+        switch (RallyGameSession.SelectedBotDifficulty)
+        {
+            case RallyBotDifficulty.Easy:
+                raceMaxSpeedKph = maxSpeedKph * 0.85f;
+                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness + 0.05f);
+                break;
+            case RallyBotDifficulty.Hard:
+                raceMaxSpeedKph = maxSpeedKph * 1.15f;
+                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness - 0.12f);
+                break;
+            default:
+                raceMaxSpeedKph = maxSpeedKph;
+                raceCornerBrakingAggressiveness = cornerBrakingAggressiveness;
+                break;
+        }
     }
 
     public void SetLaneOffset(float offsetMeters) =>
@@ -71,18 +100,15 @@ public sealed class RallyBotController : MonoBehaviour
         Collider[] otherColliders = other.GetComponentsInChildren<Collider>();
         foreach (Collider own in ownColliders)
         {
-            if (own is WheelCollider)
-                continue;
             foreach (Collider obstacle in otherColliders)
-            {
-                if (!(obstacle is WheelCollider))
-                    Physics.IgnoreCollision(own, obstacle, true);
-            }
+                Physics.IgnoreCollision(own, obstacle, true);
         }
     }
 
     private void Awake()
     {
+        RallyGameSession.RestoreSavedState();
+        ApplySelectedDifficulty();
         if (vehicle == null)
             vehicle = GetComponentInChildren<JrsVehicleController>();
         if (vehicleBody == null && vehicle != null)
@@ -135,13 +161,13 @@ public sealed class RallyBotController : MonoBehaviour
         float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
         float correctionAngle = Mathf.Atan2(5f * laneError,
             12f + speedKph / 3.6f) * Mathf.Rad2Deg;
-        float steeringDenominator = Mathf.Lerp(36f, 55f, Mathf.Clamp01(speedKph / maxSpeedKph));
+        float steeringDenominator = Mathf.Lerp(36f, 55f, Mathf.Clamp01(speedKph / raceMaxSpeedKph));
         float requestedSteering = Mathf.Clamp((headingError - correctionAngle) / steeringDenominator, -1f, 1f);
         HorizontalInput = Mathf.MoveTowards(HorizontalInput, requestedSteering, 3f * Time.fixedDeltaTime);
 
         // Accumulate heading changes over up to 110 m of road, not just the next
         // waypoint. Closely spaced hairpin points would otherwise look harmless.
-        float lookAhead = Mathf.Lerp(60f, 110f, Mathf.Clamp01(speedKph / maxSpeedKph));
+        float lookAhead = Mathf.Lerp(60f, 110f, Mathf.Clamp01(speedKph / raceMaxSpeedKph));
         float upcomingTurn = 0f;
         float distanceAhead = toTarget.magnitude;
         Vector3 previousLeg = pathDirection;
@@ -158,11 +184,11 @@ public sealed class RallyBotController : MonoBehaviour
             previousLeg = leg;
         }
         float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(headingError), upcomingTurn) / 90f);
-        float minimumCornerSpeed = Mathf.Min(18f, maxSpeedKph);
-        float targetSpeed = Mathf.Lerp(maxSpeedKph, minimumCornerSpeed,
-            cornerSeverity * cornerBrakingAggressiveness);
+        float minimumCornerSpeed = Mathf.Min(18f, raceMaxSpeedKph);
+        float targetSpeed = Mathf.Lerp(raceMaxSpeedKph, minimumCornerSpeed,
+            cornerSeverity * raceCornerBrakingAggressiveness);
         float outsideCorridor = Mathf.Max(0f, CrossTrackDistance - safeCorridorHalfWidth);
-        float recoverySpeed = Mathf.Lerp(maxSpeedKph, 15f, Mathf.Clamp01(outsideCorridor / 2f));
+        float recoverySpeed = Mathf.Lerp(raceMaxSpeedKph, 15f, Mathf.Clamp01(outsideCorridor / 2f));
         targetSpeed = Mathf.Min(targetSpeed, recoverySpeed);
 
         VerticalInput = speedKph > targetSpeed + 4f ? -1f : speedKph < targetSpeed - 2f ? 1f : 0f;

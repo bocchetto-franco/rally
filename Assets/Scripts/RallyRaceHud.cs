@@ -8,6 +8,8 @@ public sealed class RallyRaceHud : MonoBehaviour
     [SerializeField] TMP_Text speedText;
     [SerializeField] TMP_Text timeText;
     [SerializeField] TMP_Text checkpointText;
+    [SerializeField] TMP_Text positionText;
+    [SerializeField] RallyRacePositions racePositions;
 
     public void Configure(RallyCheckpointManager manager, Rigidbody body, TMP_Text speed, TMP_Text time, TMP_Text checkpoint)
     {
@@ -19,10 +21,21 @@ public sealed class RallyRaceHud : MonoBehaviour
         Refresh();
     }
 
+    public void ConfigurePositions(RallyRacePositions positions, TMP_Text position)
+    {
+        racePositions = positions;
+        positionText = position;
+        Refresh();
+    }
+
     void Update() => Refresh();
 
     void Refresh()
     {
+        if (positionText != null)
+            positionText.text = racePositions == null ? "—/—" :
+                $"{racePositions.PlayerPosition}°/{racePositions.RacerCount}";
+
         if (speedText != null)
         {
             float speedKph = vehicleBody == null ? 0f : vehicleBody.linearVelocity.magnitude * 3.6f;

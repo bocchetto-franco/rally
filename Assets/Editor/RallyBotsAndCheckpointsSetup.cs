@@ -141,11 +141,11 @@ public static class RallyBotsAndCheckpointsSetup
             string label = i == 0 ? "Start" : i == gateCount - 1 ? "Finish" : $"{distance:000}m";
             GameObject gate = new GameObject($"Checkpoint_{i:00}_{label}");
             gate.transform.SetParent(checkpointRoot.transform, false);
-            gate.transform.SetPositionAndRotation(hit.point + Vector3.up * 1.9f,
+            gate.transform.SetPositionAndRotation(hit.point + Vector3.up * 3.5f,
                 Quaternion.LookRotation(tangent, Vector3.up));
             BoxCollider box = gate.AddComponent<BoxCollider>();
             box.isTrigger = true;
-            box.size = new Vector3(width + 0.8f, 4f, 2.4f);
+            box.size = new Vector3(width + 6f, 8f, 6f);
             gates[i] = gate.AddComponent<RallyCheckpointTrigger>();
             gates[i].Configure(manager, i);
         }
@@ -180,6 +180,9 @@ public static class RallyBotsAndCheckpointsSetup
             speed.gameObject.scene != scene || time.gameObject.scene != scene || checkpoint.gameObject.scene != scene)
             throw new InvalidOperationException("HUD text references were not cloned into " + scene.name);
         hud.Configure(manager, playerBody, speed, time, checkpoint);
+        RallyRacePositions positions = hudObject.GetComponent<RallyRacePositions>();
+        if (positions != null)
+            positions.Configure(route.transform, playerBody, manager);
         EditorSceneManager.CloseScene(hudSource, true);
         SceneManager.SetActiveScene(scene);
 

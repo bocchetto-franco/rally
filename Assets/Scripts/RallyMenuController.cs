@@ -5,6 +5,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public enum RallyBotDifficulty
+{
+    Easy,
+    Medium,
+    Hard
+}
+
 public static class RallyGameSession
 {
     public const string MainMenuScene = "MainMenu";
@@ -19,9 +26,11 @@ public static class RallyGameSession
     const string TimeKey = "Rally.LastRaceTime";
     const string VehicleKey = "Rally.SelectedVehicle";
     const string CircuitKey = "Rally.SelectedCircuit";
+    const string DifficultyKey = "Rally.BotDifficulty";
 
     public static string SelectedVehicle { get; private set; } = VehicleName;
     public static string SelectedCircuit { get; private set; } = CircuitName;
+    public static RallyBotDifficulty SelectedBotDifficulty { get; private set; } = RallyBotDifficulty.Medium;
     public static float LastRaceTime { get; private set; } = -1f;
     public static string SelectedRaceScene
     {
@@ -41,11 +50,21 @@ public static class RallyGameSession
         PlayerPrefs.Save();
     }
 
+    public static void SelectDifficulty(int index)
+    {
+        if (index < 0 || index > (int)RallyBotDifficulty.Hard)
+            throw new ArgumentOutOfRangeException(nameof(index));
+        SelectedBotDifficulty = (RallyBotDifficulty)index;
+        PlayerPrefs.SetInt(DifficultyKey, index);
+        PlayerPrefs.Save();
+    }
+
     public static void SelectCurrentOptions()
     {
         SelectedVehicle = VehicleName;
         PlayerPrefs.SetString(VehicleKey, SelectedVehicle);
         PlayerPrefs.SetString(CircuitKey, SelectedCircuit);
+        PlayerPrefs.SetInt(DifficultyKey, (int)SelectedBotDifficulty);
         PlayerPrefs.Save();
     }
 
@@ -63,6 +82,9 @@ public static class RallyGameSession
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);
         if (Array.IndexOf(CircuitNames, SelectedCircuit) < 0)
             SelectedCircuit = CircuitName;
+        int difficulty = PlayerPrefs.GetInt(DifficultyKey, (int)RallyBotDifficulty.Medium);
+        SelectedBotDifficulty = difficulty >= (int)RallyBotDifficulty.Easy && difficulty <= (int)RallyBotDifficulty.Hard
+            ? (RallyBotDifficulty)difficulty : RallyBotDifficulty.Medium;
         LastRaceTime = PlayerPrefs.GetFloat(TimeKey, -1f);
     }
 
@@ -99,6 +121,7 @@ public sealed class RallyMenuController : MonoBehaviour
     TextMeshProUGUI selectedCircuitTitle;
     TextMeshProUGUI selectedCircuitDetails;
     Button[] circuitButtons;
+    Button[] difficultyButtons;
 
     public void Configure(RallyMenuScreen targetScreen) => screen = targetScreen;
 
@@ -172,7 +195,7 @@ public sealed class RallyMenuController : MonoBehaviour
     void BuildSelection(Transform root)
     {
         Text(root, "Title", "CONFIGURACIÓN DE CARRERA", 52f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 345f), new Vector2(1500f, 70f), Color.white);
-        Text(root, "Subtitle", "Elegí auto y circuito antes de salir a pista.", 25f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 292f), new Vector2(1400f, 42f), Muted);
+        Text(root, "Subtitle", "Elegí auto, circuito y dificultad de bots antes de salir a pista.", 25f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 292f), new Vector2(1400f, 42f), Muted);
 
         RectTransform carCard = SelectionCard(root, "Vehicle Card", new Vector2(-375f, 40f), "AUTO", "PORSCHE 911 SC RALLY", "TRACCIÓN ARCADE\nAJUSTE DE RALLY ACTIVO");
         Text(carCard, "Vehicle Glyph", "911", 92f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 40f), new Vector2(300f, 115f), new Color(1f, 1f, 1f, 0.12f));
@@ -193,6 +216,19 @@ public sealed class RallyMenuController : MonoBehaviour
             PanelRect(circuitButtons[i].transform, "Track Color", swatches[i], new Vector2(-252f, 0f), new Vector2(12f, 58f));
         }
         RefreshCircuitSelection();
+
+        RectTransform difficultyCard = PanelRect(root, "Bot Difficulty Card", Panel, new Vector2(0f, -266f), new Vector2(1400f, 116f));
+        Text(difficultyCard, "Category", "DIFICULTAD BOTS", 22f, FontStyles.Bold, TextAlignmentOptions.Left,
+            new Vector2(-515f, 0f), new Vector2(290f, 42f), Accent);
+        string[] difficulties = { "FÁCIL", "MEDIO", "DIFÍCIL" };
+        difficultyButtons = new Button[difficulties.Length];
+        for (int i = 0; i < difficulties.Length; i++)
+        {
+            int choice = i;
+            difficultyButtons[i] = Button(difficultyCard, "Difficulty " + difficulties[i] + " Button", difficulties[i],
+                new Vector2(-225f + i * 310f, 0f), new Vector2(260f, 70f), () => ChooseDifficulty(choice), false);
+        }
+        RefreshDifficultySelection();
 
         Button(root, "Back Button", "VOLVER", new Vector2(-265f, -380f), new Vector2(300f, 74f), BackToMenu, false);
         Button(root, "Race Button", "COMENZAR CARRERA", new Vector2(180f, -380f), new Vector2(520f, 74f), StartRace, true);
@@ -240,6 +276,28 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         RallyGameSession.SelectCircuit(index);
         RefreshCircuitSelection();
+    }
+
+    void ChooseDifficulty(int index)
+    {
+        RallyGameSession.SelectDifficulty(index);
+        RefreshDifficultySelection();
+    }
+
+    void RefreshDifficultySelection()
+    {
+        for (int i = 0; i < difficultyButtons.Length; i++)
+        {
+            bool active = i == (int)RallyGameSession.SelectedBotDifficulty;
+            Color baseColor = active ? Accent : PanelLight;
+            Button button = difficultyButtons[i];
+            button.GetComponent<Image>().color = baseColor;
+            ColorBlock colors = button.colors;
+            colors.normalColor = baseColor;
+            colors.highlightedColor = active ? new Color(1f, .62f, .18f) : new Color(.14f, .17f, .22f);
+            colors.selectedColor = colors.highlightedColor;
+            button.colors = colors;
+        }
     }
 
     void RefreshCircuitSelection()
