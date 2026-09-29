@@ -42,6 +42,7 @@ public class JrsInputController : MonoBehaviour
 
     private float verticalInput;
     private float horizontalInput;
+    private bool steeringButtonHeld;
 
     public Camera[] cameras;
 
@@ -51,12 +52,14 @@ public class JrsInputController : MonoBehaviour
         verticalInput = 0f;
 
         // Handle acceleration and braking
-        if (Input.GetKey(KeyCode.W) || accelerateButton.IsButtonPressed())
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ||
+            (accelerateButton != null && accelerateButton.IsButtonPressed()))
         {
             verticalInput = 1f;
             //Debug.Log("Accelerate: verticalInput = " + verticalInput);
         }
-        else if (Input.GetKey(KeyCode.S) || revButton.IsButtonPressed())
+        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
+                 (revButton != null && revButton.IsButtonPressed()))
         {
             verticalInput = -1f;
             //Debug.Log("Brake: verticalInput = " + verticalInput);
@@ -64,12 +67,17 @@ public class JrsInputController : MonoBehaviour
 
         // Handle steering
         float targetHorizontalInput = 0f;
-        if (Input.GetKey(KeyCode.A) || leftButton.IsButtonPressed())
+        bool leftHeld = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) ||
+                        (leftButton != null && leftButton.IsButtonPressed());
+        bool rightHeld = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) ||
+                         (rightButton != null && rightButton.IsButtonPressed());
+        steeringButtonHeld = leftHeld || rightHeld;
+        if (leftHeld)
         {
             targetHorizontalInput = -1f;
            // Debug.Log("SteerLeft: targetHorizontalInput = " + targetHorizontalInput);
         }
-        else if (Input.GetKey(KeyCode.D) || rightButton.IsButtonPressed())
+        else if (rightHeld)
         {
             targetHorizontalInput = 1f;
            // Debug.Log("SteerRight: targetHorizontalInput = " + targetHorizontalInput);
@@ -86,7 +94,7 @@ public class JrsInputController : MonoBehaviour
 
     public float GetHorizontalInput()
     {
-        return RallyGamepadInput.GetHorizontalInput(horizontalInput);
+        return RallyGamepadInput.GetHorizontalInput(horizontalInput, steeringButtonHeld);
     }
 
     public float GetLegacyVerticalInput() => verticalInput;

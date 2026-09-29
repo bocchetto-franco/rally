@@ -61,7 +61,6 @@ public static class RallyGameSession
 
     public static void SelectCurrentOptions()
     {
-        SelectedVehicle = VehicleName;
         PlayerPrefs.SetString(VehicleKey, SelectedVehicle);
         PlayerPrefs.SetString(CircuitKey, SelectedCircuit);
         PlayerPrefs.SetInt(DifficultyKey, (int)SelectedBotDifficulty);
@@ -79,6 +78,8 @@ public static class RallyGameSession
     public static void RestoreSavedState()
     {
         SelectedVehicle = PlayerPrefs.GetString(VehicleKey, VehicleName);
+        if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicle) < 0)
+            SelectedVehicle = VehicleName;
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);
         if (Array.IndexOf(CircuitNames, SelectedCircuit) < 0)
             SelectedCircuit = CircuitName;
@@ -96,6 +97,15 @@ public static class RallyGameSession
         int minutes = Mathf.FloorToInt(elapsedTime / 60f);
         float seconds = elapsedTime - minutes * 60f;
         return $"{minutes:00}:{seconds:00.000}";
+    }
+
+    public static void SelectVehicle(int index)
+    {
+        if (index < 0 || index >= RallyPlayerVehicleSelection.Names.Length)
+            throw new ArgumentOutOfRangeException(nameof(index));
+        SelectedVehicle = RallyPlayerVehicleSelection.Names[index];
+        PlayerPrefs.SetString(VehicleKey, SelectedVehicle);
+        PlayerPrefs.Save();
     }
 }
 
@@ -122,6 +132,8 @@ public sealed class RallyMenuController : MonoBehaviour
     TextMeshProUGUI selectedCircuitDetails;
     Button[] circuitButtons;
     Button[] difficultyButtons;
+    Button[] vehicleButtons;
+    TextMeshProUGUI selectedVehicleTitle;
 
     public void Configure(RallyMenuScreen targetScreen) => screen = targetScreen;
 
@@ -175,21 +187,26 @@ public sealed class RallyMenuController : MonoBehaviour
                 BuildResults(background);
                 break;
         }
+
+        // The buttons are created in reading order: tracks, difficulties, then actions.
+        // D-Pad up/down (and left/right) can therefore reach every option without a mouse.
+        RallyMenuNavigation navigation = canvasObject.AddComponent<RallyMenuNavigation>();
+        navigation.Configure(canvasObject.GetComponentsInChildren<Button>(true));
     }
 
     void BuildMainMenu(Transform root)
     {
         Text(root, "Eyebrow", "GRAVA  /  VELOCIDAD  /  CONTROL", 23f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-455f, 245f), new Vector2(770f, 42f), Accent);
         Text(root, "Title", "RALLY", 150f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(-420f, 100f), new Vector2(840f, 190f), Color.white);
-        Text(root, "Subtitle", "Un auto. Tres pistas. Todo por recorrer.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-390f, -25f), new Vector2(900f, 60f), Muted);
+        Text(root, "Subtitle", "Dos clásicos. Tres pistas. Todo por recorrer.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-390f, -25f), new Vector2(900f, 60f), Muted);
         PanelRect(root, "Title Accent", Accent, new Vector2(-862f, 94f), new Vector2(12f, 250f));
 
         RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 440f));
         Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 150f), new Vector2(460f, 36f), Accent);
         Text(card, "Circuit", RallyGameSession.SelectedCircuit.Replace(' ', '_').ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 87f), new Vector2(460f, 60f), Color.white);
-        Text(card, "Details", "3 PISTAS DISPONIBLES\nPORSCHE 911 SC RALLY", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 5f), new Vector2(460f, 80f), Muted);
+        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicle.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 5f), new Vector2(460f, 80f), Muted);
         Button(card, "Play Button", "JUGAR", new Vector2(0f, -125f), new Vector2(470f, 86f), StartSelection, true);
-        Text(root, "Hint", "ENTER: seleccionar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-500f, -475f), new Vector2(800f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.75f));
+        Text(root, "Hint", "CRUZ / ENTER: seleccionar    D-PAD: navegar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-500f, -475f), new Vector2(1050f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.75f));
     }
 
     void BuildSelection(Transform root)
@@ -197,8 +214,20 @@ public sealed class RallyMenuController : MonoBehaviour
         Text(root, "Title", "CONFIGURACIÓN DE CARRERA", 52f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 345f), new Vector2(1500f, 70f), Color.white);
         Text(root, "Subtitle", "Elegí auto, circuito y dificultad de bots antes de salir a pista.", 25f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 292f), new Vector2(1400f, 42f), Muted);
 
-        RectTransform carCard = SelectionCard(root, "Vehicle Card", new Vector2(-375f, 40f), "AUTO", "PORSCHE 911 SC RALLY", "TRACCIÓN ARCADE\nAJUSTE DE RALLY ACTIVO");
-        Text(carCard, "Vehicle Glyph", "911", 92f, FontStyles.Bold, TextAlignmentOptions.Center, new Vector2(0f, 40f), new Vector2(300f, 115f), new Color(1f, 1f, 1f, 0.12f));
+        RectTransform carCard = PanelRect(root, "Vehicle Card", Panel, new Vector2(-375f, 40f), new Vector2(650f, 470f));
+        PanelRect(carCard, "Selected Border", Accent, new Vector2(-317f, 0f), new Vector2(8f, 470f));
+        Text(carCard, "Category", "ELEGÍ AUTO", 20f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 178f), new Vector2(540f, 34f), Accent);
+        selectedVehicleTitle = Text(carCard, "Selected Vehicle", "", 30f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 112f), new Vector2(540f, 52f), Color.white);
+        Text(carCard, "Vehicle Details", "CLÁSICOS  •  FÍSICA ARCADE DE RALLY", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 69f), new Vector2(540f, 34f), Muted);
+        vehicleButtons = new Button[RallyPlayerVehicleSelection.Names.Length];
+        for (int i = 0; i < vehicleButtons.Length; i++)
+        {
+            int choice = i;
+            vehicleButtons[i] = Button(carCard, "Vehicle " + i + " Button", RallyPlayerVehicleSelection.Names[i].ToUpperInvariant(),
+                new Vector2(0f, -9f - 70f * i), new Vector2(530f, 58f), () => { RallyGameSession.SelectVehicle(choice); RefreshVehicleSelection(); }, false);
+        }
+        Text(carCard, "Asset Credit", "Mini: Gilang Romadhan / CC-BY 3.0 · adaptado", 15f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, -174f), new Vector2(540f, 34f), Muted);
+        RefreshVehicleSelection();
 
         RectTransform circuitCard = PanelRect(root, "Circuit Card", Panel, new Vector2(375f, 40f), new Vector2(650f, 470f));
         PanelRect(circuitCard, "Selected Border", Accent, new Vector2(-317f, 0f), new Vector2(8f, 470f));
@@ -276,6 +305,22 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         RallyGameSession.SelectCircuit(index);
         RefreshCircuitSelection();
+    }
+
+    void RefreshVehicleSelection()
+    {
+        selectedVehicleTitle.text = RallyGameSession.SelectedVehicle.ToUpperInvariant();
+        for (int i = 0; i < vehicleButtons.Length; i++)
+        {
+            bool active = RallyPlayerVehicleSelection.Names[i] == RallyGameSession.SelectedVehicle;
+            Color baseColor = active ? Accent : PanelLight;
+            vehicleButtons[i].GetComponent<Image>().color = baseColor;
+            ColorBlock colors = vehicleButtons[i].colors;
+            colors.normalColor = baseColor;
+            colors.highlightedColor = active ? new Color(1f, .62f, .18f) : new Color(.14f, .17f, .22f);
+            colors.selectedColor = colors.highlightedColor;
+            vehicleButtons[i].colors = colors;
+        }
     }
 
     void ChooseDifficulty(int index)

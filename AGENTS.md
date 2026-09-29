@@ -14,9 +14,10 @@
 
 - Ya existe un frontend funcional antes de la carrera. Al entrar en Play, el proyecto debe comenzar en `Assets/Scenes/MainMenu.unity` mediante `EditorSceneManager.playModeStartScene`.
 - El botón **Jugar** de `MainMenu` abre `Assets/Scenes/VehicleCircuitSelection.unity`.
-- La selección ofrece un único auto, **Porsche 911 SC Rally**, tres circuitos (**Circuit_01**, **Circuit_02** y **Circuit_03**) y dificultad de bots **Fácil/Medio/Difícil**. `RallyGameSession` conserva estas selecciones en PlayerPrefs (`Rally.SelectedVehicle`, `Rally.SelectedCircuit` y `Rally.BotDifficulty`); la dificultad predeterminada es Medio.
+- La selección ofrece **Porsche 911 SC Rally** y **Mini Classic Rally**, tres circuitos (**Circuit_01**, **Circuit_02** y **Circuit_03**) y dificultad de bots **Fácil/Medio/Difícil**. `RallyGameSession` conserva estas selecciones en PlayerPrefs (`Rally.SelectedVehicle`, `Rally.SelectedCircuit` y `Rally.BotDifficulty`); la dificultad predeterminada es Medio.
 - La selección incluye los tres circuitos; cada botón actualiza la pista y **Comenzar carrera** carga la escena correcta. `Circuit_01`, `Circuit_02` y `Circuit_03` tienen checkpoints, cronómetro, HUD, tres bots y avisos visuales de frenada antes de curvas.
 - Los tres circuitos tienen un GameObject `Race Flow` con `RallyRaceFlow`: al finalizar congela el Porsche, deshabilita el control y la dinámica adicional, pausa con `Time.timeScale = 0` y muestra el resultado con tiempo final, reinicio, mejores tiempos y regreso a selección. El ranking guarda cinco tiempos por pista en PlayerPrefs bajo `Rally.BestTimes.*`; los botones restauran `Time.timeScale = 1` antes de cambiar o recargar escena.
+- `RallyRaceFlow` instala `RallyPauseMenu` en las tres pistas: Options del DualSense (Start genérico del Input System) o Esc alterna la pausa con `Time.timeScale = 0`. Ofrece Reanudar, Reiniciar carrera y Volver al menú principal. `RallyMenuNavigation` da D-Pad/Cruz (y flechas/Enter) a la pausa, frontend y resultados, conservando el mouse; `Tools → Rally → Verify Pause Menu Gamepad Mapping` ejecuta una prueba con gamepad virtual.
 - Desde resultados se puede repetir la carrera, volver a selección o regresar al menú principal.
 - Al completar una vuelta en cualquier circuito, aparece el menú de fin de carrera con el tiempo, **Reiniciar**, **Ver tiempos** (cinco mejores guardados por pista mediante PlayerPrefs) y **Volver al menú**, que retorna a la selección de auto/pista.
 - El orden esperado en Build Settings es: `MainMenu`, `VehicleCircuitSelection`, `Circuit_01`, `Circuit_02`, `Circuit_03`, `RaceResults`.
@@ -53,6 +54,13 @@
 - Los tres Terrain mantienen `Tree Distance = 5000 m` y `Detail Distance = 180 m`. Las nuevas texturas de bosque/Poly Haven son 2K con compresión en el importador; no se modificaron sombras, resolución ni otros ajustes generales de calidad durante esta revisión.
 
 ## Assets reutilizables para nuevos circuitos
+
+### Autos seleccionables
+
+- Porsche: conservar el modelo original y todos sus parámetros. Mini: `Assets/Art/Vehicles/ClassicMini/ClassicMini.fbx`, adaptado del modelo **Low Poly Mini Cooper** de Gilang Romadhan, CC-BY 3.0; atribución/fuente y cambios en `Assets/Art/Vehicles/ClassicMini/SOURCE.md`. El original publicado es GLTF; `Tools/prepare_classic_mini.py` lo convierte a FBX, retira la base de exposición y separa/nombra las cuatro ruedas existentes. No es una réplica fotorealista ni incluye una livery histórica de competición.
+- Prefab visual URP listo: `Assets/Resources/Vehicles/ClassicMini.prefab`; contiene carrocería y pivotes `wheel_FL`, `wheel_FR`, `wheel_BL`, `wheel_BR`. `RallyClassicMiniSetup` mide bounds y radios, convierte materiales y permite reconstruirlo. Los pivotes derechos compensan el giro de 180° del controlador original.
+- `RallyPlayerVehicleSelection` aplica la selección al cargar cualquiera de los tres circuitos, después de Awake y antes de Start. Conserva el mismo objeto físico del jugador, Rigidbody, controlador y WheelColliders; solo cambia modelo, posición/radio de ruedas y ajuste de collider de carrocería. La raíz sigue llamándose `Porsche 911 SC Rally` por compatibilidad con cámara, checkpoints, ranking y resultados; al seleccionar el Mini contiene el hijo `Mini Classic Rally Visual`.
+- El Mini conserva **todos** los valores del perfil arcade del jugador (masa, COM, fricción, suspensión, dirección, frenos, downforce y asistencia). La batalla más corta ya aporta variedad. No aplicar el perfil de bots ni modificar sus prefabs al cambiar el auto seleccionado. `RallyVehicleSelectionSmokeTest.Run` verifica en Play los dos autos en las tres pistas usando los botones reales del menú y un gamepad virtual.
 
 Usar estas rutas verificadas en `main` como base para nuevos circuitos. Las fuentes y licencias están documentadas en `Assets/Art/Environment/ASSET_SOURCES.md` y `Assets/Art/Environment/DOWNLOAD_MANIFEST.json`.
 

@@ -42,6 +42,16 @@ public static class RallyGamepadInput
         return Mathf.Abs(legacyInput) > 0.1f ? legacyInput : Steering;
     }
 
+    // The legacy steering value eases back to zero after a key is released.
+    // Do not let that residual value mask a newly moved gamepad stick.
+    public static float GetHorizontalInput(float legacyInput, bool legacySteeringHeld)
+    {
+        if (legacySteeringHeld)
+            return legacyInput;
+        float gamepadSteering = Steering;
+        return Mathf.Abs(gamepadSteering) > 0.1f ? gamepadSteering : legacyInput;
+    }
+
     // Input Manager's Horizontal/Vertical axes also include joystick axes.
     // The fallback scenes must read keys explicitly so a stick cannot masquerade
     // as keyboard input and override the analog trigger/stick mapping.

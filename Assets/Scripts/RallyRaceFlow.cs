@@ -26,6 +26,9 @@ public sealed class RallyRaceFlow : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (checkpointManager == null) checkpointManager = FindAnyObjectByType<RallyCheckpointManager>();
+        // All three race scenes already contain Race Flow, so install pause without
+        // rewriting large scene files or changing their vehicle/track configuration.
+        gameObject.AddComponent<RallyPauseMenu>().Configure(checkpointManager);
         GameObject playerCar = GameObject.Find("Porsche 911 SC Rally");
         vehicleController = playerCar != null ? playerCar.GetComponent<JrsVehicleController>() : null;
         vehicleBody = vehicleController != null ? vehicleController.GetComponent<Rigidbody>() : null;
@@ -87,12 +90,13 @@ public sealed class RallyRaceFlow : MonoBehaviour
         Label(card, font, "Finished", "VUELTA COMPLETADA", 26f, FontStyles.Bold, new Vector2(0f, 278f), new Vector2(640f, 42f), new Color(1f, .48f, .06f));
         Label(card, font, "Time Caption", "TIEMPO FINAL", 20f, FontStyles.Bold, new Vector2(0f, 218f), new Vector2(600f, 34f), new Color(.66f, .71f, .77f));
         Label(card, font, "Final Time", RallyGameSession.FormatTime(elapsedTime), 68f, FontStyles.Bold, new Vector2(0f, 155f), new Vector2(650f, 84f), Color.white);
-        CreateButton(card, font, "Restart Button", "REINICIAR", new Vector2(0f, 50f), RestartRace, true);
-        CreateButton(card, font, "Times Button", "VER TIEMPOS", new Vector2(0f, -50f), ToggleTimes, false);
-        CreateButton(card, font, "Menu Button", "VOLVER AL MENÚ", new Vector2(0f, -150f), BackToSelection, false);
+        Button restart = CreateButton(card, font, "Restart Button", "REINICIAR", new Vector2(0f, 50f), RestartRace, true);
+        Button times = CreateButton(card, font, "Times Button", "VER TIEMPOS", new Vector2(0f, -50f), ToggleTimes, false);
+        Button menu = CreateButton(card, font, "Menu Button", "VOLVER AL MENÚ", new Vector2(0f, -150f), BackToSelection, false);
         timesPanel = Panel(card, "Best Times Panel", new Color(.075f, .095f, .125f, 1f), new Vector2(0f, -265f), new Vector2(610f, 125f)).gameObject;
         timesText = Label(timesPanel.transform, font, "Best Times", BestTimesLabel(), 19f, FontStyles.Normal, Vector2.zero, new Vector2(560f, 105f), Color.white);
         timesPanel.SetActive(false);
+        canvasObject.AddComponent<RallyMenuNavigation>().Configure(restart, times, menu);
     }
 
     void RestartRace() { ResumeTime(); SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
@@ -139,11 +143,12 @@ public sealed class RallyRaceFlow : MonoBehaviour
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, .5f); rect.anchoredPosition = position; rect.sizeDelta = dimensions;
         var text = go.GetComponent<TextMeshProUGUI>(); text.font = font; text.text = value; text.fontSize = size; text.fontStyle = style; text.alignment = TextAlignmentOptions.Center; text.color = color; text.textWrappingMode = TextWrappingModes.Normal; text.raycastTarget = false; return text;
     }
-    static void CreateButton(Transform parent, TMP_FontAsset font, string name, string caption, Vector2 position, UnityEngine.Events.UnityAction action, bool primary)
+    static Button CreateButton(Transform parent, TMP_FontAsset font, string name, string caption, Vector2 position, UnityEngine.Events.UnityAction action, bool primary)
     {
         Color baseColor = primary ? new Color(1f, .48f, .06f) : new Color(.105f, .13f, .17f); RectTransform rect = Panel(parent, name, baseColor, position, new Vector2(540f, 76f));
         var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>(); ColorBlock colors = button.colors; colors.normalColor = baseColor; colors.highlightedColor = primary ? new Color(1f, .62f, .18f) : new Color(.17f, .2f, .26f); colors.pressedColor = primary ? new Color(.82f, .32f, .02f) : new Color(.055f, .07f, .1f); colors.selectedColor = colors.highlightedColor; button.colors = colors; button.onClick.AddListener(action);
         Label(rect, font, "Label", caption, 23f, FontStyles.Bold, Vector2.zero, new Vector2(510f, 60f), Color.white);
+        return button;
     }
     static void Stretch(RectTransform rect) { rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero; }
 }

@@ -94,12 +94,12 @@ public class JrsVehicleController : MonoBehaviour
             rb.centerOfMass = transform.InverseTransformPoint(centerOfMassObject.transform.position);
         }
 
-        float v = botInput != null ? botInput.VerticalInput * motorForce :
+        float v = (botInput != null ? botInput.VerticalInput :
             mobileInputController != null ? mobileInputController.GetVerticalInput() :
-            RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical) * motorForce;
-        float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
+            RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical)) * motorForce;
+        float h = (botInput != null ? botInput.HorizontalInput :
             mobileInputController != null ? mobileInputController.GetHorizontalInput() :
-            RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal) * maxSteerAngle;
+            RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal)) * maxSteerAngle;
 
         // Apply motor torque to the wheels
         frontLeftWheel.motorTorque = v;
