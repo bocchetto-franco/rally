@@ -57,7 +57,7 @@ public sealed class RallyRacePositions : MonoBehaviour
         }
         if (playerBody == null)
         {
-            foreach (JrsVehicleController vehicle in FindObjectsByType<JrsVehicleController>(FindObjectsSortMode.None))
+            foreach (JrsVehicleController vehicle in FindObjectsByType<JrsVehicleController>())
             {
                 if (vehicle.GetComponentInParent<RallyBotController>() == null)
                 {
@@ -106,7 +106,7 @@ public sealed class RallyRacePositions : MonoBehaviour
             }
         }
 
-        RallyBotController[] bots = FindObjectsByType<RallyBotController>(FindObjectsSortMode.None);
+        RallyBotController[] bots = FindObjectsByType<RallyBotController>();
         int activeBots = 0;
         foreach (RallyBotController bot in bots)
             if (bot.gameObject.scene == gameObject.scene && bot.isActiveAndEnabled &&

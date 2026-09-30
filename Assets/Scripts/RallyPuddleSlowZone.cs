@@ -226,7 +226,7 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
             hideFlags = HideFlags.HideAndDontSave,
             renderQueue = 3000
         };
-        Texture2D texture = Resources.GetBuiltinResource<Texture2D>("Default-Particle.png");
+        Texture2D texture = Resources.GetBuiltinResource<Texture2D>("Default-Particle.psd");
         if (texture != null)
             runtimeSplashMaterial.SetTexture("_BaseMap", texture);
         Color tint = new Color(0.72f, 0.9f, 0.98f, 0.62f);

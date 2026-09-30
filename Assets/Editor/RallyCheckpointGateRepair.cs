@@ -10,10 +10,10 @@ public static class RallyCheckpointGateRepair
     [Serializable]
     private sealed class Layout
     {
-        public float lengthMeters;
-        public Vector3[] centerline;
-        public float[] distances;
-        public float[] roadWidths;
+        public float lengthMeters = default;
+        public Vector3[] centerline = default;
+        public float[] distances = default;
+        public float[] roadWidths = default;
     }
 
     private struct Circuit

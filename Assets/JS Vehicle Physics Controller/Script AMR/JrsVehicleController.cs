@@ -66,7 +66,7 @@ public class JrsVehicleController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         prevRotation = frontLeftWheelTransform.rotation;
 
-        mobileInputController = FindObjectOfType<JrsInputController>();
+        mobileInputController = FindAnyObjectByType<JrsInputController>();
 
         engineSound = Resources.Load<AudioClip>("EngineSound");
         targetPitch = engineAudioSource.pitch;

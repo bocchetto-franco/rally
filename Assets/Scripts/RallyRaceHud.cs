@@ -11,6 +11,8 @@ public sealed class RallyRaceHud : MonoBehaviour
     [SerializeField] TMP_Text positionText;
     [SerializeField] RallyRacePositions racePositions;
 
+    void Awake() => PreparePositionPanel();
+
     public void Configure(RallyCheckpointManager manager, Rigidbody body, TMP_Text speed, TMP_Text time, TMP_Text checkpoint)
     {
         checkpointManager = manager;
@@ -25,7 +27,21 @@ public sealed class RallyRaceHud : MonoBehaviour
     {
         racePositions = positions;
         positionText = position;
+        PreparePositionPanel();
         Refresh();
+    }
+
+    void PreparePositionPanel()
+    {
+        if (positionText == null)
+            return;
+
+        positionText.richText = true;
+        RectTransform label = positionText.rectTransform;
+        RectTransform panel = label.parent as RectTransform;
+        if (panel != null && panel.name == "Position Panel")
+            panel.sizeDelta = new Vector2(panel.sizeDelta.x, Mathf.Max(panel.sizeDelta.y, 132f));
+        label.sizeDelta = new Vector2(label.sizeDelta.x, Mathf.Max(label.sizeDelta.y, 116f));
     }
 
     void Update() => Refresh();
@@ -33,8 +49,13 @@ public sealed class RallyRaceHud : MonoBehaviour
     void Refresh()
     {
         if (positionText != null)
-            positionText.text = racePositions == null ? "—/—" :
+        {
+            string position = racePositions == null ? "—/—" :
                 $"{racePositions.PlayerPosition}°/{racePositions.RacerCount}";
+            string lap = checkpointManager == null ? "Vuelta —/—" :
+                $"Vuelta {checkpointManager.CurrentLap}/{checkpointManager.TotalLaps}";
+            positionText.text = $"{position}\n<size=26>{lap}</size>";
+        }
 
         if (speedText != null)
         {

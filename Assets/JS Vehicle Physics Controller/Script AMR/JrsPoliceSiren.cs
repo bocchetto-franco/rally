@@ -37,7 +37,7 @@ public class JrsPoliceSiren : MonoBehaviour
     {
         if (mobileInputController == null)
         {
-            mobileInputController = FindObjectOfType<JrsInputController>();
+            mobileInputController = FindAnyObjectByType<JrsInputController>();
         }
         if (Input.GetKeyDown(KeyCode.P)  || mobileInputController.sirenButton.IsButtonClicked())
         {

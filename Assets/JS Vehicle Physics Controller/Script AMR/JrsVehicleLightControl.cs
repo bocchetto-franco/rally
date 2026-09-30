@@ -48,7 +48,7 @@ public class JrsVehicleLightControl : MonoBehaviour
     {
         if (mobileInputController == null)
         {
-            mobileInputController = FindObjectOfType<JrsInputController>();
+            mobileInputController = FindAnyObjectByType<JrsInputController>();
         }
 
 
@@ -202,7 +202,6 @@ public class JrsVehicleLightControl : MonoBehaviour
         }
     }
 }
-
 
 
 

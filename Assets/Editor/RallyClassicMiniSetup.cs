@@ -8,24 +8,27 @@ using UnityEngine;
 public static class RallyClassicMiniSetup
 {
     const string Folder = "Assets/Art/Vehicles/ClassicMini";
-    const string Prefab = "Assets/Resources/Vehicles/ClassicMini.prefab";
 
     [MenuItem("Tools/Rally/Build Classic Mini Visual")]
     public static void Build()
+        => BuildVariant(Folder, "ClassicMini", ConvertMaterial);
+
+    public static void BuildVariant(string folder, string modelName, Func<Material, Material> convertMaterial)
     {
         AssetDatabase.Refresh();
-        var importer = (ModelImporter)AssetImporter.GetAtPath(Folder + "/ClassicMini.fbx");
+        var importer = (ModelImporter)AssetImporter.GetAtPath(folder + "/" + modelName + ".fbx");
         importer.importCameras = false;
         importer.importLights = false;
         importer.importAnimation = false;
         importer.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;
         importer.SaveAndReimport();
-        Directory.CreateDirectory(Folder + "/Materials");
+        Directory.CreateDirectory(folder + "/Materials");
         Directory.CreateDirectory("Assets/Resources/Vehicles");
         AssetDatabase.Refresh();
-        var source = AssetDatabase.LoadAssetAtPath<GameObject>(Folder + "/ClassicMini.fbx");
+        var source = AssetDatabase.LoadAssetAtPath<GameObject>(folder + "/" + modelName + ".fbx");
         var instance = UnityEngine.Object.Instantiate(source);
-        instance.name = "Mini Classic Rally";
+        instance.name = modelName;
+        GameObject root = null;
         try
         {
             var all = instance.GetComponentsInChildren<Transform>();
@@ -36,7 +39,7 @@ public static class RallyClassicMiniSetup
 
             // Preserve source transforms under a neutral Unity root. Use wheel bounds, not
             // source object origins, to determine axle locations and wheel radius.
-            var root = new GameObject("Mini Classic Rally");
+            root = new GameObject(modelName);
             instance.transform.SetParent(root.transform, true);
             var visual = root.AddComponent<RallyVehicleVisual>();
             visual.wheels = new Transform[4];
@@ -44,7 +47,7 @@ public static class RallyClassicMiniSetup
             var meshes = instance.GetComponentsInChildren<MeshRenderer>();
             foreach (var renderer in meshes)
             {
-                renderer.sharedMaterials = renderer.sharedMaterials.Select(ConvertMaterial).ToArray();
+                renderer.sharedMaterials = renderer.sharedMaterials.Select(convertMaterial).ToArray();
             }
             var candidates = instance.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("wheel_")).ToArray();
             var ordered = candidates.OrderByDescending(t => BoundsIn(root.transform, t.GetComponentsInChildren<MeshRenderer>()).center.z)
@@ -67,12 +70,16 @@ public static class RallyClassicMiniSetup
                     throw new Exception("Unexpected imported wheel scale: " + b);
             }
             visual.bodyBounds = BoundsIn(root.transform, instance.GetComponentsInChildren<MeshRenderer>());
-            PrefabUtility.SaveAsPrefabAsset(root, Prefab);
-            Debug.Log("CLASSIC_MINI_BUILT " + visual.bodyBounds + " radii=" + string.Join(",", visual.radii));
+            PrefabUtility.SaveAsPrefabAsset(root, "Assets/Resources/Vehicles/" + modelName + ".prefab");
+            Debug.Log("VEHICLE_VISUAL_BUILT " + modelName + " " + visual.bodyBounds + " radii=" + string.Join(",", visual.radii));
             UnityEngine.Object.DestroyImmediate(root);
             AssetDatabase.SaveAssets();
         }
-        finally { if (instance != null) UnityEngine.Object.DestroyImmediate(instance); }
+        finally
+        {
+            if (root != null) UnityEngine.Object.DestroyImmediate(root);
+            else if (instance != null) UnityEngine.Object.DestroyImmediate(instance);
+        }
     }
 
     static Material ConvertMaterial(Material original)
@@ -140,7 +147,7 @@ public static class RallyClassicMiniSetup
                 if (visual.wheels[0].localPosition.z <= visual.wheels[2].localPosition.z ||
                     visual.wheels[0].localPosition.x >= visual.wheels[1].localPosition.x) throw new Exception("Invalid wheel order.");
                 if (RallyPlayerVehicleSelection.ApplyMini(player) != visual) throw new Exception("Duplicate visual on reapply.");
-                foreach (var bot in UnityEngine.Object.FindObjectsByType<RallyBotController>(FindObjectsSortMode.None))
+                foreach (var bot in UnityEngine.Object.FindObjectsByType<RallyBotController>())
                     if (bot.GetComponentInChildren<RallyVehicleVisual>() != null) throw new Exception("A bot was modified.");
                 Debug.Log("CLASSIC_CAR_SELECTION_PASS " + sceneName + " wheels=" + string.Join(",", visual.radii));
             }

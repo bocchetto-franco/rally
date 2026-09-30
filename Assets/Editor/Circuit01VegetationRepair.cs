@@ -154,7 +154,7 @@ public static class Circuit01VegetationRepair
                     report += mf.name + " rot=" + mf.transform.eulerAngles + " size=" + mf.sharedMesh.bounds.size.ToString("F6") + " matrix=" + mf.transform.localToWorldMatrix + "\n";
             }
         }
-        foreach(var t in UnityEngine.Object.FindObjectsByType<Terrain>(FindObjectsSortMode.None))
+        foreach(var t in UnityEngine.Object.FindObjectsByType<Terrain>())
             foreach(var d in t.terrainData.detailPrototypes) report += "DETAIL " + d.prototype.name + " align=" + d.alignToGround + "\n";
         foreach(var r in GameObject.Find("Additional CC0 desert trees").GetComponentsInChildren<MeshRenderer>().Take(3))report += "TREE " + r.name + " rot="+r.transform.eulerAngles+" mesh="+r.GetComponent<MeshFilter>().sharedMesh.bounds+" world="+r.bounds+"\n";
         File.WriteAllText("Logs/vegetation-repair-audit.txt", report);

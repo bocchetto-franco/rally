@@ -21,7 +21,7 @@ public static class RallyBrakeWarningSetup
     };
 
     [Serializable]
-    sealed class Layout { public Vector3[] centerline; public float[] distances; public float[] roadWidths; }
+    sealed class Layout { public Vector3[] centerline = default; public float[] distances = default; public float[] roadWidths = default; }
     sealed class Route { public readonly List<Vector3> points = new List<Vector3>(); public readonly List<float> distance = new List<float>(); public readonly List<float> width = new List<float>(); public float length; }
     sealed class Curve { public float start, end, angle, radius; }
 

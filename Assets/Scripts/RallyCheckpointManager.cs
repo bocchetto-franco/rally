@@ -3,8 +3,10 @@ using UnityEngine;
 public sealed class RallyCheckpointManager : MonoBehaviour
 {
     [SerializeField] RallyCheckpointTrigger[] checkpoints;
+    [SerializeField, Min(1)] int totalLaps = 1;
 
     int nextCheckpoint;
+    int completedLaps;
     float elapsedTime;
     bool running;
     bool finished;
@@ -15,6 +17,8 @@ public sealed class RallyCheckpointManager : MonoBehaviour
 
     public int CheckpointCount => checkpoints == null ? 0 : checkpoints.Length;
     public int NextCheckpoint => nextCheckpoint;
+    public int TotalLaps => Mathf.Max(1, totalLaps);
+    public int CurrentLap => Mathf.Clamp(completedLaps + 1, 1, TotalLaps);
     public float ElapsedTime => elapsedTime;
     public bool IsRunning => running;
     public bool IsFinished => finished;
@@ -76,21 +80,31 @@ public sealed class RallyCheckpointManager : MonoBehaviour
 
         if (checkpointIndex == 0)
         {
-            elapsedTime = 0f;
+            if (completedLaps == 0)
+                elapsedTime = 0f;
             running = true;
         }
 
         nextCheckpoint++;
         if (nextCheckpoint >= CheckpointCount)
         {
-            running = false;
-            finished = true;
+            completedLaps++;
+            if (completedLaps >= TotalLaps)
+            {
+                running = false;
+                finished = true;
+            }
+            else
+            {
+                nextCheckpoint = 0;
+            }
         }
     }
 
     public void ResetTimer()
     {
         nextCheckpoint = 0;
+        completedLaps = 0;
         elapsedTime = 0f;
         running = false;
         finished = false;
@@ -99,7 +113,7 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     void CacheInitialVehiclePose()
     {
         JrsVehicleController vehicle = null;
-        foreach (JrsVehicleController candidate in FindObjectsByType<JrsVehicleController>(FindObjectsSortMode.None))
+        foreach (JrsVehicleController candidate in FindObjectsByType<JrsVehicleController>())
         {
             if (candidate.GetComponentInParent<RallyBotController>() != null)
                 continue;

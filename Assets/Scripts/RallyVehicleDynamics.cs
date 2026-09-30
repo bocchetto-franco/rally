@@ -11,7 +11,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private WheelCollider frontRight;
     [SerializeField] private WheelCollider rearLeft;
     [SerializeField] private WheelCollider rearRight;
-    [SerializeField] private RallyBotGripProfile botGripProfile;
+    [SerializeField] private RallyBotGripProfile botGripProfile = default;
 
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;

@@ -21,7 +21,8 @@ Unity prefab: `Assets/Resources/Vehicles/ClassicMini.prefab`.
 Rebuild using `Tools > Rally > Build Classic Mini Visual`.
 
 Runtime selection reuses the existing player root, Rigidbody, four WheelColliders,
-JrsVehicleController and RallyVehicleDynamics in each circuit. Only visual model,
-wheel geometry and body collider fit change. All tuned parameters remain identical
-to the Porsche; the shorter wheelbase already supplies a handling difference.
+JrsVehicleController and RallyVehicleDynamics in each circuit. Only visual meshes
+change; the body and wheel visuals are fitted to the Porsche's physical rig.
+All physics remains identical, including wheelbase, radii, body collider and inertia.
+The previous model-specific collider fitting was removed at the user's request.
 The root retains its historical name for compatibility with existing references.

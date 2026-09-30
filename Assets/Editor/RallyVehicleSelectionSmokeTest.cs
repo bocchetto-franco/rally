@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-/// <summary>Batch Play-mode regression: actual menu buttons, both cars, all three tracks.</summary>
+/// <summary>Batch Play-mode regression: actual menu buttons, all cars, all three tracks.</summary>
 [InitializeOnLoad]
 public static class RallyVehicleSelectionSmokeTest
 {
@@ -24,6 +24,7 @@ public static class RallyVehicleSelectionSmokeTest
 
     public static void Run()
     {
+        RallyVehiclePhysicsParityTest.Run();
         SessionState.SetString(Key + "Vehicle", PlayerPrefs.GetString("Rally.SelectedVehicle", RallyGameSession.VehicleName));
         SessionState.SetString(Key + "Circuit", PlayerPrefs.GetString("Rally.SelectedCircuit", "Circuit 01"));
         SessionState.SetString(Key + "Start", AssetDatabase.GetAssetPath(EditorSceneManager.playModeStartScene));
@@ -43,7 +44,8 @@ public static class RallyVehicleSelectionSmokeTest
         try
         {
             int test = SessionState.GetInt(Key + "Case", 0);
-            int vehicleIndex = test % 2, circuitIndex = test / 2;
+            int vehicleCount = RallyPlayerVehicleSelection.Names.Length;
+            int vehicleIndex = test % vehicleCount, circuitIndex = test / vehicleCount;
             if (SessionState.GetInt(Key + "Phase", 0) == 0)
             {
                 if (SceneManager.GetActiveScene().name != RallyGameSession.SelectionScene) return;
@@ -64,7 +66,8 @@ public static class RallyVehicleSelectionSmokeTest
             if (!prepared)
             {
                 activeVisual = player.GetComponentInChildren<RallyVehicleVisual>();
-                if ((activeVisual != null) != (vehicleIndex == 1)) throw new Exception("Wrong car instantiated.");
+                if ((activeVisual != null) != (vehicleIndex > 0)) throw new Exception("Wrong car instantiated.");
+                if (activeVisual != null && activeVisual.name != RallyGameSession.SelectedVehicle + " Visual") throw new Exception("Wrong visual variant.");
                 if (!player.enabled || !GameObject.Find("Porsche Rally Dynamics").GetComponent<RallyVehicleDynamics>().enabled)
                     throw new Exception("Player physics was disabled by model binding.");
                 if (Mathf.Abs(rb.mass - 1450) > .01f || Mathf.Abs(rb.angularDamping - 3) > .01f)
@@ -102,7 +105,7 @@ public static class RallyVehicleSelectionSmokeTest
                 " travelled=" + Vector3.Distance(initialPosition, rb.position).ToString("F2"));
             InputSystem.RemoveDevice(pad);
             pad = null;
-            if (test == 5) { Finish(null); return; }
+            if (test == vehicleCount * RallyGameSession.CircuitScenes.Length - 1) { Finish(null); return; }
             SessionState.SetInt(Key + "Case", test + 1);
             SessionState.SetInt(Key + "Phase", 0);
             SceneManager.LoadScene(RallyGameSession.SelectionScene);
@@ -118,7 +121,7 @@ public static class RallyVehicleSelectionSmokeTest
         PlayerPrefs.SetString("Rally.SelectedCircuit", SessionState.GetString(Key + "Circuit", "Circuit 01"));
         PlayerPrefs.Save();
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(SessionState.GetString(Key + "Start", "Assets/Scenes/MainMenu.unity"));
-        if (error == null) Debug.Log("VEHICLE_SELECTION_ALL_PASS: two cars, three tracks, menu, player physics and wheel animation.");
+        if (error == null) Debug.Log("VEHICLE_SELECTION_ALL_PASS: " + RallyPlayerVehicleSelection.Names.Length + " cars, three tracks, menu, player physics and wheel animation.");
         else Debug.LogError("VEHICLE_SELECTION_FAIL " + error);
         EditorApplication.Exit(error == null ? 0 : 1);
     }
