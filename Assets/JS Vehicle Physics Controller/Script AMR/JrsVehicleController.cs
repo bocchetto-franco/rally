@@ -55,11 +55,8 @@ public class JrsVehicleController : MonoBehaviour
     public void SetBotInput(RallyBotController input) => botInput = input;
 
     public AudioSource engineAudioSource; // Assign this in the Inspector
-    private AudioClip engineSound;
-    private float targetPitch;
     public AudioSource engineStartAudioSource; // Assign this in the Inspector
-
-    private bool hasStartedMoving = false;
+    static AudioClip placeholderEngineClip;
 
     void Start()
     {
@@ -68,24 +65,38 @@ public class JrsVehicleController : MonoBehaviour
 
         mobileInputController = FindAnyObjectByType<JrsInputController>();
 
-        engineSound = Resources.Load<AudioClip>("EngineSound");
-        targetPitch = engineAudioSource.pitch;
-
-        StartCoroutine(DelayedEngineSound());
-    }
-
-        IEnumerator DelayedEngineSound()
+        // The original engine AudioSources reference clips that are no longer in Assets.
+        // Use an existing EngineSound resource if one is later imported, otherwise a tiny
+        // generated looping placeholder. Bots keep their separate, silent audio setup.
+        if (botInput == null)
         {
-            while (!hasStartedMoving)
-            {
-                yield return null;
-            }
-
-            yield return new WaitForSeconds(2f); // Delay for 2 seconds
-
+            if (engineAudioSource == null) engineAudioSource = gameObject.AddComponent<AudioSource>();
+            if (engineAudioSource.clip == null)
+                engineAudioSource.clip = Resources.Load<AudioClip>("EngineSound") ?? CreatePlaceholderEngineClip();
+            engineAudioSource.loop = true;
+            engineAudioSource.playOnAwake = false;
+            engineAudioSource.spatialBlend = 0f;
+            engineAudioSource.volume = 0.22f;
+            engineAudioSource.pitch = 0.65f;
             engineAudioSource.Play();
         }
-        
+    }
+
+    static AudioClip CreatePlaceholderEngineClip()
+    {
+        if (placeholderEngineClip != null) return placeholderEngineClip;
+        const int sampleRate = 22050;
+        float[] samples = new float[sampleRate];
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float phase = 2f * Mathf.PI * 55f * i / sampleRate;
+            samples[i] = 0.5f * Mathf.Sin(phase) + 0.3f * Mathf.Sin(phase * 2f)
+                + 0.15f * Mathf.Sin(phase * 3f) + 0.05f * Mathf.Sin(phase * 5f);
+        }
+        placeholderEngineClip = AudioClip.Create("Motor provisional", sampleRate, 1, sampleRate, false);
+        placeholderEngineClip.SetData(samples, 0);
+        return placeholderEngineClip;
+    }
 
     void Update()
     {
@@ -216,24 +227,12 @@ public class JrsVehicleController : MonoBehaviour
         SetDustParticleSystemState(rearLeftDustParticleSystem, shouldPlayDustParticles);
         SetDustParticleSystemState(rearRightDustParticleSystem, shouldPlayDustParticles);
 
-        // Calculate the target pitch based on the current speed and direction
-        float targetPitch = currentSpeedKmph > 0.1f ? Mathf.Lerp(0.5f, 2f, currentSpeedKmph / 100f) : 0.5f;
-
-        // Check if the vehicle is moving in reverse
-        if (currentSpeedKmph < -0.1f)
+        // Use the chassis speed, not wheel RPM, so slip does not spike the sound.
+        if (botInput == null && engineAudioSource != null)
         {
-            targetPitch = Mathf.Lerp(0.5f, 2f, Mathf.Abs(currentSpeedKmph) / 100f);
-        }
-       
-        // Smoothly adjust the pitch towards the target pitch
-        engineAudioSource.pitch = Mathf.Lerp(engineAudioSource.pitch, targetPitch, Time.deltaTime * 5f);
-
-
-        // Play the engine start sound if the vehicle just starts moving
-        if (!hasStartedMoving && currentSpeedKmph > 0.1f)
-        {
-            engineStartAudioSource.Play();
-            hasStartedMoving = true;
+            float speedKmh = rb.linearVelocity.magnitude * 3.6f;
+            float targetPitch = Mathf.Lerp(0.65f, 1.55f, Mathf.Clamp01(speedKmh / 140f));
+            engineAudioSource.pitch = Mathf.Lerp(engineAudioSource.pitch, targetPitch, Time.deltaTime * 5f);
         }
     }
 
