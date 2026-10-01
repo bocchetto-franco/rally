@@ -56,7 +56,6 @@ public class JrsVehicleController : MonoBehaviour
 
     public AudioSource engineAudioSource; // Assign this in the Inspector
     public AudioSource engineStartAudioSource; // Assign this in the Inspector
-    static AudioClip placeholderEngineClip;
 
     void Start()
     {
@@ -65,37 +64,16 @@ public class JrsVehicleController : MonoBehaviour
 
         mobileInputController = FindAnyObjectByType<JrsInputController>();
 
-        // The original engine AudioSources reference clips that are no longer in Assets.
-        // Use an existing EngineSound resource if one is later imported, otherwise a tiny
-        // generated looping placeholder. Bots keep their separate, silent audio setup.
+        // Audio is shared by the three player visual variants; bots stay silent.
         if (botInput == null)
         {
-            if (engineAudioSource == null) engineAudioSource = gameObject.AddComponent<AudioSource>();
-            if (engineAudioSource.clip == null)
-                engineAudioSource.clip = Resources.Load<AudioClip>("EngineSound") ?? CreatePlaceholderEngineClip();
-            engineAudioSource.loop = true;
-            engineAudioSource.playOnAwake = false;
-            engineAudioSource.spatialBlend = 0f;
-            engineAudioSource.volume = 0.22f;
-            engineAudioSource.pitch = 0.65f;
-            engineAudioSource.Play();
+            if (GetComponent<RallyVehicleRecovery>() == null)
+                gameObject.AddComponent<RallyVehicleRecovery>();
+            if (GetComponent<RallyVehicleDust>() == null)
+                gameObject.AddComponent<RallyVehicleDust>();
+            RallyVehicleAudio audio = GetComponent<RallyVehicleAudio>() ?? gameObject.AddComponent<RallyVehicleAudio>();
+            audio.Configure(this);
         }
-    }
-
-    static AudioClip CreatePlaceholderEngineClip()
-    {
-        if (placeholderEngineClip != null) return placeholderEngineClip;
-        const int sampleRate = 22050;
-        float[] samples = new float[sampleRate];
-        for (int i = 0; i < samples.Length; i++)
-        {
-            float phase = 2f * Mathf.PI * 55f * i / sampleRate;
-            samples[i] = 0.5f * Mathf.Sin(phase) + 0.3f * Mathf.Sin(phase * 2f)
-                + 0.15f * Mathf.Sin(phase * 3f) + 0.05f * Mathf.Sin(phase * 5f);
-        }
-        placeholderEngineClip = AudioClip.Create("Motor provisional", sampleRate, 1, sampleRate, false);
-        placeholderEngineClip.SetData(samples, 0);
-        return placeholderEngineClip;
     }
 
     void Update()

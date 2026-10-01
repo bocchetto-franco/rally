@@ -11,13 +11,30 @@ public sealed class RallyRaceHud : MonoBehaviour
     [SerializeField] TMP_Text positionText;
     [SerializeField] RallyRacePositions racePositions;
 
-    void Awake() => PreparePositionPanel();
+    void Awake()
+    {
+        PreparePositionPanel();
+        PrepareSpeedPanel();
+    }
+
+    void PrepareSpeedPanel()
+    {
+        if (speedText == null) return;
+
+        speedText.fontSize = 88f;
+        speedText.richText = true;
+        RectTransform label = speedText.rectTransform;
+        label.sizeDelta = new Vector2(380f, 130f);
+        if (label.parent is RectTransform panel && panel.name == "Speed Panel")
+            panel.sizeDelta = new Vector2(410f, 154f);
+    }
 
     public void Configure(RallyCheckpointManager manager, Rigidbody body, TMP_Text speed, TMP_Text time, TMP_Text checkpoint)
     {
         checkpointManager = manager;
         vehicleBody = body;
         speedText = speed;
+        PrepareSpeedPanel();
         timeText = time;
         checkpointText = checkpoint;
         Refresh();
@@ -60,7 +77,7 @@ public sealed class RallyRaceHud : MonoBehaviour
         if (speedText != null)
         {
             float speedKph = vehicleBody == null ? 0f : vehicleBody.linearVelocity.magnitude * 3.6f;
-            speedText.text = $"{Mathf.RoundToInt(speedKph):000} <size=45%>km/h</size>";
+            speedText.text = $"{Mathf.RoundToInt(speedKph):000} <size=40%>km/h</size>";
         }
 
         if (checkpointManager == null)

@@ -64,7 +64,25 @@ public static class RallyPauseMenuSmokeTest
             InvokeUpdate(pause.GetComponentInChildren<RallyMenuNavigation>(true));
             if (pause.IsOpen || Time.timeScale != 1f) throw new Exception("Cross did not activate Reanudar.");
 
-            Debug.Log("Rally pause menu PASS: DualSense Options toggle, D-Pad navigation, single Cross submit, resume/timeScale.");
+            Press(pad, new GamepadState());
+            InvokeUpdate(pause);
+            Press(pad, new GamepadState(GamepadButton.Start));
+            InvokeUpdate(pause);
+            Press(pad, new GamepadState());
+            InvokeUpdate(pause);
+            FindButton(pauseObject, "Main Menu Button").onClick.Invoke();
+            if (!pause.IsConfirmingExit || !pause.IsOpen || Time.timeScale != 0f)
+                throw new Exception("Back to menu did not show confirmation while paused.");
+            FindButton(pauseObject, "No Button").onClick.Invoke();
+            if (pause.IsConfirmingExit || !pause.IsOpen || Time.timeScale != 0f)
+                throw new Exception("No did not return to the paused race.");
+            FindButton(pauseObject, "Main Menu Button").onClick.Invoke();
+            Press(pad, new GamepadState(GamepadButton.Start));
+            InvokeUpdate(pause);
+            if (pause.IsConfirmingExit || !pause.IsOpen || Time.timeScale != 0f)
+                throw new Exception("Options did not dismiss confirmation safely.");
+
+            Debug.Log("Rally pause menu PASS: Options toggle, D-Pad/Cross, exit confirmation, No and Options cancellation, resume/timeScale.");
         }
         finally
         {
@@ -81,6 +99,13 @@ public static class RallyPauseMenuSmokeTest
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
         go.transform.SetParent(parent, false);
         return go.GetComponent<Button>();
+    }
+
+    static Button FindButton(GameObject root, string name)
+    {
+        foreach (Button button in root.GetComponentsInChildren<Button>(true))
+            if (button.name == name) return button;
+        throw new Exception("Missing pause button: " + name);
     }
 
     static void Press(Gamepad pad, GamepadState state)

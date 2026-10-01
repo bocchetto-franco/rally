@@ -4,6 +4,9 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class RallyVehicleDynamics : MonoBehaviour
 {
+    public JrsVehicleController VehicleController => controller;
+    public bool IsRearDrifting => rearLeftSmokeActive || rearRightSmokeActive;
+
     [Header("Vehicle references")]
     [SerializeField] private JrsVehicleController controller;
     [SerializeField] private Rigidbody vehicleBody;

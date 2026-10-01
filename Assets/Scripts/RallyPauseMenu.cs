@@ -5,18 +5,22 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-/// <summary>Race pause menu. DualSense Options maps to Gamepad.startButton.</summary>
+/// <summary>Race pause menu. Escape and gamepad Start/Options toggle the same pause state.</summary>
 [DisallowMultipleComponent]
 public sealed class RallyPauseMenu : MonoBehaviour
 {
     RallyCheckpointManager checkpointManager;
     GameObject canvasObject;
+    GameObject confirmationObject;
+    RallyMenuNavigation pauseNavigation;
+    RallyMenuNavigation confirmationNavigation;
     bool isOpen;
     bool cursorWasVisible;
     bool optionsHeld;
     CursorLockMode previousCursorLock;
 
     public bool IsOpen => isOpen;
+    public bool IsConfirmingExit => confirmationObject != null && confirmationObject.activeSelf;
     public void Configure(RallyCheckpointManager manager) => checkpointManager = manager;
 
     void Start()
@@ -41,7 +45,8 @@ public sealed class RallyPauseMenu : MonoBehaviour
         optionsHeld = options;
         if (toggle)
         {
-            if (isOpen) Close(true);
+            if (IsConfirmingExit) CancelExit();
+            else if (isOpen) Close(true);
             else Open();
         }
     }
@@ -58,7 +63,8 @@ public sealed class RallyPauseMenu : MonoBehaviour
         previousCursorLock = Cursor.lockState;
         isOpen = true;
         canvasObject.SetActive(true);
-        canvasObject.GetComponent<RallyMenuNavigation>().ResetSelection();
+        pauseNavigation.enabled = true;
+        pauseNavigation.ResetSelection();
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         Time.timeScale = 0f;
@@ -67,6 +73,7 @@ public sealed class RallyPauseMenu : MonoBehaviour
     void Close(bool resumeTime)
     {
         isOpen = false;
+        if (confirmationObject != null) confirmationObject.SetActive(false);
         if (canvasObject != null) canvasObject.SetActive(false);
         Cursor.visible = cursorWasVisible;
         Cursor.lockState = previousCursorLock;
@@ -77,6 +84,20 @@ public sealed class RallyPauseMenu : MonoBehaviour
     {
         Close(true);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    void ConfirmExit()
+    {
+        pauseNavigation.enabled = false;
+        confirmationObject.SetActive(true);
+        confirmationNavigation.ResetSelection();
+    }
+
+    void CancelExit()
+    {
+        confirmationObject.SetActive(false);
+        pauseNavigation.enabled = true;
+        pauseNavigation.ResetSelection();
     }
 
     void BackToMainMenu()
@@ -108,10 +129,33 @@ public sealed class RallyPauseMenu : MonoBehaviour
         Label(card, font, "Title", "PAUSA", 60f, new Vector2(0f, 185f), new Vector2(600f, 80f));
         Button resume = CreateButton(card, font, "Resume Button", "REANUDAR", new Vector2(0f, 65f), () => Close(true), true);
         Button restart = CreateButton(card, font, "Restart Button", "REINICIAR CARRERA", new Vector2(0f, -35f), RestartRace, false);
-        Button menu = CreateButton(card, font, "Main Menu Button", "VOLVER AL MENÚ PRINCIPAL", new Vector2(0f, -135f), BackToMainMenu, false);
-        Label(card, font, "Hint", "D-PAD: navegar   •   CRUZ: elegir   •   OPTIONS: reanudar", 18f,
+        Button menu = CreateButton(card, font, "Main Menu Button", "VOLVER AL MENÚ PRINCIPAL", new Vector2(0f, -135f), ConfirmExit, false);
+        Label(card, font, "Hint", "D-PAD: navegar   •   CRUZ: elegir   •   ESC / OPTIONS: reanudar", 18f,
             new Vector2(0f, -225f), new Vector2(620f, 35f));
-        canvasObject.AddComponent<RallyMenuNavigation>().Configure(resume, restart, menu);
+        pauseNavigation = canvasObject.AddComponent<RallyMenuNavigation>();
+        pauseNavigation.Configure(resume, restart, menu);
+
+        confirmationObject = new GameObject("Confirm Exit", typeof(RectTransform), typeof(Image));
+        confirmationObject.transform.SetParent(canvasObject.transform, false);
+        RectTransform veil = (RectTransform)confirmationObject.transform;
+        veil.anchorMin = Vector2.zero;
+        veil.anchorMax = Vector2.one;
+        veil.offsetMin = Vector2.zero;
+        veil.offsetMax = Vector2.zero;
+        confirmationObject.GetComponent<Image>().color = new Color(.01f, .015f, .025f, .9f);
+        RectTransform confirmationCard = Panel(veil, "Confirmation Card", new Color(.045f, .06f, .085f, 1f),
+            Vector2.zero, new Vector2(740f, 390f));
+        Label(confirmationCard, font, "Confirmation Title", "¿SEGURO?", 48f,
+            new Vector2(0f, 105f), new Vector2(660f, 70f));
+        Label(confirmationCard, font, "Progress Warning", "Se perderá el progreso de la vuelta actual.", 26f,
+            new Vector2(0f, 30f), new Vector2(680f, 65f));
+        Button no = CreateButton(confirmationCard, font, "No Button", "NO, SEGUIR EN LA CARRERA",
+            new Vector2(0f, -60f), CancelExit, true);
+        Button yes = CreateButton(confirmationCard, font, "Yes Button", "SÍ, VOLVER AL MENÚ",
+            new Vector2(0f, -145f), BackToMainMenu, false);
+        confirmationNavigation = confirmationObject.AddComponent<RallyMenuNavigation>();
+        confirmationNavigation.Configure(no, yes);
+        confirmationObject.SetActive(false);
     }
 
     static RectTransform Panel(Transform parent, string name, Color color, Vector2 position, Vector2 size)

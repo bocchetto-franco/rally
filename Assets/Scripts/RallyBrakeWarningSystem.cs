@@ -6,10 +6,14 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
 {
     [SerializeField] Rigidbody vehicleBody;
     [SerializeField, Min(1f)] float fullIntensitySpeedExcessKph = 30f;
+    [SerializeField, Min(.1f)] float appearanceDuration = .32f;
 
     CanvasGroup warningGroup;
+    RectTransform warningRect;
     TMP_Text warningText;
     RallyBrakeWarningTrigger activeTrigger;
+    float appearanceTime;
+    bool wasVisible;
 
     public Rigidbody VehicleBody => vehicleBody;
 
@@ -45,11 +49,32 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         warningGroup.blocksRaycasts = false;
         warningGroup.interactable = false;
         warningText.text = $"<size=70%>▲</size>  BRAKE\n<size=38%>CURVA {Mathf.RoundToInt(activeTrigger.TargetSpeedKph)} km/h</size>";
+
+        // Animate size only: opacity remains exactly the speed-based warning value.
+        bool visible = alpha > 0f;
+        if (visible && !wasVisible) appearanceTime = 0f;
+        wasVisible = visible;
+        if (!visible)
+        {
+            warningRect.localScale = Vector3.one;
+            return;
+        }
+        appearanceTime = Mathf.Min(appearanceTime + Time.deltaTime, appearanceDuration);
+        float progress = Mathf.Clamp01(appearanceTime / Mathf.Max(.1f, appearanceDuration));
+        float scale = progress < .7f
+            ? Mathf.Lerp(.78f, 1.08f, Mathf.SmoothStep(0f, 1f, progress / .7f))
+            : Mathf.Lerp(1.08f, 1f, Mathf.SmoothStep(0f, 1f, (progress - .7f) / .3f));
+        warningRect.localScale = Vector3.one * scale;
     }
 
     public void Enter(RallyBrakeWarningTrigger trigger)
     {
-        if (trigger != null) activeTrigger = trigger;
+        // OnTriggerStay calls Enter repeatedly; replay the pop only for a new zone.
+        if (trigger != null && activeTrigger != trigger)
+        {
+            activeTrigger = trigger;
+            wasVisible = false;
+        }
     }
 
     public void Exit(RallyBrakeWarningTrigger trigger)
@@ -64,6 +89,9 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
     void HideImmediate()
     {
         if (warningGroup != null) warningGroup.alpha = 0f;
+        if (warningRect != null) warningRect.localScale = Vector3.one;
+        wasVisible = false;
+        appearanceTime = 0f;
     }
 
     void BuildHud()
@@ -78,14 +106,21 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = .5f;
 
-        GameObject panel = new GameObject("Brake Warning", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
+        GameObject panel = new GameObject("Brake Warning", typeof(RectTransform), typeof(CanvasGroup), typeof(Image), typeof(Outline));
         panel.transform.SetParent(canvasObject.transform, false);
         RectTransform rect = panel.GetComponent<RectTransform>();
+        warningRect = rect;
         rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1f);
-        rect.pivot = new Vector2(.5f, 1f);
-        rect.anchoredPosition = new Vector2(0f, -105f);
-        rect.sizeDelta = new Vector2(430f, 145f);
-        panel.GetComponent<Image>().color = new Color(.12f, .015f, .005f, .88f);
+        rect.pivot = new Vector2(.5f, .5f);
+        rect.anchoredPosition = new Vector2(0f, -200f);
+        rect.sizeDelta = new Vector2(620f, 190f);
+        Image background = panel.GetComponent<Image>();
+        background.color = new Color(.48f, .012f, .018f, .95f);
+        background.raycastTarget = false;
+        Outline border = panel.GetComponent<Outline>();
+        border.effectColor = new Color(1f, .86f, .06f, 1f);
+        border.effectDistance = new Vector2(4f, -4f);
+        border.useGraphicAlpha = false;
         warningGroup = panel.GetComponent<CanvasGroup>();
 
         GameObject label = new GameObject("Brake Label", typeof(RectTransform), typeof(TextMeshProUGUI));
@@ -93,13 +128,14 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         RectTransform labelRect = label.GetComponent<RectTransform>();
         labelRect.anchorMin = Vector2.zero;
         labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = new Vector2(12f, 8f);
-        labelRect.offsetMax = new Vector2(-12f, -8f);
+        labelRect.offsetMin = new Vector2(20f, 12f);
+        labelRect.offsetMax = new Vector2(-20f, -12f);
         warningText = label.GetComponent<TextMeshProUGUI>();
         warningText.alignment = TextAlignmentOptions.Center;
-        warningText.fontSize = 42f;
+        warningText.fontSize = 66f;
         warningText.fontStyle = FontStyles.Bold;
-        warningText.color = new Color(1f, .72f, .08f, 1f);
+        warningText.color = new Color(1f, .9f, .12f, 1f);
+        warningText.raycastTarget = false;
         warningText.textWrappingMode = TextWrappingModes.NoWrap;
     }
 }

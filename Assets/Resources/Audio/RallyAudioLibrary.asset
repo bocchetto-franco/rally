@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1363c1b57e7c6d4478f9c3683fb67774, type: 3}
+  m_Name: RallyAudioLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::RallyAudioLibrary
+  mixer: {fileID: 24100000, guid: d12243f52e0eeb44b9f7a83419ce1027, type: 2}
+  motorGroup: {fileID: 7691335090525744702, guid: d12243f52e0eeb44b9f7a83419ce1027, type: 2}
+  effectsGroup: {fileID: -6133508546791391906, guid: d12243f52e0eeb44b9f7a83419ce1027, type: 2}
+  musicGroup: {fileID: 2762875057291408847, guid: d12243f52e0eeb44b9f7a83419ce1027, type: 2}
+  engineLoop: {fileID: 8300000, guid: 23d9e9bc4db2642448fcd6e8fff76851, type: 3}
+  tyreSkidLoop: {fileID: 8300000, guid: b6ecf95bf0eca664091828804e7dfd1e, type: 3}
+  impact: {fileID: 8300000, guid: d0e2dd82e98d8b04da57a0abcc9bdc6a, type: 3}
+  menuMusic: {fileID: 8300000, guid: 5a8aeda962b0d294bbd2599f8fefb9ed, type: 3}
+  raceMusic: {fileID: 8300000, guid: faffdc26ec561094cb6a630d4c5abebe, type: 3}
+  engineVolume: 0.75
+  skidVolume: 0.65
+  impactVolume: 0.85
+  menuMusicVolume: 0.75
+  raceMusicVolume: 0.5
+  musicFadeSeconds: 0.8
+  minimumImpactSpeed: 2
+  fullVolumeImpactSpeed: 14
+  impactCooldown: 0.2

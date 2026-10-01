@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public static class RallyGamepadInput
 {
     private static bool resetWasHeld;
+    private static bool recoveryWasHeld;
 
     public static float Throttle => ReadTrigger(Gamepad.current == null ? 0f :
         Gamepad.current.rightTrigger.ReadValue());
@@ -18,6 +19,18 @@ public static class RallyGamepadInput
     // South = A on Xbox / Cross on PlayStation; North = Y / Triangle.
     public static bool HandbrakePressed => Gamepad.current != null &&
         Gamepad.current.buttonSouth.isPressed;
+
+    // West = X on Xbox / Square on PlayStation; independent of checkpoint reset.
+    public static bool RecoverPressedThisFrame
+    {
+        get
+        {
+            bool held = Gamepad.current != null && Gamepad.current.buttonWest.isPressed;
+            bool pressed = held && !recoveryWasHeld;
+            recoveryWasHeld = held;
+            return pressed;
+        }
+    }
 
     public static bool ResetPressedThisFrame
     {

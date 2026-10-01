@@ -1,0 +1,44 @@
+[
+  {
+    "asset": "rocky_trail_02",
+    "channel": "diff",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rocky_trail_02/rocky_trail_02_diff_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "d755ac6c70729afce6bb78b9a265d16bdf599ece64f4f079d681433e77bb24a9"
+  },
+  {
+    "asset": "rocky_trail_02",
+    "channel": "nor_gl",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rocky_trail_02/rocky_trail_02_nor_gl_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "d85fc706716b921e1511b5dc0730ed820c904fe68603605a161095501622c0dd"
+  },
+  {
+    "asset": "rocky_trail_02",
+    "channel": "arm",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rocky_trail_02/rocky_trail_02_arm_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "2f8d71fb073c893e6a8330268d59eb85b4e3f46bbf41fa0b9bb7b230d1a0542f"
+  },
+  {
+    "asset": "muddy_tracks",
+    "channel": "diff",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/muddy_tracks/muddy_tracks_diff_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "09d45e99ae5338b4cdb0aa1897519bc096bc38a4249c5042512e5ee74b21125c"
+  },
+  {
+    "asset": "muddy_tracks",
+    "channel": "nor_gl",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/muddy_tracks/muddy_tracks_nor_gl_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "db4884d62000939863718260d97b2a073f0b82b2d9133921cb836457e6f1fc01"
+  },
+  {
+    "asset": "muddy_tracks",
+    "channel": "arm",
+    "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/muddy_tracks/muddy_tracks_arm_2k.jpg",
+    "license": "CC0-1.0",
+    "sha256": "8781febd71da2d0b88b7c74f57b5d61b507d932c98387c0b36359690d66ee248"
+  }
+]

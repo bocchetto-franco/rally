@@ -56,8 +56,8 @@ public static class Circuit01HudSetup
         TMP_Text time = Label(timingPanel, "Time", font, 44, TextAlignmentOptions.Center, new Vector2(0, -12), new Vector2(530, 58));
         TMP_Text checkpoint = Label(timingPanel, "Checkpoint", font, 30, TextAlignmentOptions.Center, new Vector2(0, -72), new Vector2(530, 42));
 
-        RectTransform speedPanel = Panel(root.transform, "Speed Panel", new Vector2(1, 0), new Vector2(-30, 30), new Vector2(330, 122), new Vector2(1, 0));
-        TMP_Text speed = Label(speedPanel, "Speed", font, 64, TextAlignmentOptions.Center, Vector2.zero, new Vector2(310, 104));
+        RectTransform speedPanel = Panel(root.transform, "Speed Panel", new Vector2(1, 0), new Vector2(-30, 30), new Vector2(410, 154), new Vector2(1, 0));
+        TMP_Text speed = Label(speedPanel, "Speed", font, 88, TextAlignmentOptions.Center, Vector2.zero, new Vector2(380, 130));
 
         Transform route = GameObject.Find("AI_Waypoints")?.transform;
         if (route == null) throw new InvalidOperationException("Race positions require AI_Waypoints.");

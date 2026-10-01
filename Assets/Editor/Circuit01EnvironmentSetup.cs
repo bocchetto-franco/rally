@@ -143,6 +143,8 @@ public static class Circuit01EnvironmentSetup
     static Material Lit(string name,string id,bool foliage)
     {
         var mat=MaterialAsset(name,"Universal Render Pipeline/Lit");
+        // Preserve the separately upgraded road surface when rebuilding the environment.
+        if(name=="Road - dry gravel" && AssetDatabase.GetAssetPath(mat.GetTexture("_BaseMap")).StartsWith("Assets/Art/RoadSurfaces/"))return mat;
         mat.SetTexture("_BaseMap",foliage?Packed(id,false,true):Texture(id,"diff"));
         mat.SetTexture("_BumpMap",Texture(id,"nor_gl",true));mat.EnableKeyword("_NORMALMAP");
         mat.SetFloat("_BumpScale",.7f);mat.SetColor("_BaseColor",Color.white);

@@ -1,0 +1,72 @@
+[
+  {
+    "name": "EngineLoop",
+    "title": "Sedan engine loop",
+    "author": "Dmitry_mansurev64",
+    "page": "https://freesound.org/people/Dmitry_mansurev64/sounds/748027/",
+    "download": "https://cdn.freesound.org/previews/748/748027_16197341-hq.mp3",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_sha256": "0dce2f929e730dc983a913fccde4f87697396cb0b855ca104297a96f61ed24bc",
+    "file": "Assets/Resources/Audio/EngineLoop.wav",
+    "sha256": "b46ce29574abf7bb16f2f0eeb99a9c29b2319c36993e035c126db5307c09e7f7",
+    "duration_seconds": 16.91174603174603,
+    "changes": "Public HQ MP3 preview decoded to mono PCM 44.1 kHz/16-bit; silence trimmed and level normalized. 80 ms circular crossfade for looping."
+  },
+  {
+    "name": "TyreSkid",
+    "title": "screeching tyres / tires",
+    "author": "johnnydekk",
+    "page": "https://freesound.org/people/johnnydekk/sounds/614627/",
+    "download": "https://cdn.freesound.org/previews/614/614627_5790048-hq.mp3",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_sha256": "0fefc459e1cced727e2228f43dbcc2f3ef5e8ed60297c435c1f3128c5af1c3d7",
+    "file": "Assets/Resources/Audio/TyreSkid.wav",
+    "sha256": "8d8659739c20aa1a56af583daaf40a9c7b0faf0db2a2eb841bdece28d91c0209",
+    "duration_seconds": 1.92,
+    "changes": "Public HQ MP3 preview decoded to mono PCM 44.1 kHz/16-bit; silence trimmed and level normalized. 80 ms circular crossfade for looping. Strongest 2-second screech excerpt."
+  },
+  {
+    "name": "Impact",
+    "title": "Collision",
+    "author": "qubodup",
+    "page": "https://freesound.org/people/qubodup/sounds/332058/",
+    "download": "https://cdn.freesound.org/previews/332/332058_71257-hq.mp3",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_sha256": "b66bfff152e98c3ffaf265939bbbcf53255a38a0ca32e29f9e901f65103359b9",
+    "file": "Assets/Resources/Audio/Impact.wav",
+    "sha256": "a4324db3e95bd7a92abacffb5606cd855a7fe90d83b8f39ccced206600061c0a",
+    "duration_seconds": 0.9053968253968254,
+    "changes": "Public HQ MP3 preview decoded to mono PCM 44.1 kHz/16-bit; silence trimmed and level normalized. One-shot, not looped."
+  },
+  {
+    "name": "MenuMusic",
+    "title": "Racing Game Title",
+    "author": "MintoDog",
+    "page": "https://opengameart.org/content/racing-game-title",
+    "download": "https://opengameart.org/sites/default/files/racing_game_title_bpm140.ogg",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_sha256": "61134b6be3d9f65e39d74d9d8645accf77d815bd37e9d30e7697d4b6eb00f680",
+    "file": "Assets/Resources/Audio/MenuMusic.ogg",
+    "sha256": "61134b6be3d9f65e39d74d9d8645accf77d815bd37e9d30e7697d4b6eb00f680",
+    "duration_seconds": null,
+    "changes": "Original Ogg file, unchanged."
+  },
+  {
+    "name": "RaceMusic",
+    "title": "Hot Roadway",
+    "author": "MintoDog",
+    "page": "https://opengameart.org/content/hot-roadway",
+    "download": "https://opengameart.org/sites/default/files/hot_roadway_bpm160.ogg",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_sha256": "66d065b2c48d41f7bf86635a81296b99e5963075dccf4906c83c573f53971a7c",
+    "file": "Assets/Resources/Audio/RaceMusic.ogg",
+    "sha256": "66d065b2c48d41f7bf86635a81296b99e5963075dccf4906c83c573f53971a7c",
+    "duration_seconds": null,
+    "changes": "Original Ogg file, unchanged."
+  }
+]
