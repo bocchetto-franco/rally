@@ -19,8 +19,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;
     [SerializeField] private float vehicleAngularDamping = 3.0f;
-    [SerializeField] private float maximumSteerAngle = 36f;
-    [SerializeField] private float steeringResponse = 6f;
+    [SerializeField] private float maximumSteerAngle = 38f;
+    [SerializeField] private float steeringResponse = 8.5f;
     [SerializeField] private float motorForce = 480f;
     [SerializeField] private float firstGearRatio = 6.0f;
     [SerializeField] private float secondGearRatio = 3.75f;
@@ -63,9 +63,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Arcade spin stability assist")]
     [Tooltip("Local yaw rate in radians per second before the anti-spin assistance begins. Normal controlled drifts below this rate are untouched.")]
-    [SerializeField, Min(0.1f)] private float spinAssistYawRateThreshold = 1.75f;
+    [SerializeField, Min(0.1f)] private float spinAssistYawRateThreshold = 1.25f;
     [Tooltip("Maximum counter-yaw angular acceleration in radians per second squared. The assistance ramps in progressively above the threshold.")]
-    [SerializeField, Min(0f)] private float spinAssistCorrectionStrength = 4.5f;
+    [SerializeField, Min(0f)] private float spinAssistCorrectionStrength = 7f;
 
     [Header("Service brake and handbrake")]
     [SerializeField] private float frontServiceBrakeTorque = 4200f;
@@ -75,6 +75,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float absSlipFull = 0.85f;
     [SerializeField, Range(0f, 1f)] private float absMinimumTorqueMultiplier = 0.35f;
     [SerializeField] private float rearHandbrakeTorque = 3500f;
+    [Tooltip("Rear handbrake torque retained at severe yaw, allowing the wheels to regain grip before a full spin.")]
+    [SerializeField, Range(0f, 1f)] private float handbrakeRecoveryTorqueMultiplier = 0.55f;
 
     [Header("High-speed downforce")]
     [SerializeField] private float minimumDownforceSpeedKph = 65f;
@@ -125,8 +127,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         rearForwardExtremumValue = 1.05f;
         rearForwardAsymptoteValue = 0.76f;
         rearSideAsymptoteSlip = 0.72f;
-        spinAssistYawRateThreshold = 1.75f;
-        spinAssistCorrectionStrength = 4.5f;
+        maximumSteerAngle = 38f;
+        steeringResponse = 8.5f;
+        spinAssistYawRateThreshold = 1.25f;
+        spinAssistCorrectionStrength = 7f;
+        handbrakeRecoveryTorqueMultiplier = 0.55f;
         frontServiceBrakeTorque = 4200f;
         rearServiceBrakeTorque = 1800f;
         serviceBrakeMinimumForwardSpeedKph = 3f;
@@ -299,12 +304,23 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         }
 
         if (handbrake)
-            rearTorque = Mathf.Max(rearTorque, rearHandbrakeTorque);
+        {
+            float localYawRate = vehicleBody.transform.InverseTransformDirection(vehicleBody.angularVelocity).y;
+            rearTorque = Mathf.Max(rearTorque, CalculateHandbrakeTorque(localYawRate));
+        }
 
         SetAbsBrakeTorque(frontLeft, frontTorque);
         SetAbsBrakeTorque(frontRight, frontTorque);
         SetAbsBrakeTorque(rearLeft, rearTorque);
         SetAbsBrakeTorque(rearRight, rearTorque);
+    }
+
+    private float CalculateHandbrakeTorque(float localYawRate)
+    {
+        float threshold = Mathf.Max(0.1f, spinAssistYawRateThreshold);
+        float recovery = Mathf.SmoothStep(0f, 1f,
+            Mathf.InverseLerp(threshold, threshold * 2f, Mathf.Abs(localYawRate)));
+        return rearHandbrakeTorque * Mathf.Lerp(1f, handbrakeRecoveryTorqueMultiplier, recovery);
     }
 
     private void SetAbsBrakeTorque(WheelCollider wheel, float requestedTorque)

@@ -10,6 +10,15 @@ public sealed class RallyRaceHud : MonoBehaviour
     [SerializeField] TMP_Text checkpointText;
     [SerializeField] TMP_Text positionText;
     [SerializeField] RallyRacePositions racePositions;
+    int displayedSpeed = -1;
+    int displayedPosition = -1;
+    int displayedRacerCount = -1;
+    int displayedLap = -1;
+    int displayedTotalLaps = -1;
+    int displayedCheckpoint = -1;
+    int displayedCheckpointCount = -1;
+    float displayedElapsedTime = -1f;
+    bool displayedFinish;
 
     void Awake()
     {
@@ -53,12 +62,13 @@ public sealed class RallyRaceHud : MonoBehaviour
         if (positionText == null)
             return;
 
+        positionText.fontSize = 64f;
         positionText.richText = true;
         RectTransform label = positionText.rectTransform;
         RectTransform panel = label.parent as RectTransform;
         if (panel != null && panel.name == "Position Panel")
-            panel.sizeDelta = new Vector2(panel.sizeDelta.x, Mathf.Max(panel.sizeDelta.y, 132f));
-        label.sizeDelta = new Vector2(label.sizeDelta.x, Mathf.Max(label.sizeDelta.y, 116f));
+            panel.sizeDelta = new Vector2(Mathf.Max(panel.sizeDelta.x, 300f), Mathf.Max(panel.sizeDelta.y, 168f));
+        label.sizeDelta = new Vector2(Mathf.Max(label.sizeDelta.x, 280f), Mathf.Max(label.sizeDelta.y, 144f));
     }
 
     void Update() => Refresh();
@@ -67,25 +77,58 @@ public sealed class RallyRaceHud : MonoBehaviour
     {
         if (positionText != null)
         {
-            string position = racePositions == null ? "—/—" :
-                $"{racePositions.PlayerPosition}°/{racePositions.RacerCount}";
-            string lap = checkpointManager == null ? "Vuelta —/—" :
-                $"Vuelta {checkpointManager.CurrentLap}/{checkpointManager.TotalLaps}";
-            positionText.text = $"{position}\n<size=26>{lap}</size>";
+            int position = racePositions == null ? 0 : racePositions.PlayerPosition;
+            int racerCount = racePositions == null ? 0 : racePositions.RacerCount;
+            int lap = checkpointManager == null ? 0 : checkpointManager.CurrentLap;
+            int totalLaps = checkpointManager == null ? 0 : checkpointManager.TotalLaps;
+            if (position != displayedPosition || racerCount != displayedRacerCount ||
+                lap != displayedLap || totalLaps != displayedTotalLaps)
+            {
+                string rank = racePositions == null ? "—/—" : $"{position}°/{racerCount}";
+                string lapLabel = checkpointManager == null ? "Vuelta —/—" : $"Vuelta {lap}/{totalLaps}";
+                positionText.text = $"{rank}\n<size=28>{lapLabel}</size>";
+                displayedPosition = position;
+                displayedRacerCount = racerCount;
+                displayedLap = lap;
+                displayedTotalLaps = totalLaps;
+            }
         }
 
         if (speedText != null)
         {
             float speedKph = vehicleBody == null ? 0f : vehicleBody.linearVelocity.magnitude * 3.6f;
-            speedText.text = $"{Mathf.RoundToInt(speedKph):000} <size=40%>km/h</size>";
+            int roundedSpeed = Mathf.RoundToInt(speedKph);
+            if (roundedSpeed != displayedSpeed)
+            {
+                speedText.text = $"{roundedSpeed:000} <size=40%>km/h</size>";
+                displayedSpeed = roundedSpeed;
+            }
         }
 
         if (checkpointManager == null)
             return;
 
         if (timeText != null)
-            timeText.text = $"{(checkpointManager.IsFinished ? "META" : "TIEMPO")}  {checkpointManager.FormattedTime}";
+        {
+            float elapsed = checkpointManager.ElapsedTime;
+            bool finished = checkpointManager.IsFinished;
+            if (elapsed != displayedElapsedTime || finished != displayedFinish)
+            {
+                timeText.text = $"{(finished ? "META" : "TIEMPO")}  {checkpointManager.FormattedTime}";
+                displayedElapsedTime = elapsed;
+                displayedFinish = finished;
+            }
+        }
         if (checkpointText != null)
-            checkpointText.text = $"Checkpoint {checkpointManager.CompletedRaceCheckpoints}/{checkpointManager.RaceCheckpointCount}";
+        {
+            int completed = checkpointManager.CompletedRaceCheckpoints;
+            int count = checkpointManager.RaceCheckpointCount;
+            if (completed != displayedCheckpoint || count != displayedCheckpointCount)
+            {
+                checkpointText.text = $"Checkpoint {completed}/{count}";
+                displayedCheckpoint = completed;
+                displayedCheckpointCount = count;
+            }
+        }
     }
 }

@@ -124,7 +124,7 @@ public static class RallyAudioSetup
         Type parameterType = exposed.PropertyType.GetElementType();
         Array parameters = Array.CreateInstance(parameterType, 3);
         string[] names = { "Motor", "Efectos", "Musica" };
-        float[] levels = { -3f, -4f, -12f };
+        float[] levels = { -3f, -4f, -22f };
         for (int i = 0; i < names.Length; i++)
         {
             object group = type.GetMethod("CreateNewGroup", Flags).Invoke(mixer, new object[] { names[i], false });

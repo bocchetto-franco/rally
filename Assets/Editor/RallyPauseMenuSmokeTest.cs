@@ -33,6 +33,9 @@ public static class RallyPauseMenuSmokeTest
             Press(pad, new GamepadState(GamepadButton.DpadDown));
             InvokeUpdate(navigation);
             if (navigation.SelectedIndex != 1) throw new Exception("D-Pad Down did not select the next button.");
+            if (first.GetComponent<Outline>().enabled || !second.GetComponent<Outline>().enabled ||
+                second.transform.localScale.x <= first.transform.localScale.x)
+                throw new Exception("Visual focus did not follow D-Pad selection.");
             Press(pad, new GamepadState(GamepadButton.South));
             InvokeUpdate(navigation);
             if (firstClicks != 0 || secondClicks != 1)

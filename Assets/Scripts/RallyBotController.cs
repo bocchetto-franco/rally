@@ -22,6 +22,9 @@ public sealed class RallyBotController : MonoBehaviour
     private float raceCornerBrakingAggressiveness;
 
     private Transform[] waypoints;
+    private Vector3[] waypointPositions;
+    private Vector3[] planarLegs;
+    private float[] planarLegLengths;
     private int targetIndex;
     private bool routeReady;
     private static readonly List<RallyBotController> activeBots = new List<RallyBotController>();
@@ -42,6 +45,9 @@ public sealed class RallyBotController : MonoBehaviour
         waypointRoot = route;
         routeReady = false;
         waypoints = null;
+        waypointPositions = null;
+        planarLegs = null;
+        planarLegLengths = null;
     }
 
     public void SetDifficulty(float speedKph, float brakingAggressiveness)
@@ -120,6 +126,13 @@ public sealed class RallyBotController : MonoBehaviour
             dynamics.SetBotInput(this);
     }
 
+    private void Start()
+    {
+        // Execute before JrsVehicleController.Start (default execution order), so
+        // its wheel visuals are already bound to the selected model.
+        RallyBotVisualSelection.ApplyToScene(gameObject.scene);
+    }
+
     private void FixedUpdate()
     {
         if (vehicle == null || vehicleBody == null || !EnsureRoute())
@@ -133,15 +146,13 @@ public sealed class RallyBotController : MonoBehaviour
         Vector3 forward = Vector3.ProjectOnPlane(vehicleBody.transform.forward, Vector3.up).normalized;
         AdvanceTarget(position);
 
-        Vector3 toTarget = Vector3.ProjectOnPlane(waypoints[targetIndex].position - position, Vector3.up);
+        Vector3 toTarget = Vector3.ProjectOnPlane(waypointPositions[targetIndex] - position, Vector3.up);
         int previous = (targetIndex - 1 + waypoints.Length) % waypoints.Length;
-        int next = (targetIndex + 1) % waypoints.Length;
-        Vector3 segmentStart = waypoints[previous].position;
-        Vector3 segmentEnd = waypoints[targetIndex].position;
-        Vector3 pathDirection = Vector3.ProjectOnPlane(segmentEnd - segmentStart, Vector3.up).normalized;
+        Vector3 segmentStart = waypointPositions[previous];
+        Vector3 pathDirection = planarLegs[previous].normalized;
         if (pathDirection.sqrMagnitude < 0.01f)
             pathDirection = forward;
-        Vector3 nextDirection = Vector3.ProjectOnPlane(waypoints[next].position - segmentEnd, Vector3.up).normalized;
+        Vector3 nextDirection = planarLegs[targetIndex].normalized;
         float distanceToWaypoint = toTarget.magnitude;
         float turnBlend = Mathf.Clamp01((20f - distanceToWaypoint) / 20f) * 0.45f;
         Vector3 desiredDirection = nextDirection.sqrMagnitude > 0.01f
@@ -154,7 +165,7 @@ public sealed class RallyBotController : MonoBehaviour
         Vector3 planarStart = Vector3.ProjectOnPlane(segmentStart, Vector3.up);
         Vector3 closest = planarStart + pathDirection * Mathf.Clamp(
             Vector3.Dot(planarPosition - planarStart, pathDirection), 0f,
-            Vector3.ProjectOnPlane(segmentEnd - segmentStart, Vector3.up).magnitude);
+            planarLegLengths[previous]);
         float signedOffset = Vector3.Cross(pathDirection, planarPosition - closest).y;
         float laneError = signedOffset - laneOffsetMeters;
         CrossTrackDistance = Mathf.Abs(laneError);
@@ -174,13 +185,12 @@ public sealed class RallyBotController : MonoBehaviour
         for (int step = 0; step < waypoints.Length - 1 && distanceAhead < lookAhead; step++)
         {
             int from = (targetIndex + step) % waypoints.Length;
-            int to = (from + 1) % waypoints.Length;
-            Vector3 leg = Vector3.ProjectOnPlane(waypoints[to].position - waypoints[from].position, Vector3.up);
+            Vector3 leg = planarLegs[from];
             if (leg.sqrMagnitude < 0.01f)
                 continue;
             if (previousLeg.sqrMagnitude > 0.01f)
                 upcomingTurn += Vector3.Angle(previousLeg, leg) * Mathf.Lerp(1f, 0.55f, distanceAhead / lookAhead);
-            distanceAhead += leg.magnitude;
+            distanceAhead += planarLegLengths[from];
             previousLeg = leg;
         }
         float cornerSeverity = Mathf.Clamp01(Mathf.Max(Mathf.Abs(headingError), upcomingTurn) / 90f);
@@ -211,15 +221,26 @@ public sealed class RallyBotController : MonoBehaviour
         if (count < 3)
             return false;
         waypoints = new Transform[count];
+        waypointPositions = new Vector3[count];
+        planarLegs = new Vector3[count];
+        planarLegLengths = new float[count];
         for (int i = 0; i < count; i++)
+        {
             waypoints[i] = waypointRoot.GetChild(i);
+            waypointPositions[i] = waypoints[i].position;
+        }
+        for (int i = 0; i < count; i++)
+        {
+            planarLegs[i] = Vector3.ProjectOnPlane(waypointPositions[(i + 1) % count] - waypointPositions[i], Vector3.up);
+            planarLegLengths[i] = planarLegs[i].magnitude;
+        }
 
         Vector3 position = vehicleBody.position;
         Vector3 forward = Vector3.ProjectOnPlane(vehicleBody.transform.forward, Vector3.up).normalized;
         float bestScore = float.MaxValue;
         for (int i = 0; i < count; i++)
         {
-            Vector3 delta = Vector3.ProjectOnPlane(waypoints[i].position - position, Vector3.up);
+            Vector3 delta = Vector3.ProjectOnPlane(waypointPositions[i] - position, Vector3.up);
             float score = delta.magnitude + (Vector3.Dot(delta, forward) < -1f ? 1000f : 0f);
             if (score >= bestScore)
                 continue;
@@ -234,12 +255,11 @@ public sealed class RallyBotController : MonoBehaviour
     {
         for (int i = 0; i < waypoints.Length; i++)
         {
-            Vector3 delta = Vector3.ProjectOnPlane(waypoints[targetIndex].position - position, Vector3.up);
+            Vector3 delta = Vector3.ProjectOnPlane(waypointPositions[targetIndex] - position, Vector3.up);
             bool reached = delta.sqrMagnitude <= waypointReachDistance * waypointReachDistance;
             int previous = (targetIndex - 1 + waypoints.Length) % waypoints.Length;
-            Vector3 pathDirection = Vector3.ProjectOnPlane(
-                waypoints[targetIndex].position - waypoints[previous].position, Vector3.up);
-            bool justPassed = delta.magnitude < Mathf.Min(25f, pathDirection.magnitude + 8f) &&
+            Vector3 pathDirection = planarLegs[previous];
+            bool justPassed = delta.magnitude < Mathf.Min(25f, planarLegLengths[previous] + 8f) &&
                 Vector3.Dot(-delta, pathDirection) > 0f;
             if (!reached && !justPassed)
                 break;

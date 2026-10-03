@@ -40,6 +40,11 @@ public sealed class RallyVehicleDust : MonoBehaviour
     void UpdateEmitter(WheelCollider wheel, ParticleSystem dust, float rate)
     {
         if (dust == null) return;
+        if (rate <= 0f)
+        {
+            if (dust.isPlaying) dust.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+            return;
+        }
         WheelHit contact = default;
         bool grounded = wheel != null && wheel.GetGroundHit(out contact);
         if (grounded)

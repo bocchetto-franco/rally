@@ -56371,8 +56371,8 @@ MonoBehaviour:
   botGripProfile: {fileID: 0}
   vehicleMass: 1450
   vehicleAngularDamping: 3
-  maximumSteerAngle: 36
-  steeringResponse: 6
+  maximumSteerAngle: 38
+  steeringResponse: 8.5
   motorForce: 480
   firstGearRatio: 6
   secondGearRatio: 3.75
@@ -56402,8 +56402,8 @@ MonoBehaviour:
   rearGripIncreaseStartKph: 90
   rearGripIncreaseFullKph: 150
   rearGripMultiplierAtFullSpeed: 1.4
-  spinAssistYawRateThreshold: 1.75
-  spinAssistCorrectionStrength: 4.5
+  spinAssistYawRateThreshold: 1.25
+  spinAssistCorrectionStrength: 7
   frontServiceBrakeTorque: 4200
   rearServiceBrakeTorque: 1800
   serviceBrakeMinimumForwardSpeedKph: 3
@@ -56411,6 +56411,7 @@ MonoBehaviour:
   absSlipFull: 0.85
   absMinimumTorqueMultiplier: 0.35
   rearHandbrakeTorque: 3500
+  handbrakeRecoveryTorqueMultiplier: 0.55
   minimumDownforceSpeedKph: 65
   downforceCoefficient: 3.2
   maximumDownforce: 4500

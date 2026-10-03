@@ -9,6 +9,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 {
     Button[] buttons;
     Outline[] outlines;
+    Vector3[] originalScales;
     int selectedIndex;
     EventSystem eventSystem;
     bool previousNavigationEvents;
@@ -29,12 +30,14 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     {
         buttons = orderedButtons;
         outlines = new Outline[buttons.Length];
+        originalScales = new Vector3[buttons.Length];
         for (int i = 0; i < buttons.Length; i++)
         {
             Outline outline = buttons[i].GetComponent<Outline>() ?? buttons[i].gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(1f, .78f, .24f, 1f);
-            outline.effectDistance = new Vector2(4f, -4f);
+            outline.effectColor = new Color(.15f, .9f, 1f, 1f);
+            outline.effectDistance = new Vector2(7f, -7f);
             outlines[i] = outline;
+            originalScales[i] = buttons[i].transform.localScale;
         }
         Select(0);
     }
@@ -90,7 +93,10 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     {
         selectedIndex = index;
         for (int i = 0; i < outlines.Length; i++)
+        {
             if (outlines[i] != null) outlines[i].enabled = i == selectedIndex;
+            if (buttons[i] != null) buttons[i].transform.localScale = originalScales[i] * (i == selectedIndex ? 1.04f : 1f);
+        }
         if (eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)
             eventSystem.SetSelectedGameObject(buttons[selectedIndex].gameObject);
     }

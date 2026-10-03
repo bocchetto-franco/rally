@@ -14,6 +14,7 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
     RallyBrakeWarningTrigger activeTrigger;
     float appearanceTime;
     bool wasVisible;
+    int displayedTargetSpeed = -1;
 
     public Rigidbody VehicleBody => vehicleBody;
 
@@ -48,7 +49,12 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         warningGroup.alpha = alpha;
         warningGroup.blocksRaycasts = false;
         warningGroup.interactable = false;
-        warningText.text = $"<size=70%>▲</size>  BRAKE\n<size=38%>CURVA {Mathf.RoundToInt(activeTrigger.TargetSpeedKph)} km/h</size>";
+        int targetSpeed = Mathf.RoundToInt(activeTrigger.TargetSpeedKph);
+        if (targetSpeed != displayedTargetSpeed)
+        {
+            warningText.text = $"<size=70%>▲</size>  BRAKE\n<size=38%>CURVA {targetSpeed} km/h</size>";
+            displayedTargetSpeed = targetSpeed;
+        }
 
         // Animate size only: opacity remains exactly the speed-based warning value.
         bool visible = alpha > 0f;
@@ -88,8 +94,8 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
 
     void HideImmediate()
     {
-        if (warningGroup != null) warningGroup.alpha = 0f;
-        if (warningRect != null) warningRect.localScale = Vector3.one;
+        if (warningGroup != null && warningGroup.alpha != 0f) warningGroup.alpha = 0f;
+        if (warningRect != null && warningRect.localScale != Vector3.one) warningRect.localScale = Vector3.one;
         wasVisible = false;
         appearanceTime = 0f;
     }

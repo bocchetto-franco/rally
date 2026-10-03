@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 /// <summary>Ranks the player and bots by completed laps plus distance along AI_Waypoints.</summary>
@@ -31,6 +30,9 @@ public sealed class RallyRacePositions : MonoBehaviour
     }
 
     private Vector3[] points;
+    private Vector3[] flatPoints;
+    private Vector3[] flatLegs;
+    private float[] flatLegSquareLengths;
     private float[] segmentLengths;
     private float[] cumulativeDistances;
     private float routeLength;
@@ -77,12 +79,20 @@ public sealed class RallyRacePositions : MonoBehaviour
 
         int count = waypointRoot.childCount;
         points = new Vector3[count];
+        flatPoints = new Vector3[count];
+        flatLegs = new Vector3[count];
+        flatLegSquareLengths = new float[count];
         segmentLengths = new float[count];
         cumulativeDistances = new float[count + 1];
         for (int i = 0; i < count; i++)
+        {
             points[i] = waypointRoot.GetChild(i).position;
+            flatPoints[i] = Vector3.ProjectOnPlane(points[i], Vector3.up);
+        }
         for (int i = 0; i < count; i++)
         {
+            flatLegs[i] = flatPoints[(i + 1) % count] - flatPoints[i];
+            flatLegSquareLengths[i] = flatLegs[i].sqrMagnitude;
             segmentLengths[i] = Vector3.ProjectOnPlane(points[(i + 1) % count] - points[i], Vector3.up).magnitude;
             cumulativeDistances[i + 1] = cumulativeDistances[i] + segmentLengths[i];
         }
@@ -136,19 +146,14 @@ public sealed class RallyRacePositions : MonoBehaviour
         foreach (Racer racer in racers)
             UpdateProgress(racer);
 
-        Array.Sort(racers, (a, b) =>
-        {
-            int comparison = b.progress.CompareTo(a.progress);
-            return comparison != 0 ? comparison : a.order.CompareTo(b.order);
-        });
-        for (int i = 0; i < racers.Length; i++)
-        {
-            if (racers[i] == player)
-            {
-                PlayerPosition = i + 1;
-                break;
-            }
-        }
+        // Only the player's rank is displayed. Counting racers ahead avoids
+        // sorting the four racers and allocating a comparison delegate each frame.
+        int position = 1;
+        foreach (Racer racer in racers)
+            if (racer != player && (racer.progress > player.progress ||
+                (racer.progress == player.progress && racer.order < player.order)))
+                position++;
+        PlayerPosition = position;
     }
 
     private void UpdateProgress(Racer racer)
@@ -219,12 +224,11 @@ public sealed class RallyRacePositions : MonoBehaviour
 
     private Projection ProjectSegment(Vector3 position, int index)
     {
-        Vector3 start = Vector3.ProjectOnPlane(points[index], Vector3.up);
-        Vector3 end = Vector3.ProjectOnPlane(points[(index + 1) % points.Length], Vector3.up);
+        Vector3 start = flatPoints[index];
         Vector3 flatPosition = Vector3.ProjectOnPlane(position, Vector3.up);
-        Vector3 leg = end - start;
-        float t = leg.sqrMagnitude > 0.001f ?
-            Mathf.Clamp01(Vector3.Dot(flatPosition - start, leg) / leg.sqrMagnitude) : 0f;
+        Vector3 leg = flatLegs[index];
+        float t = flatLegSquareLengths[index] > 0.001f ?
+            Mathf.Clamp01(Vector3.Dot(flatPosition - start, leg) / flatLegSquareLengths[index]) : 0f;
         Vector3 nearest = start + leg * t;
         return new Projection
         {

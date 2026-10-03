@@ -200,7 +200,9 @@ public static class Circuit03Builder
             }
         }
         var mesh=ProBuilderMesh.Create(v,f);mesh.name=name;mesh.transform.SetParent(parent,false);
-        mesh.textures=v.Select(p=>new Vector2(p.x/6,p.z/6)).ToArray();mesh.ToMesh();mesh.Refresh();
+        mesh.textures=v.Select(p=>new Vector2(p.x/6,p.z/6)).ToArray();
+        foreach(var face in mesh.faces)face.manualUV=true;
+        mesh.ToMesh();mesh.Refresh();
         mesh.GetComponent<Renderer>().sharedMaterial=Asset<Material>(Forest+"Materials/"+(shoulders?"Forest floor":"Wet forest road")+".mat");
         var collider=mesh.GetComponent<MeshCollider>();
         if(collider==null)collider=mesh.gameObject.AddComponent<MeshCollider>();

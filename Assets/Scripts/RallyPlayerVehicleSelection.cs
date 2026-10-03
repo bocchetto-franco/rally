@@ -4,9 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Swap only the player's presentation before Start. Keep its existing
-/// Rigidbody, controller, dynamics and references held by camera, HUD, gates and ranking.
-/// No alternative physics engine and no changes to the bot prefab/profile.
+/// Swap a vehicle's presentation before its controller Start. Keep its existing
+/// Rigidbody, WheelColliders, dynamics and race references; bots retain their grip profile.
 /// </summary>
 public static class RallyPlayerVehicleSelection
 {
@@ -29,7 +28,7 @@ public static class RallyPlayerVehicleSelection
         RallyGameSession.RestoreSavedState();
         if (RallyGameSession.SelectedVehicle == RallyGameSession.VehicleName) return;
         var player = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<JrsVehicleController>())
-            .FirstOrDefault(c => c.name == RallyGameSession.VehicleName && c.GetComponent<RallyBotController>() == null);
+            .FirstOrDefault(c => c.name == RallyGameSession.VehicleName && c.GetComponentInParent<RallyBotController>() == null);
         if (player == null) { Debug.LogError("Selected vehicle: player root not found."); return; }
         ApplyVisual(player, RallyGameSession.SelectedVehicle);
     }
@@ -39,8 +38,23 @@ public static class RallyPlayerVehicleSelection
 
     public static RallyVehicleVisual ApplyVisual(JrsVehicleController player, string vehicleName)
     {
-        if (player.GetComponent<RallyBotController>() != null)
+        if (player.GetComponentInParent<RallyBotController>() != null)
             throw new InvalidOperationException("Player selection must never modify a bot.");
+        return ApplyVisualOnly(player, vehicleName);
+    }
+
+    /// <summary>Changes only a bot's meshes and visual wheel pivots, never its grip profile.</summary>
+    public static RallyVehicleVisual ApplyBotVisual(JrsVehicleController bot, string vehicleName)
+    {
+        if (bot.GetComponentInParent<RallyBotController>() == null)
+            throw new InvalidOperationException("Bot visuals require a bot vehicle.");
+        if (vehicleName == RallyGameSession.VehicleName)
+            return null; // The shared Bot_Car prefab already has the Porsche model.
+        return ApplyVisualOnly(bot, vehicleName);
+    }
+
+    private static RallyVehicleVisual ApplyVisualOnly(JrsVehicleController player, string vehicleName)
+    {
         var existing = player.GetComponentInChildren<RallyVehicleVisual>();
         if (existing != null) return existing;
         string resource = vehicleName == MiniName ? MiniResource : vehicleName == LanciaName ? LanciaResource : null;

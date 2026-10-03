@@ -61,8 +61,8 @@ public static class Circuit01HudSetup
 
         Transform route = GameObject.Find("AI_Waypoints")?.transform;
         if (route == null) throw new InvalidOperationException("Race positions require AI_Waypoints.");
-        RectTransform positionPanel = Panel(root.transform, "Position Panel", new Vector2(0, 1), new Vector2(28, -28), new Vector2(240, 86), new Vector2(0, 1));
-        TMP_Text position = Label(positionPanel, "Position", font, 40, TextAlignmentOptions.Center, Vector2.zero, new Vector2(220, 70));
+        RectTransform positionPanel = Panel(root.transform, "Position Panel", new Vector2(0, 1), new Vector2(28, -28), new Vector2(300, 168), new Vector2(0, 1));
+        TMP_Text position = Label(positionPanel, "Position", font, 64, TextAlignmentOptions.Center, Vector2.zero, new Vector2(280, 144));
         RallyRacePositions positions = root.AddComponent<RallyRacePositions>();
         positions.Configure(route, body, manager);
 
