@@ -14,6 +14,12 @@ public static class Circuit01VehicleSetup
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) return;
         if (EditorApplication.isCompiling || EditorApplication.isUpdating) { EditorApplication.delayCall += Once; return; }
+        // The race grid supersedes the original one-car placement. Never move a
+        // tuned/grid-positioned player merely because the editor restarted.
+        if (SceneManager.GetActiveScene().GetRootGameObjects().Any(g => g.name == "Starting Grid")) return;
+        // The race grid supersedes the original one-car placement. Never move a
+        // tuned/grid-positioned player merely because the editor restarted.
+        if (SceneManager.GetActiveScene().GetRootGameObjects().Any(g => g.name == "Starting Grid")) return;
         if (SceneManager.GetActiveScene().path == Target && !SessionState.GetBool("Circuit01.StartPlacement.v2", false)) { Install(); SessionState.SetBool("Circuit01.StartPlacement.v2", true); }
     }
     [MenuItem("Tools/Rally/Place Porsche at Circuit 01 Start")]

@@ -12,14 +12,14 @@ public sealed class RallyBotGripProfile : ScriptableObject
     [Min(0.1f)] public float forwardStiffness = 1.35f;
 
     [Header("Front lateral grip")]
-    [Min(0.1f)] public float frontSideExtremumValue = 1.10f;
-    [Min(0.1f)] public float frontSideAsymptoteValue = 0.90f;
-    [Min(0.1f)] public float frontSideStiffness = 1.00f;
+    [Min(0.1f)] public float frontSideExtremumValue = 1.70f;
+    [Min(0.1f)] public float frontSideAsymptoteValue = 1.40f;
+    [Min(0.1f)] public float frontSideStiffness = 1.35f;
 
     [Header("Rear lateral grip")]
-    [Min(0.01f)] public float rearSideExtremumSlip = 0.18f;
-    [Min(0.1f)] public float rearSideExtremumValue = 1.05f;
+    [Min(0.01f)] public float rearSideExtremumSlip = 0.32f;
+    [Min(0.1f)] public float rearSideExtremumValue = 1.70f;
     [Min(0.01f)] public float rearSideAsymptoteSlip = 0.80f;
-    [Min(0.1f)] public float rearSideAsymptoteValue = 0.80f;
-    [Min(0.1f)] public float rearSideStiffness = 1.00f;
+    [Min(0.1f)] public float rearSideAsymptoteValue = 1.40f;
+    [Min(0.1f)] public float rearSideStiffness = 1.35f;
 }

@@ -4,7 +4,6 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 [InitializeOnLoad]
 public static class RallySpinAssistVerification
@@ -39,26 +38,32 @@ public static class RallySpinAssistVerification
     public static void Verify()
     {
         EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-        RallyVehicleDynamics dynamics = Object.FindAnyObjectByType<RallyVehicleDynamics>();
+        GameObject playerDynamics = GameObject.Find("Porsche Rally Dynamics");
+        RallyVehicleDynamics dynamics = playerDynamics != null
+            ? playerDynamics.GetComponent<RallyVehicleDynamics>() : null;
         if (dynamics == null)
             throw new InvalidOperationException("RallyVehicleDynamics is missing from Circuit_01.");
 
         var serialized = new SerializedObject(dynamics);
-        AssertFloat(serialized, "maximumSteerAngle", 38f);
-        AssertFloat(serialized, "steeringResponse", 8.5f);
+        AssertFloat(serialized, "maximumSteerAngle", 40f);
+        AssertFloat(serialized, "steeringResponse", 14f);
         AssertFloat(serialized, "spinAssistYawRateThreshold", 1.25f);
         AssertFloat(serialized, "spinAssistCorrectionStrength", 7f);
         AssertFloat(serialized, "rearHandbrakeTorque", 3500f);
         AssertFloat(serialized, "handbrakeRecoveryTorqueMultiplier", 0.55f);
 
-        // Guard the established tune: this feature must not alter it.
+        // Guard the established downforce and manual-braking tune.
         AssertFloat(serialized, "downforceCoefficient", 3.2f);
         AssertFloat(serialized, "maximumDownforce", 4500f);
         AssertFloat(serialized, "frontServiceBrakeTorque", 4200f);
         AssertFloat(serialized, "rearServiceBrakeTorque", 1800f);
-        AssertFloat(serialized, "rearSideExtremumValue", 0.405f);
-        AssertFloat(serialized, "rearSideAsymptoteValue", 0.135f);
+        AssertFloat(serialized, "frontSideExtremumValue", 1.55f);
+        AssertFloat(serialized, "frontSideAsymptoteValue", 1.25f);
+        AssertFloat(serialized, "rearSideExtremumValue", 1.55f);
+        AssertFloat(serialized, "rearSideAsymptoteValue", 1.25f);
         AssertFloat(serialized, "rearSideAsymptoteSlip", 0.72f);
+        AssertFloat(serialized, "lateralVelocityCorrection", 3f);
+        AssertFloat(serialized, "automaticBrakeMaximumFraction", 0.65f);
 
         MethodInfo calculate = typeof(RallyVehicleDynamics).GetMethod(
             "CalculateSpinAssistAngularAcceleration",
@@ -93,9 +98,21 @@ public static class RallySpinAssistVerification
             !Mathf.Approximately(BrakeAt(-3f), 1925f))
             throw new InvalidOperationException("Handbrake does not progressively release excessive yaw.");
 
+        MethodInfo cornerBrake = typeof(RallyVehicleDynamics).GetMethod(
+            "CalculateAutomaticBrakeAmount", BindingFlags.Instance | BindingFlags.NonPublic);
+        if (cornerBrake == null)
+            throw new MissingMethodException("Automatic corner braking calculation was not found.");
+        float CornerBrake(float steering, float speed) =>
+            (float)cornerBrake.Invoke(dynamics, new object[] { steering, speed });
+        if (!Mathf.Approximately(CornerBrake(0f, 160f), 0f) ||
+            !Mathf.Approximately(CornerBrake(1f, 40f), 0f) ||
+            !(CornerBrake(0.5f, 130f) > 0f && CornerBrake(0.5f, 130f) < CornerBrake(1f, 130f)) ||
+            !Mathf.Approximately(CornerBrake(1f, 130f), 0.65f))
+            throw new InvalidOperationException("Automatic braking is not proportional to steering and excessive speed.");
+
         File.WriteAllText(
             "Logs/spin-assist-verification.txt",
-            "PASS: assist is inactive below 1.25 rad/s, ramps progressively, opposes both yaw directions, caps at 7 rad/s^2; handbrake torque falls from 3500 to 1925 at severe yaw; existing drift/downforce values remain unchanged.\n" +
+            "PASS: anti-spin is progressive, four-wheel lateral grip is high, corner braking scales with steering and speed, handbrake recovery works, and downforce/manual brakes remain unchanged.\n" +
             DateTime.Now.ToString("O"));
         if (File.Exists("Logs/spin-assist-verify-error.txt"))
             File.Delete("Logs/spin-assist-verify-error.txt");

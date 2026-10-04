@@ -32,6 +32,8 @@ public static class RallyBotSmokeTest
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/" + Scenes[index] + ".unity");
         SessionState.SetString(Prefix + "PlayStart", "");
         SessionState.SetInt(Prefix + "StartWaypoint", -1);
+        SessionState.SetInt(Prefix + "LastWaypoint", -1);
+        SessionState.SetInt(Prefix + "WaypointsAdvanced", 0);
         SessionState.SetFloat(Prefix + "MaxCrossTrack", 0f);
         SessionState.SetInt(Prefix + "MaxCrossTrackWaypoint", -1);
         EditorApplication.isPlaying = true;
@@ -91,8 +93,18 @@ public static class RallyBotSmokeTest
         {
             SessionState.SetString(Prefix + "PlayStart", DateTime.UtcNow.Ticks.ToString());
             SessionState.SetInt(Prefix + "StartWaypoint", bot.CurrentWaypointIndex);
+            SessionState.SetInt(Prefix + "LastWaypoint", bot.CurrentWaypointIndex);
             return;
         }
+        int lastWaypoint = SessionState.GetInt(Prefix + "LastWaypoint", -1);
+        if (bot.WaypointCount > 0 && lastWaypoint >= 0)
+        {
+            int advanced = (bot.CurrentWaypointIndex - lastWaypoint + bot.WaypointCount) % bot.WaypointCount;
+            if (advanced < bot.WaypointCount / 2)
+                SessionState.SetInt(Prefix + "WaypointsAdvanced",
+                    SessionState.GetInt(Prefix + "WaypointsAdvanced", 0) + advanced);
+        }
+        SessionState.SetInt(Prefix + "LastWaypoint", bot.CurrentWaypointIndex);
         double elapsed = (DateTime.UtcNow - new DateTime(long.Parse(started), DateTimeKind.Utc)).TotalSeconds;
         if (bot.CrossTrackDistance > SessionState.GetFloat(Prefix + "MaxCrossTrack", 0f))
         {
@@ -102,11 +114,14 @@ public static class RallyBotSmokeTest
         if (elapsed < 100.0)
             return;
         int startWaypoint = SessionState.GetInt(Prefix + "StartWaypoint", -1);
-        string status = bot.CurrentWaypointIndex >= startWaypoint + 12 && probe.BoundaryHits == 0
+        int waypointsAdvanced = SessionState.GetInt(Prefix + "WaypointsAdvanced", 0);
+        string status = waypointsAdvanced >= 12 && probe.BoundaryHits == 0
             ? "PASS" : "CHECK";
         File.AppendAllText(ResultPath,
             $"{Scenes[index]}: {status}; waypoint {startWaypoint + 1} -> {bot.CurrentWaypointIndex + 1}; " +
-            $"bot speed {body.linearVelocity.magnitude * 3.6f:F1} km/h; player timer {manager.FormattedTime}; " +
+            $"advanced {waypointsAdvanced} waypoints (including wrap); bot speed " +
+            $"{body.linearVelocity.magnitude * 3.6f:F1} km/h; target max {bot.RaceMaxSpeedKph:F1} km/h; " +
+            $"player timer {manager.FormattedTime}; " +
             $"checkpoints {manager.CheckpointCount}; max cross-track " +
             $"{SessionState.GetFloat(Prefix + "MaxCrossTrack", 0f):F1} m near waypoint " +
             $"{SessionState.GetInt(Prefix + "MaxCrossTrackWaypoint", -1)}; " +

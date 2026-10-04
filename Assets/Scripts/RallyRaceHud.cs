@@ -73,11 +73,22 @@ public sealed class RallyRaceHud : MonoBehaviour
 
     void Update() => Refresh();
 
+    public void BindPlayer(RallyCheckpointManager manager, Rigidbody body, RallyRacePositions positions)
+    {
+        checkpointManager = manager;
+        vehicleBody = body;
+        racePositions = positions;
+        displayedSpeed = displayedPosition = displayedRacerCount = displayedLap = displayedTotalLaps = -1;
+        displayedCheckpoint = displayedCheckpointCount = -1;
+        displayedElapsedTime = -1f;
+        Refresh();
+    }
+
     void Refresh()
     {
         if (positionText != null)
         {
-            int position = racePositions == null ? 0 : racePositions.PlayerPosition;
+            int position = racePositions == null ? 0 : racePositions.GetPosition(vehicleBody);
             int racerCount = racePositions == null ? 0 : racePositions.RacerCount;
             int lap = checkpointManager == null ? 0 : checkpointManager.CurrentLap;
             int totalLaps = checkpointManager == null ? 0 : checkpointManager.TotalLaps;

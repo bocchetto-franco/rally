@@ -17,11 +17,11 @@ MonoBehaviour:
   rearForwardExtremumValue: 1.35
   rearForwardAsymptoteValue: 1
   forwardStiffness: 1.35
-  frontSideExtremumValue: 1.1
-  frontSideAsymptoteValue: 0.9
-  frontSideStiffness: 1
-  rearSideExtremumSlip: 0.18
-  rearSideExtremumValue: 1.05
+  frontSideExtremumValue: 1.7
+  frontSideAsymptoteValue: 1.4
+  frontSideStiffness: 1.35
+  rearSideExtremumSlip: 0.32
+  rearSideExtremumValue: 1.7
   rearSideAsymptoteSlip: 0.8
-  rearSideAsymptoteValue: 0.8
-  rearSideStiffness: 1
+  rearSideAsymptoteValue: 1.4
+  rearSideStiffness: 1.35

@@ -38,6 +38,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
 
     void Update()
     {
+        if (RallySplitScreen.Active != null && !RallySplitScreen.Active.AllFinished) return;
         if (!finishHandled && checkpointManager != null && checkpointManager.IsFinished)
             FinishRace(checkpointManager.ElapsedTime);
     }
@@ -57,6 +58,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
         }
         RallyGameSession.RecordResult(elapsedTime);
         SaveBestTime(elapsedTime);
+        if (RallySplitScreen.Active != null) SaveBestTime(RallySplitScreen.Active.TimerTwo.ElapsedTime);
         FreezeVehicle();
         BuildFinishMenu(elapsedTime);
         Cursor.visible = true;
@@ -69,6 +71,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
         if (vehicleController != null) vehicleController.enabled = false;
         if (vehicleDynamics != null) vehicleDynamics.enabled = false;
         if (vehicleBody == null) return;
+        if (vehicleBody.isKinematic) return;
         vehicleBody.linearVelocity = Vector3.zero;
         vehicleBody.angularVelocity = Vector3.zero;
         vehicleBody.isKinematic = true;
@@ -89,7 +92,9 @@ public sealed class RallyRaceFlow : MonoBehaviour
         Panel(card, "Accent", new Color(1f, .48f, .06f), new Vector2(-374f, 0f), new Vector2(12f, 710f));
         Label(card, font, "Finished", "VUELTA COMPLETADA", 26f, FontStyles.Bold, new Vector2(0f, 278f), new Vector2(640f, 42f), new Color(1f, .48f, .06f));
         Label(card, font, "Time Caption", "TIEMPO FINAL", 20f, FontStyles.Bold, new Vector2(0f, 218f), new Vector2(600f, 34f), new Color(.66f, .71f, .77f));
-        Label(card, font, "Final Time", RallyGameSession.FormatTime(elapsedTime), 68f, FontStyles.Bold, new Vector2(0f, 155f), new Vector2(650f, 84f), Color.white);
+        string result = RallySplitScreen.Active == null ? RallyGameSession.FormatTime(elapsedTime) :
+            $"J1  {RallyGameSession.FormatTime(elapsedTime)}\nJ2  {RallyGameSession.FormatTime(RallySplitScreen.Active.TimerTwo.ElapsedTime)}";
+        Label(card, font, "Final Time", result, RallySplitScreen.Active == null ? 68f : 34f, FontStyles.Bold, new Vector2(0f, 155f), new Vector2(650f, 84f), Color.white);
         Button restart = CreateButton(card, font, "Restart Button", "REINICIAR", new Vector2(0f, 50f), RestartRace, true);
         Button times = CreateButton(card, font, "Times Button", "VER TIEMPOS", new Vector2(0f, -50f), ToggleTimes, false);
         Button menu = CreateButton(card, font, "Menu Button", "VOLVER AL MENÚ", new Vector2(0f, -150f), BackToSelection, false);

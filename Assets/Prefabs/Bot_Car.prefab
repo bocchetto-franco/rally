@@ -13255,8 +13255,8 @@ MonoBehaviour:
   waypointRoot: {fileID: 0}
   waypointReachDistance: 3.5
   safeCorridorHalfWidth: 1.5
-  maxSpeedKph: 80
-  cornerBrakingAggressiveness: 0.95
+  maxSpeedKph: 118
+  cornerBrakingAggressiveness: 0.88
 --- !u!114 &6533994807396338111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13297,15 +13297,15 @@ MonoBehaviour:
   rearForwardExtremumValue: 1.35
   rearForwardAsymptoteValue: 1
   frontSideExtremumSlip: 0.32
-  frontSideExtremumValue: 1.1
+  frontSideExtremumValue: 1.7
   frontSideAsymptoteSlip: 0.7
-  frontSideAsymptoteValue: 0.9
-  frontSideStiffness: 1
-  rearSideExtremumSlip: 0.18
-  rearSideExtremumValue: 1.05
+  frontSideAsymptoteValue: 1.4
+  frontSideStiffness: 1.35
+  rearSideExtremumSlip: 0.32
+  rearSideExtremumValue: 1.7
   rearSideAsymptoteSlip: 0.8
-  rearSideAsymptoteValue: 0.8
-  rearSideStiffness: 1
+  rearSideAsymptoteValue: 1.4
+  rearSideStiffness: 1.35
   rearGripIncreaseStartKph: 90
   rearGripIncreaseFullKph: 150
   rearGripMultiplierAtFullSpeed: 1.4

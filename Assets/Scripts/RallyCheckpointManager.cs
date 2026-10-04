@@ -22,6 +22,21 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     public float ElapsedTime => elapsedTime;
     public bool IsRunning => running;
     public bool IsFinished => finished;
+    public Rigidbody VehicleBody => vehicleBody;
+    public RallyCheckpointTrigger[] OrderedCheckpoints => checkpoints;
+    public void BindVehicle(Rigidbody body)
+    {
+        vehicleBody = body;
+        resetPosition = body.position;
+        resetRotation = body.rotation;
+        hasResetPose = true;
+    }
+    public void ConfigureLocalPlayer(RallyCheckpointManager source, Rigidbody body)
+    {
+        totalLaps = source.totalLaps;
+        Configure(source.checkpoints);
+        BindVehicle(body);
+    }
     public int RaceCheckpointCount => Mathf.Max(0, CheckpointCount - 1);
     public int CompletedRaceCheckpoints => Mathf.Clamp(nextCheckpoint, 0, RaceCheckpointCount);
     public string FormattedTime
@@ -42,10 +57,12 @@ public sealed class RallyCheckpointManager : MonoBehaviour
 
     void Update()
     {
-        bool gamepadResetPressed = RallyGamepadInput.ResetPressedThisFrame;
         if (Time.timeScale == 0f)
             return;
-        if (Input.GetKeyDown(KeyCode.R) || gamepadResetPressed)
+        RallyLocalPlayerInput localInput = vehicleBody != null ? vehicleBody.GetComponent<RallyLocalPlayerInput>() : null;
+        bool reset = localInput != null ? localInput.ResetPressed :
+            (Input.GetKeyDown(KeyCode.R) || RallyGamepadInput.ResetPressedThisFrame);
+        if (!finished && reset)
             ResetVehicleToLastCheckpoint();
 
         if (running)
@@ -73,6 +90,8 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         if (attachedBody == null)
             attachedBody = vehicle.GetComponent<Rigidbody>();
         if (attachedBody == null)
+            return;
+        if (vehicleBody != null && attachedBody != vehicleBody)
             return;
 
         vehicleBody = attachedBody;
@@ -152,6 +171,9 @@ public sealed class RallyCheckpointManager : MonoBehaviour
             return;
 
         // Preserve race progress: this recovery only changes the vehicle pose and motion.
+        // Keep the interpolated Transform in sync before SyncTransforms; otherwise
+        // it can push the pre-teleport pose back into physics for a cloned local car.
+        vehicleBody.transform.SetPositionAndRotation(resetPosition, resetRotation);
         vehicleBody.position = resetPosition;
         vehicleBody.rotation = resetRotation;
         vehicleBody.linearVelocity = Vector3.zero;

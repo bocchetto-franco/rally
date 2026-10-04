@@ -226,7 +226,11 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
             hideFlags = HideFlags.HideAndDontSave,
             renderQueue = 3000
         };
-        Texture2D texture = Resources.GetBuiltinResource<Texture2D>("Default-Particle.psd");
+        // The old built-in filename is not available in Unity 6.6. Use the
+        // pipeline's supplied particle texture without repeated load errors.
+        Material defaults = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null
+            ? UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline.defaultParticleMaterial : null;
+        Texture texture = defaults != null ? defaults.mainTexture : null;
         if (texture != null)
             runtimeSplashMaterial.SetTexture("_BaseMap", texture);
         Color tint = new Color(0.72f, 0.9f, 0.98f, 0.62f);

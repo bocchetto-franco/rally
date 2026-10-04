@@ -18,13 +18,20 @@ public sealed class RallyCheckpointTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        manager?.TryPass(checkpointIndex, other);
+        ResolveManager(other)?.TryPass(checkpointIndex, other);
     }
 
     void OnTriggerStay(Collider other)
     {
         // Covers vehicles that begin a frame overlapping the start gate.
         // TryPass is ordered/idempotent, so repeated physics callbacks are safe.
-        manager?.TryPass(checkpointIndex, other);
+        ResolveManager(other)?.TryPass(checkpointIndex, other);
+    }
+
+    RallyCheckpointManager ResolveManager(Collider other)
+    {
+        RallyLocalPlayerInput player = other.attachedRigidbody != null ?
+            other.attachedRigidbody.GetComponent<RallyLocalPlayerInput>() : null;
+        return player != null ? player.Checkpoints : manager;
     }
 }

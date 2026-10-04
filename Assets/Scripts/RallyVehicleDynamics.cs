@@ -6,6 +6,23 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 {
     public JrsVehicleController VehicleController => controller;
     public bool IsRearDrifting => rearLeftSmokeActive || rearRightSmokeActive;
+    public float SteeringResponse => steeringResponse;
+    RallyLocalPlayerInput localInput;
+    public void SetLocalInput(RallyLocalPlayerInput input) => localInput = input;
+
+    // Used when cloning the existing player's tuned component. Do not reset tuning.
+    public void BindVehicle(JrsVehicleController vehicle)
+    {
+        controller = vehicle;
+        vehicleBody = vehicle.GetComponent<Rigidbody>();
+        frontLeft = vehicle.frontLeftWheel;
+        frontRight = vehicle.frontRightWheel;
+        rearLeft = vehicle.rearLeftWheel;
+        rearRight = vehicle.rearRightWheel;
+        rearLeftDriftSmoke = vehicle.rearLeftDustParticleSystem;
+        rearRightDriftSmoke = vehicle.rearRightDustParticleSystem;
+        localInput = vehicle.GetComponent<RallyLocalPlayerInput>();
+    }
 
     [Header("Vehicle references")]
     [SerializeField] private JrsVehicleController controller;
@@ -19,8 +36,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1450f;
     [SerializeField] private float vehicleAngularDamping = 3.0f;
-    [SerializeField] private float maximumSteerAngle = 38f;
-    [SerializeField] private float steeringResponse = 8.5f;
+    [SerializeField] private float maximumSteerAngle = 40f;
+    [SerializeField] private float steeringResponse = 14f;
     [SerializeField] private float motorForce = 480f;
     [SerializeField] private float firstGearRatio = 6.0f;
     [SerializeField] private float secondGearRatio = 3.75f;
@@ -42,19 +59,23 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float rearForwardExtremumValue = 1.05f;
     [SerializeField] private float rearForwardAsymptoteValue = 0.76f;
 
-    [Header("Gravel sideways friction - front")]
-    [SerializeField] private float frontSideExtremumSlip = 0.32f;
-    [SerializeField] private float frontSideExtremumValue = 1.00f;
-    [SerializeField] private float frontSideAsymptoteSlip = 0.70f;
-    [SerializeField] private float frontSideAsymptoteValue = 0.72f;
-    [SerializeField] private float frontSideStiffness = 0.92f;
+    [Header("Arcade sideways grip - front")]
+    [SerializeField] private float frontSideExtremumSlip = 0.30f;
+    [SerializeField] private float frontSideExtremumValue = 1.55f;
+    [SerializeField] private float frontSideAsymptoteSlip = 0.72f;
+    [SerializeField] private float frontSideAsymptoteValue = 1.25f;
+    [SerializeField] private float frontSideStiffness = 1.25f;
 
-    [Header("Rally drift sideways friction - rear")]
-    [SerializeField] private float rearSideExtremumSlip = 0.06f;
-    [SerializeField] private float rearSideExtremumValue = 0.405f;
+    [Header("Arcade sideways grip - rear")]
+    [SerializeField] private float rearSideExtremumSlip = 0.30f;
+    [SerializeField] private float rearSideExtremumValue = 1.55f;
     [SerializeField] private float rearSideAsymptoteSlip = 0.72f;
-    [SerializeField] private float rearSideAsymptoteValue = 0.135f;
-    [SerializeField] private float rearSideStiffness = 0.50f;
+    [SerializeField] private float rearSideAsymptoteValue = 1.25f;
+    [SerializeField] private float rearSideStiffness = 1.25f;
+
+    [Header("Direct steering without lateral drift")]
+    [SerializeField, Min(0f)] private float lateralVelocityCorrection = 3f;
+    [SerializeField, Min(0f)] private float maximumLateralCorrectionAcceleration = 8f;
 
     [Header("High-speed rear stability")]
     [SerializeField] private float rearGripIncreaseStartKph = 90f;
@@ -78,6 +99,13 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [Tooltip("Rear handbrake torque retained at severe yaw, allowing the wheels to regain grip before a full spin.")]
     [SerializeField, Range(0f, 1f)] private float handbrakeRecoveryTorqueMultiplier = 0.55f;
 
+    [Header("Automatic corner braking - player only")]
+    [SerializeField, Range(0f, 0.9f)] private float automaticBrakeStartSteering = 0.25f;
+    [SerializeField, Min(0f)] private float automaticBrakeFreeSpeedKph = 120f;
+    [SerializeField, Min(0f)] private float automaticBrakeFullSteerSpeedKph = 48f;
+    [SerializeField, Min(1f)] private float automaticBrakeSpeedRangeKph = 25f;
+    [SerializeField, Range(0f, 1f)] private float automaticBrakeMaximumFraction = 0.65f;
+
     [Header("High-speed downforce")]
     [SerializeField] private float minimumDownforceSpeedKph = 65f;
     [SerializeField] private float downforceCoefficient = 3.2f;
@@ -95,6 +123,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     private bool rearLeftSmokeActive;
     private bool rearRightSmokeActive;
+    private bool handbrakeHeld;
     private JrsInputController inputController;
     [SerializeField] private RallyBotController botInput;
 
@@ -126,12 +155,23 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         vehicleAngularDamping = 3.0f;
         rearForwardExtremumValue = 1.05f;
         rearForwardAsymptoteValue = 0.76f;
-        rearSideAsymptoteSlip = 0.72f;
-        maximumSteerAngle = 38f;
-        steeringResponse = 8.5f;
+        frontSideExtremumSlip = rearSideExtremumSlip = 0.30f;
+        frontSideExtremumValue = rearSideExtremumValue = 1.55f;
+        frontSideAsymptoteSlip = rearSideAsymptoteSlip = 0.72f;
+        frontSideAsymptoteValue = rearSideAsymptoteValue = 1.25f;
+        frontSideStiffness = rearSideStiffness = 1.25f;
+        lateralVelocityCorrection = 3f;
+        maximumLateralCorrectionAcceleration = 8f;
+        maximumSteerAngle = 40f;
+        steeringResponse = 14f;
         spinAssistYawRateThreshold = 1.25f;
         spinAssistCorrectionStrength = 7f;
         handbrakeRecoveryTorqueMultiplier = 0.55f;
+        automaticBrakeStartSteering = 0.25f;
+        automaticBrakeFreeSpeedKph = 120f;
+        automaticBrakeFullSteerSpeedKph = 48f;
+        automaticBrakeSpeedRangeKph = 25f;
+        automaticBrakeMaximumFraction = 0.65f;
         frontServiceBrakeTorque = 4200f;
         rearServiceBrakeTorque = 1800f;
         serviceBrakeMinimumForwardSpeedKph = 3f;
@@ -177,6 +217,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             return;
 
         ApplySpinStabilityAssist();
+        ApplyLateralGripAssist(planarVelocity);
 
         float minimumDownforceSpeed = minimumDownforceSpeedKph / 3.6f;
         float speedSquaredAboveThreshold = Mathf.Max(
@@ -193,6 +234,18 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         float correction = CalculateSpinAssistAngularAcceleration(localAngularVelocity.y);
         if (!Mathf.Approximately(correction, 0f))
             vehicleBody.AddTorque(vehicleBody.transform.up * correction, ForceMode.Acceleration);
+    }
+
+    private void ApplyLateralGripAssist(Vector3 planarVelocity)
+    {
+        if (botInput != null || handbrakeHeld || lateralVelocityCorrection <= 0f)
+            return;
+
+        Vector3 right = Vector3.ProjectOnPlane(vehicleBody.transform.right, Vector3.up).normalized;
+        float lateralSpeed = Vector3.Dot(planarVelocity, right);
+        float correction = Mathf.Clamp(lateralSpeed * lateralVelocityCorrection,
+            -maximumLateralCorrectionAcceleration, maximumLateralCorrectionAcceleration);
+        vehicleBody.AddForce(-right * correction, ForceMode.Acceleration);
     }
 
     private float CalculateSpinAssistAngularAcceleration(float localYawRate)
@@ -282,13 +335,24 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         float forwardSpeedKph = Vector3.Dot(vehicleBody.linearVelocity, vehicleBody.transform.forward) * 3.6f;
         bool legacyBrake = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
             (inputController != null && inputController.GetLegacyVerticalInput() < -0.1f);
-        float brakeAmount = botInput != null ? (botInput.Braking ? 1f : 0f) :
+        float manualBrakeAmount = botInput != null ? botInput.BrakeInput : localInput != null ? localInput.Brake :
             Mathf.Max(legacyBrake ? 1f : 0f, RallyGamepadInput.Brake);
-        bool serviceBrake = brakeAmount > 0.02f && forwardSpeedKph > serviceBrakeMinimumForwardSpeedKph;
-        bool handbrake = botInput == null && (Input.GetKey(KeyCode.Space) ||
+        bool handbrake = botInput == null && (localInput != null ? localInput.Handbrake : (Input.GetKey(KeyCode.Space) ||
                          RallyGamepadInput.HandbrakePressed ||
                          (inputController != null && inputController.brakeButton != null &&
-                          inputController.brakeButton.IsButtonPressed()));
+                          inputController.brakeButton.IsButtonPressed())));
+        handbrakeHeld = handbrake;
+
+        float automaticBrakeAmount = 0f;
+        if (botInput == null && manualBrakeAmount <= 0.02f && !handbrake)
+        {
+            float steering = Mathf.Abs((frontLeft.steerAngle + frontRight.steerAngle) * 0.5f) /
+                Mathf.Max(1f, maximumSteerAngle);
+            automaticBrakeAmount = CalculateAutomaticBrakeAmount(steering, forwardSpeedKph);
+        }
+
+        float brakeAmount = Mathf.Max(manualBrakeAmount, automaticBrakeAmount);
+        bool serviceBrake = brakeAmount > 0.02f && forwardSpeedKph > serviceBrakeMinimumForwardSpeedKph;
 
         float frontTorque = serviceBrake ? frontServiceBrakeTorque * brakeAmount : 0f;
         float rearTorque = serviceBrake ? rearServiceBrakeTorque * brakeAmount : 0f;
@@ -313,6 +377,15 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         SetAbsBrakeTorque(frontRight, frontTorque);
         SetAbsBrakeTorque(rearLeft, rearTorque);
         SetAbsBrakeTorque(rearRight, rearTorque);
+    }
+
+    private float CalculateAutomaticBrakeAmount(float steering, float forwardSpeedKph)
+    {
+        float turn = Mathf.InverseLerp(automaticBrakeStartSteering, 1f, Mathf.Clamp01(steering));
+        float targetSpeed = Mathf.Lerp(automaticBrakeFreeSpeedKph, automaticBrakeFullSteerSpeedKph, turn);
+        float excessSpeed = Mathf.Clamp01((forwardSpeedKph - targetSpeed) /
+            Mathf.Max(1f, automaticBrakeSpeedRangeKph));
+        return automaticBrakeMaximumFraction * turn * excessSpeed;
     }
 
     private float CalculateHandbrakeTorque(float localYawRate)
@@ -345,8 +418,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     private void UpdateRearHighSpeedGrip(float speedKph)
     {
-        // Keep the established arcade drift exactly as tuned through low and
-        // medium speeds. Only the high-speed tail of the curve gains grip.
+        // Preserve the extra high-speed rear stability on top of the new
+        // high-grip baseline. Bots still use their separate grip profile.
         float speedRange = Mathf.Max(1f, rearGripIncreaseFullKph - rearGripIncreaseStartKph);
         float normalizedSpeed = Mathf.Clamp01((speedKph - rearGripIncreaseStartKph) / speedRange);
         float blend = Mathf.SmoothStep(0f, 1f, normalizedSpeed);

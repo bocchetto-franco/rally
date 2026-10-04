@@ -33,7 +33,8 @@ public sealed class RallyPauseMenu : MonoBehaviour
 
     void Update()
     {
-        if (checkpointManager != null && checkpointManager.IsFinished)
+        if (checkpointManager != null && (RallySplitScreen.Active != null ?
+            RallySplitScreen.Active.AllFinished : checkpointManager.IsFinished))
         {
             if (isOpen) Close(false);
             return;

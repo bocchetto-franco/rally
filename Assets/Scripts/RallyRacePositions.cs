@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>Ranks the player and bots by completed laps plus distance along AI_Waypoints.</summary>
 [DefaultExecutionOrder(-50)]
@@ -13,6 +14,7 @@ public sealed class RallyRacePositions : MonoBehaviour
     {
         public Rigidbody body;
         public RallyBotController bot;
+        public RallyCheckpointManager checkpoints;
         public int order;
         public int segment;
         public int laps;
@@ -116,16 +118,21 @@ public sealed class RallyRacePositions : MonoBehaviour
             }
         }
 
+        RebuildRacers();
+    }
+
+    public void RebuildRacers()
+    {
+        var entries = new List<Racer>();
+        player = new Racer { body = playerBody, order = 0, checkpoints = checkpointManager };
+        entries.Add(player);
+        foreach (RallyLocalPlayerInput local in FindObjectsByType<RallyLocalPlayerInput>())
+        {
+            Rigidbody body = local.GetComponent<Rigidbody>();
+            if (local.gameObject.scene == gameObject.scene && body != null && body != playerBody)
+                entries.Add(new Racer { body = body, order = entries.Count, checkpoints = local.Checkpoints });
+        }
         RallyBotController[] bots = FindObjectsByType<RallyBotController>();
-        int activeBots = 0;
-        foreach (RallyBotController bot in bots)
-            if (bot.gameObject.scene == gameObject.scene && bot.isActiveAndEnabled &&
-                bot.GetComponentInChildren<Rigidbody>() != null)
-                activeBots++;
-        racers = new Racer[activeBots + 1];
-        player = new Racer { body = playerBody, order = 0 };
-        racers[0] = player;
-        int index = 1;
         foreach (RallyBotController bot in bots)
         {
             if (bot.gameObject.scene != gameObject.scene || !bot.isActiveAndEnabled)
@@ -133,10 +140,10 @@ public sealed class RallyRacePositions : MonoBehaviour
             Rigidbody body = bot.GetComponentInChildren<Rigidbody>();
             if (body != null)
             {
-                racers[index] = new Racer { body = body, bot = bot, order = index };
-                index++;
+                entries.Add(new Racer { body = body, bot = bot, order = entries.Count });
             }
         }
+        racers = entries.ToArray();
     }
 
     private void Update()
@@ -146,14 +153,24 @@ public sealed class RallyRacePositions : MonoBehaviour
         foreach (Racer racer in racers)
             UpdateProgress(racer);
 
-        // Only the player's rank is displayed. Counting racers ahead avoids
-        // sorting the four racers and allocating a comparison delegate each frame.
+        // Count racers ahead instead of sorting/allocating every frame.
+        // The same shared progress table serves one or both local HUDs.
+        PlayerPosition = GetPosition(playerBody);
+    }
+
+    public int GetPosition(Rigidbody body)
+    {
+        if (racers == null) return 1;
+        Racer target = null;
+        foreach (Racer racer in racers)
+            if (racer.body == body) { target = racer; break; }
+        if (target == null) return 1;
         int position = 1;
         foreach (Racer racer in racers)
-            if (racer != player && (racer.progress > player.progress ||
-                (racer.progress == player.progress && racer.order < player.order)))
+            if (racer != target && (racer.progress > target.progress ||
+                (racer.progress == target.progress && racer.order < target.order)))
                 position++;
-        PlayerPosition = position;
+        return position;
     }
 
     private void UpdateProgress(Racer racer)
@@ -185,7 +202,7 @@ public sealed class RallyRacePositions : MonoBehaviour
             else if (racer.lastDistance < routeLength * 0.25f && distance > routeLength * 0.75f)
                 racer.laps--;
         }
-        else if (racer == player && checkpointManager != null && checkpointManager.NextCheckpoint == 0)
+        else if (racer.checkpoints != null && racer.checkpoints.NextCheckpoint == 0)
         {
             racer.laps = distance > routeLength * 0.75f ? -1 : 0;
         }

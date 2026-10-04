@@ -309,15 +309,18 @@ public static class Circuit01EnvironmentSetup
     }
     static void ApplyWater(RallyPuddleSlowZone[] puddles)
     {
-        string source=Root+"/UnityWaterSample/ProductionReady/Environment/Water/Water.mat";
-        var template=AssetDatabase.LoadAssetAtPath<Material>(source);
-        if(template==null || template.shader==null)throw new InvalidOperationException("Official Unity water sample not imported.");
+        string source=Root+"/UnityWaterSample/ProductionReady/Environment/Water/WaterLake.shadergraph";
+        var shader=AssetDatabase.LoadAssetAtPath<Shader>(source);
+        if(shader==null)throw new InvalidOperationException("Official Unity WaterLake sample not imported.");
         string path=Root+"/Materials/Puddles - Unity sample.mat";
         var mat=AssetDatabase.LoadAssetAtPath<Material>(path);
-        if(mat==null){mat=new Material(template);AssetDatabase.CreateAsset(mat,path);}
-        mat.SetColor("_Color",new Color(.32f,.46f,.50f,0));mat.SetColor("_DepthColor",new Color(.045f,.11f,.13f,0));
-        mat.SetFloat("_OpaqueDepth",.65f);mat.SetFloat("_RefractionStrength",.01f);
-        mat.SetVector("_RippleSpeed",new Vector4(-.06f,.018f,-.035f,-.045f));
+        if(mat==null){mat=new Material(shader);AssetDatabase.CreateAsset(mat,path);}
+        mat.shader=shader;
+        mat.shaderKeywords=Array.Empty<string>();
+        mat.renderQueue=2950;
+        mat.SetColor("_Color",new Color(.78f,.8f,.72f,0));mat.SetColor("_DepthColor",new Color(.17f,.19f,.145f,0));
+        mat.SetFloat("_OpaqueDepth",1.4f);mat.SetFloat("_RefractionStrength",.003f);
+        mat.SetVector("_RippleSpeed",new Vector4(-.025f,.008f,-.014f,-.02f));
         mat.SetVector("_RippleScale",new Vector4(.32f,.26f,.13f,.30f));
         foreach(var zone in puddles)zone.GetComponent<Renderer>().sharedMaterial=mat;
         foreach(var camera in Object.FindObjectsByType<Camera>())

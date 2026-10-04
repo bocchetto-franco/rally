@@ -18,6 +18,12 @@ public sealed class RallyVehicleRecovery : MonoBehaviour
 
     void Update()
     {
+        RallyLocalPlayerInput localInput = GetComponent<RallyLocalPlayerInput>();
+        if (localInput != null)
+        {
+            if (localInput.RecoverPressed) RightVehicle();
+            return;
+        }
         bool keyboardHeld = Input.GetKey(KeyCode.T) ||
             (Keyboard.current != null && Keyboard.current.tKey.isPressed);
         bool keyboardPressed = keyboardHeld && !keyboardWasHeld;

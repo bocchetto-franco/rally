@@ -26,6 +26,10 @@ public sealed class PorscheVehicleBinder : MonoBehaviour
         Transform vehicleRoot = transform.parent;
         if (vehicleRoot == null)
             return;
+        // Local multiplayer clones an already fitted, tuned rig. Rebuilding from
+        // world-space mesh bounds would inflate its collider and disable its input.
+        if (Application.isPlaying && vehicleRoot.GetComponent<RallyLocalPlayerInput>() != null)
+            return;
 
         JrsVehicleController controller = vehicleRoot.GetComponent<JrsVehicleController>();
         if (controller == null)

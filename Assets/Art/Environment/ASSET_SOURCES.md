@@ -17,6 +17,7 @@ Se consultó **Free Low Poly Desert Pack**, de 23 Space Robots and Counting, en 
 
 ## Recursos oficiales de Unity
 
+- Rework de charcos (2026-10-03): **WaterLake.shadergraph** del mismo sample oficial **Production Ready Shaders**, con `Common/Subgraphs/DistanceMask.shadersubgraph`. Importados del paquete instalado, sin descargar assets externos ni generar texturas nuevas. Conservan los GUID y la licencia de Unity en `UnityWaterSample/LICENSE.md` (no CC0). Adaptación local del graph: smoothness 1.0 → 0.88. El material compartido usa profundidad opaca 1.4 m, refracción 0.003 y ondulación lenta, sin desplazamiento geométrico ni espuma. Documentación: https://docs.unity3d.com/Packages/com.unity.shadergraph@17.4/manual/Shader-Graph-Sample-Production-Ready-Water.html
 - Agua: `WaterSimple_FoamMask.shadergraph` y material base `Water.mat`, del sample **Production Ready Shaders**, paquete `com.unity.shadergraph` 17.6.0 instalado junto a URP 17.6.0. Se copió únicamente el conjunto de dependencias del shader/material conservando los GUID originales. Licencia original incluida en `UnityWaterSample/LICENSE.md`. Documentación: https://docs.unity3d.com/Packages/com.unity.shadergraph@17.0/manual/Shader-Graph-Sample-Production-Ready-Water.html
 - Cielo: shader integrado **Skybox/Procedural**, con parámetros de color cálidos. Sin HDRI externo.
 - Superficies: shaders oficiales **Universal Render Pipeline/Lit** y **Universal Render Pipeline/Terrain/Lit**.

@@ -7,6 +7,13 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class RallyMenuNavigation : MonoBehaviour
 {
+    public event System.Action<Button> FocusChanged;
+
+    public void SetFocusColor(Color color)
+    {
+        if (outlines == null) return;
+        foreach (Outline outline in outlines) if (outline != null) outline.effectColor = color;
+    }
     Button[] buttons;
     Outline[] outlines;
     Vector3[] originalScales;
@@ -99,5 +106,6 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         }
         if (eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)
             eventSystem.SetSelectedGameObject(buttons[selectedIndex].gameObject);
+        if (buttons[selectedIndex] != null) FocusChanged?.Invoke(buttons[selectedIndex]);
     }
 }

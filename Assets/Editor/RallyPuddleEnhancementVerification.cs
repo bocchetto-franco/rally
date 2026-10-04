@@ -64,8 +64,8 @@ public static class RallyPuddleEnhancementVerification
         Material material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
         if (material == null || material.shader == null || ShaderUtil.ShaderHasError(material.shader))
             throw new InvalidOperationException("The official water material is missing or invalid.");
-        if (Mathf.Abs(material.GetFloat("_OpaqueDepth") - 0.65f) > 0.001f ||
-            Mathf.Abs(material.GetFloat("_RefractionStrength") - 0.01f) > 0.001f ||
+        if (Mathf.Abs(material.GetFloat("_OpaqueDepth") - 1.4f) > 0.001f ||
+            Mathf.Abs(material.GetFloat("_RefractionStrength") - 0.003f) > 0.0001f ||
             material.GetVector("_RippleSpeed").sqrMagnitude < 0.001f)
             throw new InvalidOperationException("Water depth, refraction or ripple animation is not configured.");
         if (puddle.GetComponent<Renderer>().sharedMaterial != material)

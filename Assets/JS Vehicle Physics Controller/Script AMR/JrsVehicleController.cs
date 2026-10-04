@@ -51,6 +51,15 @@ public class JrsVehicleController : MonoBehaviour
 
     private JrsInputController mobileInputController;
     [SerializeField] private RallyBotController botInput;
+    private RallyLocalPlayerInput localInput;
+
+    public void SetLocalInput(RallyLocalPlayerInput input) => localInput = input;
+    float ReadVertical() => botInput != null ? botInput.VerticalInput :
+        localInput != null ? localInput.Vertical : mobileInputController != null ?
+        mobileInputController.GetVerticalInput() : RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical);
+    float ReadHorizontal() => botInput != null ? botInput.HorizontalInput :
+        localInput != null ? localInput.Horizontal : mobileInputController != null ?
+        mobileInputController.GetHorizontalInput() : RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal);
 
     public void SetBotInput(RallyBotController input) => botInput = input;
 
@@ -83,12 +92,8 @@ public class JrsVehicleController : MonoBehaviour
             rb.centerOfMass = transform.InverseTransformPoint(centerOfMassObject.transform.position);
         }
 
-        float v = (botInput != null ? botInput.VerticalInput :
-            mobileInputController != null ? mobileInputController.GetVerticalInput() :
-            RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical)) * motorForce;
-        float h = (botInput != null ? botInput.HorizontalInput :
-            mobileInputController != null ? mobileInputController.GetHorizontalInput() :
-            RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal)) * maxSteerAngle;
+        float v = ReadVertical() * motorForce;
+        float h = ReadHorizontal() * maxSteerAngle;
 
         // Apply motor torque to the wheels
         frontLeftWheel.motorTorque = v;
@@ -101,9 +106,9 @@ public class JrsVehicleController : MonoBehaviour
         // Update wheel poses
         UpdateWheelPoses();
 
-        if (botInput == null && (Input.GetKey(KeyCode.Space) || RallyGamepadInput.HandbrakePressed ||
+        if (botInput == null && (localInput != null ? localInput.Handbrake : (Input.GetKey(KeyCode.Space) || RallyGamepadInput.HandbrakePressed ||
             (mobileInputController != null && mobileInputController.brakeButton != null &&
-             mobileInputController.brakeButton.IsButtonPressed())))
+             mobileInputController.brakeButton.IsButtonPressed()))))
         {
             foreach (WheelCollider wheelCollider in wheelCollidersBrake)
             {
@@ -121,16 +126,11 @@ public class JrsVehicleController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float v = botInput != null ? botInput.VerticalInput * motorForce :
-            (mobileInputController != null ? mobileInputController.GetVerticalInput() :
-             RallyGamepadInput.GetVerticalInput(RallyGamepadInput.KeyboardVertical)) * motorForce;
-        float h = botInput != null ? botInput.HorizontalInput * maxSteerAngle :
-            (mobileInputController != null ? mobileInputController.GetHorizontalInput() :
-             RallyGamepadInput.GetHorizontalInput(RallyGamepadInput.KeyboardHorizontal)) * maxSteerAngle;
+        float v = ReadVertical() * motorForce;
+        float h = ReadHorizontal() * maxSteerAngle;
 
         // Calculate the current wheel speed in km/h
         float currentSpeedKmph = frontLeftWheel.radius * Mathf.PI * frontLeftWheel.rpm * 60f / 1000f;
-        Debug.Log("Current Speed: " + currentSpeedKmph + " Kmph");
 
         // Calculate the current engine RPM based on the wheel speed and gear ratio
         float currentRPM = frontLeftWheel.rpm * gearRatios[Mathf.Clamp(currentGear - 1, 0, gearRatios.Length - 1)];

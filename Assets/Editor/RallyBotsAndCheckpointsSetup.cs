@@ -88,7 +88,7 @@ public static class RallyBotsAndCheckpointsSetup
             RallyVehicleDynamics dynamics = root.GetComponent<RallyVehicleDynamics>();
             if (driver == null || dynamics == null || root.GetComponentInChildren<JrsVehicleController>() == null)
                 throw new InvalidOperationException("Bot_Car prefab has incomplete vehicle components.");
-            driver.SetDifficulty(80f, 0.95f);
+            driver.SetDifficulty(118f, 0.88f);
             SerializedObject tuning = new SerializedObject(dynamics);
             tuning.FindProperty("botGripProfile").objectReferenceValue = profile;
             tuning.ApplyModifiedPropertiesWithoutUndo();

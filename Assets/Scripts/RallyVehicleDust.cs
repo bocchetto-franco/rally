@@ -16,6 +16,8 @@ public sealed class RallyVehicleDust : MonoBehaviour
     Rigidbody body;
     ParticleSystem leftDust;
     ParticleSystem rightDust;
+    ParticleSystem leftCornerDust;
+    ParticleSystem rightCornerDust;
     Material dustMaterial;
 
     void Awake()
@@ -24,6 +26,8 @@ public sealed class RallyVehicleDust : MonoBehaviour
         body = GetComponent<Rigidbody>();
         leftDust = CreateEmitter("Rear Left Driving Dust", controller.rearLeftDustParticleSystem);
         rightDust = CreateEmitter("Rear Right Driving Dust", controller.rearRightDustParticleSystem);
+        leftCornerDust = CreateEmitter("Front Left Corner Dust", controller.rearLeftDustParticleSystem);
+        rightCornerDust = CreateEmitter("Front Right Corner Dust", controller.rearRightDustParticleSystem);
     }
 
     void LateUpdate()
@@ -35,6 +39,15 @@ public sealed class RallyVehicleDust : MonoBehaviour
         float rate = moving ? Mathf.Lerp(minimumEmission, maximumEmission, blend) : 0f;
         UpdateEmitter(controller.rearLeftWheel, leftDust, rate);
         UpdateEmitter(controller.rearRightWheel, rightDust, rate);
+
+        // Separate front emitters respond to steering, not sideways slip.
+        float steerAngle = (controller.frontLeftWheel.steerAngle + controller.frontRightWheel.steerAngle) * .5f;
+        float steering = Mathf.Abs(steerAngle) / Mathf.Max(1f, controller.maxSteerAngle);
+        float cornerRate = moving && speedKph > 8f
+            ? Mathf.Lerp(3f, 14f, blend) * Mathf.InverseLerp(.2f, .8f, steering)
+            : 0f;
+        UpdateEmitter(controller.frontLeftWheel, leftCornerDust, cornerRate);
+        UpdateEmitter(controller.frontRightWheel, rightCornerDust, cornerRate);
     }
 
     void UpdateEmitter(WheelCollider wheel, ParticleSystem dust, float rate)
@@ -125,6 +138,8 @@ public sealed class RallyVehicleDust : MonoBehaviour
     {
         if (leftDust != null) leftDust.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         if (rightDust != null) rightDust.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (leftCornerDust != null) leftCornerDust.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (rightCornerDust != null) rightCornerDust.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     void OnDestroy()

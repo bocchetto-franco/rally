@@ -17,7 +17,7 @@ public static class RallyMultiBotSetup
         "Assets/Scenes/Circuit_03.unity"
     };
     private static readonly string[] BotNames = { "Bot_Car", "Bot_Car_02", "Bot_Car_03" };
-    private static readonly float[] SpeedsKph = { 76f, 80f, 84f };
+    private static readonly float[] SpeedsKph = { 110f, 118f, 126f };
     private static readonly float[] LaneOffsets = { -0.9f, 0f, 0.9f };
 
     [MenuItem("Tools/Rally/Place Three Bots In All Circuits")]
@@ -78,7 +78,7 @@ public static class RallyMultiBotSetup
                 throw new InvalidOperationException(BotNames[i] + " has no bot driver or vehicle Rigidbody.");
 
             driver.Configure(vehicle, body, route.transform);
-            driver.SetDifficulty(SpeedsKph[i], 0.95f);
+            driver.SetDifficulty(SpeedsKph[i], 0.88f);
             driver.SetLaneOffset(LaneOffsets[i]);
             PrefabUtility.RecordPrefabInstancePropertyModifications(bots[i]);
             PrefabUtility.RecordPrefabInstancePropertyModifications(driver);
@@ -89,7 +89,7 @@ public static class RallyMultiBotSetup
         EditorSceneManager.MarkSceneDirty(scene);
         if (!EditorSceneManager.SaveScene(scene))
             throw new InvalidOperationException("Could not save " + path);
-        results.Add(scene.name + ": 3 bots at 76/80/84 km/h");
+        results.Add(scene.name + ": 3 bots at 110/118/126 km/h");
     }
 
     private static void VerifyBots(Scene scene, GameObject[] bots, GameObject player, Transform route, GameObject prefab,
