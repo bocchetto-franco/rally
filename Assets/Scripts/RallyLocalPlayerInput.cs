@@ -6,8 +6,9 @@ using UnityEngine.InputSystem;
 [DisallowMultipleComponent]
 public sealed class RallyLocalPlayerInput : MonoBehaviour
 {
-    public enum InputDevice { Keyboard, Gamepad }
+    public enum InputDevice { Keyboard, Gamepad, Automatic }
     [SerializeField] InputDevice device;
+    [SerializeField] int playerIndex;
     [SerializeField] float steeringResponse = 14f;
     Gamepad assignedGamepad;
     bool resetHeld, recoverHeld;
@@ -17,7 +18,16 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
     public bool Handbrake { get; private set; }
     public bool ResetPressed { get; private set; }
     public bool RecoverPressed { get; private set; }
-    public InputDevice Device => device;
+    public InputDevice Device => device == InputDevice.Automatic ?
+        (RallyLocalDevices.GamepadFor(playerIndex) != null ? InputDevice.Gamepad : InputDevice.Keyboard) : device;
+    public int PlayerIndex => playerIndex;
+    public Gamepad AssignedGamepad => device == InputDevice.Automatic ? RallyLocalDevices.GamepadFor(playerIndex) : assignedGamepad;
+
+    public void ConfigurePlayer(int player, float response)
+    {
+        Configure(InputDevice.Automatic, response);
+        playerIndex = Mathf.Clamp(player, 0, 1);
+    }
     public RallyCheckpointManager Checkpoints { get; set; }
     public RallyBrakeWarningSystem BrakeWarnings { get; set; }
     public void PairGamepad(Gamepad gamepad) => assignedGamepad = gamepad;
@@ -33,7 +43,7 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
     {
         float steer;
         bool reset, recover;
-        if (device == InputDevice.Keyboard)
+        if (device == InputDevice.Keyboard || (device == InputDevice.Automatic && RallyLocalDevices.UsesKeyboard(playerIndex)))
         {
             Keyboard keyboard = Keyboard.current;
             bool accelerate = RallyGamepadInput.KeyboardVertical > 0f ||
@@ -56,8 +66,10 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
         {
             // Keep the device paired even when another device becomes Gamepad.current.
             // Reacquire automatically after disconnect/reconnect.
-            if (assignedGamepad == null || !assignedGamepad.added)
-                assignedGamepad = Gamepad.all.Count > 0 ? Gamepad.all[0] : null;
+            if (device == InputDevice.Automatic)
+                assignedGamepad = RallyLocalDevices.GamepadFor(playerIndex);
+            else if (assignedGamepad == null || !assignedGamepad.added)
+                assignedGamepad = RallyLocalDevices.GamepadFor(playerIndex);
             float throttle = assignedGamepad == null ? 0f : assignedGamepad.rightTrigger.ReadValue();
             Brake = assignedGamepad == null ? 0f : assignedGamepad.leftTrigger.ReadValue();
             if (throttle < .02f) throttle = 0f;

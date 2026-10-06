@@ -35,6 +35,15 @@ public sealed class RallySplitScreen : MonoBehaviour
         if (mode != LoadSceneMode.Single || Array.IndexOf(RallyGameSession.CircuitScenes, scene.name) < 0) return;
         RallyGameSession.RestoreSavedState();
         if (RallyGameSession.LocalPlayerCount != 2) return;
+        // Bots are scene instances, not runtime spawns. Disable their complete
+        // rigs before Start/physics/rendering, then remove this Play-only copy.
+        // The saved scenes and prefabs remain available for single-player races.
+        foreach (GameObject sceneRoot in scene.GetRootGameObjects())
+            foreach (RallyBotController bot in sceneRoot.GetComponentsInChildren<RallyBotController>(true))
+            {
+                bot.gameObject.SetActive(false);
+                Destroy(bot.gameObject);
+            }
         var root = new GameObject("Local Split Screen - 2 Players");
         SceneManager.MoveGameObjectToScene(root, scene);
         root.AddComponent<RallySplitScreen>();
@@ -60,9 +69,9 @@ public sealed class RallySplitScreen : MonoBehaviour
         secondCar.name = "Player 2 Rally Car";
         PlayerTwo = secondCar.GetComponent<JrsVehicleController>();
         var inputOne = PlayerOne.gameObject.AddComponent<RallyLocalPlayerInput>();
-        inputOne.Configure(RallyLocalPlayerInput.InputDevice.Keyboard, dynamicsOne.SteeringResponse);
+        inputOne.ConfigurePlayer(0, dynamicsOne.SteeringResponse);
         var inputTwo = secondCar.AddComponent<RallyLocalPlayerInput>();
-        inputTwo.Configure(RallyLocalPlayerInput.InputDevice.Gamepad, dynamicsOne.SteeringResponse);
+        inputTwo.ConfigurePlayer(1, dynamicsOne.SteeringResponse);
         PlayerOne.SetLocalInput(inputOne);
         PlayerTwo.SetLocalInput(inputTwo);
         dynamicsOne.SetLocalInput(inputOne);
@@ -70,6 +79,11 @@ public sealed class RallySplitScreen : MonoBehaviour
         secondDynamics.name = "Player 2 Rally Dynamics";
         dynamicsTwo = secondDynamics.GetComponent<RallyVehicleDynamics>();
         dynamicsTwo.BindVehicle(PlayerTwo);
+        // Presentation only: retain the same rigidbody, wheels and tuning for both cars.
+        if (RallyGameSession.VehicleForPlayer(0) != RallyGameSession.VehicleName)
+            RallyPlayerVehicleSelection.ApplyVisual(PlayerOne, RallyGameSession.VehicleForPlayer(0));
+        if (RallyGameSession.VehicleForPlayer(1) != RallyGameSession.VehicleName)
+            RallyPlayerVehicleSelection.ApplyVisual(PlayerTwo, RallyGameSession.VehicleForPlayer(1));
         secondCar.transform.SetParent(null, true);
         secondDynamics.transform.SetParent(null, true);
 
@@ -107,8 +121,8 @@ public sealed class RallySplitScreen : MonoBehaviour
         hudTwo.name = "Player 2 Race HUD";
         hudOne.BindPlayer(TimerOne, PlayerOne.GetComponent<Rigidbody>(), positions);
         hudTwo.BindPlayer(TimerTwo, PlayerTwo.GetComponent<Rigidbody>(), positions);
-        FitCanvas(hudOne.GetComponent<Canvas>(), CameraOne.rect, "J1 · TECLADO");
-        FitCanvas(hudTwo.GetComponent<Canvas>(), CameraTwo.rect, "J2 · GAMEPAD");
+        FitCanvas(hudOne.GetComponent<Canvas>(), CameraOne.rect, "JUGADOR 1");
+        FitCanvas(hudTwo.GetComponent<Canvas>(), CameraTwo.rect, "JUGADOR 2");
 
         var warningOne = FindObjectsByType<RallyBrakeWarningSystem>().FirstOrDefault(w => w.VehicleBody == PlayerOne.GetComponent<Rigidbody>());
         if (warningOne != null)
@@ -155,50 +169,10 @@ public sealed class RallySplitScreen : MonoBehaviour
     {
         Transform grid = GameObject.Find("Starting Grid").transform;
         var slots = Enumerable.Range(0, grid.childCount).Select(grid.GetChild).OrderBy(t => t.name, StringComparer.Ordinal).ToArray();
-        if (slots.Length < 4) throw new InvalidOperationException("Split screen needs the existing four-slot starting grid.");
-        string roadName = gameObject.scene.name == "Circuit_01" ? "Rally_Road_Start_to_Finish" : gameObject.scene.name.Replace("_", "") + "_Road";
-        var road = GameObject.Find(roadName).GetComponent<MeshCollider>();
-        var bots = FindObjectsByType<RallyBotController>().Where(b => b.gameObject.scene == gameObject.scene).OrderBy(b => b.name).ToArray();
-        if (bots.Length > 3) throw new InvalidOperationException("This grid supports two players and up to three bots.");
-        if (!road.Raycast(new Ray(slots[0].position + Vector3.up * 80f, Vector3.down), out var originalGround, 200f))
-            throw new InvalidOperationException("First grid position must be on the road.");
-        // The road join behind the grid is narrower than its centre ray suggests.
-        // Find a row with all four tyres supported, never closer than six metres
-        // to the row ahead (the tuned body is under five metres long).
-        Vector3 fifth = default;
-        bool supported = false;
-        JrsVehicleController lastCar = bots.Length == 3 ? bots[2].GetComponentInChildren<JrsVehicleController>() : PlayerOne;
-        for (float spacing = 13f; spacing >= 6f; spacing -= 1f)
-        {
-            Vector3 candidate = slots[2].position - slots[0].forward * spacing;
-            if (!road.Raycast(new Ray(candidate + Vector3.up * 80f, Vector3.down), out var ground, 200f)) continue;
-            candidate.y = ground.point.y + slots[0].position.y - originalGround.point.y;
-            if (!RoadSupportsWheels(road, lastCar, candidate, slots[0].rotation)) continue;
-            fifth = candidate;
-            supported = true;
-            break;
-        }
-        if (!supported) throw new InvalidOperationException("No safe fifth grid position on " + gameObject.scene.name);
-        var marker = new GameObject("Grid_05_Local_Bot").transform;
-        marker.SetParent(grid, false);
-        marker.SetPositionAndRotation(fifth, slots[0].rotation);
+        if (slots.Length < 2) throw new InvalidOperationException("Split screen needs two starting grid positions.");
         SetPose(PlayerOne.GetComponent<Rigidbody>(), slots[0]);
         SetPose(PlayerTwo.GetComponent<Rigidbody>(), slots[1]);
-        for (int i = 0; i < bots.Length; i++)
-            SetPose(bots[i].GetComponentInChildren<Rigidbody>(), i < 2 ? slots[i + 2] : marker);
         Physics.SyncTransforms();
-    }
-
-    static bool RoadSupportsWheels(MeshCollider road, JrsVehicleController car, Vector3 position, Quaternion rotation)
-    {
-        Rigidbody body = car.GetComponent<Rigidbody>();
-        Quaternion delta = rotation * Quaternion.Inverse(body.rotation);
-        foreach (WheelCollider wheel in new[] { car.frontLeftWheel, car.frontRightWheel, car.rearLeftWheel, car.rearRightWheel })
-        {
-            Vector3 centre = position + delta * (wheel.transform.TransformPoint(wheel.center) - body.position);
-            if (!road.Raycast(new Ray(centre + Vector3.up * 80f, Vector3.down), out _, 200f)) return false;
-        }
-        return true;
     }
 
     static void SetPose(Rigidbody body, Transform slot)

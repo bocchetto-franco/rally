@@ -1,36 +1,50 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-/// <summary>Explicit UI navigation for keyboard and any Input System gamepad (Options is handled by the pause menu).</summary>
+/// <summary>Independent focus/input per local player, plus the existing shared single-player UI.</summary>
 [DisallowMultipleComponent]
 public sealed class RallyMenuNavigation : MonoBehaviour
 {
     public event System.Action<Button> FocusChanged;
+    static readonly Dictionary<EventSystem, int> navigationUsers = new Dictionary<EventSystem, int>();
+    static readonly Dictionary<EventSystem, bool> previousNavigationEvents = new Dictionary<EventSystem, bool>();
+    Button[] buttons;
+    Outline[] outlines;
+    Vector3[] originalScales;
+    int selectedIndex;
+    int localPlayer = -1;
+    bool keyboardOverride;
+    EventSystem eventSystem;
+    bool upHeld, downHeld, leftHeld, rightHeld, southHeld;
+    Gamepad previousPad;
+
+    public int SelectedIndex => selectedIndex;
+    public int LocalPlayer => localPlayer;
+    Gamepad Pad => localPlayer >= 0 ? RallyLocalDevices.GamepadFor(localPlayer) :
+        RallyGameSession.LocalPlayerCount == 2 ? RallyLocalDevices.GamepadFor(0) : Gamepad.current;
+    bool KeyboardAllowed => localPlayer < 0 || keyboardOverride || RallyLocalDevices.UsesKeyboard(localPlayer);
+
+    public void ConfigureForLocalPlayer(int player, bool allowKeyboard = false)
+    {
+        localPlayer = Mathf.Clamp(player, 0, 1);
+        keyboardOverride = allowKeyboard;
+        SeedHeld();
+    }
 
     public void SetFocusColor(Color color)
     {
         if (outlines == null) return;
         foreach (Outline outline in outlines) if (outline != null) outline.effectColor = color;
     }
-    Button[] buttons;
-    Outline[] outlines;
-    Vector3[] originalScales;
-    int selectedIndex;
-    EventSystem eventSystem;
-    bool previousNavigationEvents;
-    bool upHeld;
-    bool downHeld;
-    bool leftHeld;
-    bool rightHeld;
-    bool southHeld;
-
-    public int SelectedIndex => selectedIndex;
 
     public void ResetSelection()
     {
-        if (buttons != null && buttons.Length > 0) Select(0);
+        if (buttons == null) return;
+        for (int i = 0; i < buttons.Length; i++)
+            if (Usable(i)) { Select(i); return; }
     }
 
     public void Configure(params Button[] orderedButtons)
@@ -46,54 +60,81 @@ public sealed class RallyMenuNavigation : MonoBehaviour
             outlines[i] = outline;
             originalScales[i] = buttons[i].transform.localScale;
         }
-        Select(0);
+        ResetSelection();
+    }
+
+    void SeedHeld()
+    {
+        previousPad = Pad;
+        upHeld = previousPad != null && previousPad.dpad.up.isPressed;
+        downHeld = previousPad != null && previousPad.dpad.down.isPressed;
+        leftHeld = previousPad != null && previousPad.dpad.left.isPressed;
+        rightHeld = previousPad != null && previousPad.dpad.right.isPressed;
+        southHeld = previousPad != null && previousPad.buttonSouth.isPressed;
     }
 
     void OnEnable()
     {
-        Gamepad pad = Gamepad.current;
-        upHeld = pad != null && pad.dpad.up.isPressed;
-        downHeld = pad != null && pad.dpad.down.isPressed;
-        leftHeld = pad != null && pad.dpad.left.isPressed;
-        rightHeld = pad != null && pad.dpad.right.isPressed;
-        southHeld = pad != null && pad.buttonSouth.isPressed;
+        SeedHeld();
         eventSystem = EventSystem.current;
         if (eventSystem == null) return;
-        previousNavigationEvents = eventSystem.sendNavigationEvents;
-        // Keep pointer events for mouse, but avoid a second submit from StandaloneInputModule.
+        if (!navigationUsers.ContainsKey(eventSystem))
+        {
+            navigationUsers[eventSystem] = 0;
+            previousNavigationEvents[eventSystem] = eventSystem.sendNavigationEvents;
+        }
+        navigationUsers[eventSystem]++;
+        // Pointer events stay enabled, but the global UI module must not submit twice
+        // or move both local players through a single EventSystem focus.
         eventSystem.sendNavigationEvents = false;
     }
 
     void OnDisable()
     {
-        if (eventSystem != null) eventSystem.sendNavigationEvents = previousNavigationEvents;
+        if (eventSystem == null || !navigationUsers.ContainsKey(eventSystem)) return;
+        if (--navigationUsers[eventSystem] == 0)
+        {
+            eventSystem.sendNavigationEvents = previousNavigationEvents[eventSystem];
+            navigationUsers.Remove(eventSystem);
+            previousNavigationEvents.Remove(eventSystem);
+        }
     }
+
+    static bool KeyPressed(Key key, KeyCode legacy) => Input.GetKeyDown(legacy) ||
+        (Keyboard.current != null && Keyboard.current[key].wasPressedThisFrame);
 
     void Update()
     {
         if (buttons == null || buttons.Length == 0) return;
-        Gamepad pad = Gamepad.current;
+        Gamepad pad = Pad;
+        if (pad != previousPad) SeedHeld(); // Reconnect without submitting a held button.
         bool up = pad != null && pad.dpad.up.isPressed;
         bool down = pad != null && pad.dpad.down.isPressed;
         bool left = pad != null && pad.dpad.left.isPressed;
         bool right = pad != null && pad.dpad.right.isPressed;
         bool south = pad != null && pad.buttonSouth.isPressed;
-        bool previous = (up && !upHeld) || (left && !leftHeld)
-            || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow);
-        bool next = (down && !downHeld) || (right && !rightHeld)
-            || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow);
-        bool confirm = (south && !southHeld)
-            || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
-        upHeld = up;
-        downHeld = down;
-        leftHeld = left;
-        rightHeld = right;
-        southHeld = south;
-        if (previous) Select((selectedIndex - 1 + buttons.Length) % buttons.Length);
-        else if (next) Select((selectedIndex + 1) % buttons.Length);
+        bool previous = (up && !upHeld) || (left && !leftHeld) ||
+            (KeyboardAllowed && (KeyPressed(Key.UpArrow, KeyCode.UpArrow) || KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
+        bool next = (down && !downHeld) || (right && !rightHeld) ||
+            (KeyboardAllowed && (KeyPressed(Key.DownArrow, KeyCode.DownArrow) || KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
+        bool confirm = (south && !southHeld) ||
+            (KeyboardAllowed && (KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
+        upHeld = up; downHeld = down; leftHeld = left; rightHeld = right; southHeld = south;
+        if (previous) Move(-1);
+        else if (next) Move(1);
+        if (confirm && Usable(selectedIndex)) buttons[selectedIndex].onClick.Invoke();
+    }
 
-        if (confirm && buttons[selectedIndex] != null && buttons[selectedIndex].IsInteractable())
-            buttons[selectedIndex].onClick.Invoke();
+    bool Usable(int index) => index >= 0 && index < buttons.Length && buttons[index] != null &&
+        buttons[index].gameObject.activeInHierarchy && buttons[index].IsInteractable();
+
+    void Move(int direction)
+    {
+        for (int step = 1; step <= buttons.Length; step++)
+        {
+            int candidate = (selectedIndex + step * direction + buttons.Length) % buttons.Length;
+            if (Usable(candidate)) { Select(candidate); return; }
+        }
     }
 
     void Select(int index)
@@ -104,7 +145,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
             if (outlines[i] != null) outlines[i].enabled = i == selectedIndex;
             if (buttons[i] != null) buttons[i].transform.localScale = originalScales[i] * (i == selectedIndex ? 1.04f : 1f);
         }
-        if (eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)
+        // Local panels keep independent outlines; one global selected object cannot represent both.
+        if (localPlayer < 0 && eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)
             eventSystem.SetSelectedGameObject(buttons[selectedIndex].gameObject);
         if (buttons[selectedIndex] != null) FocusChanged?.Invoke(buttons[selectedIndex]);
     }

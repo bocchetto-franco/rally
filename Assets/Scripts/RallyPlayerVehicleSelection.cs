@@ -26,7 +26,8 @@ public static class RallyPlayerVehicleSelection
     {
         if (Array.IndexOf(RallyGameSession.CircuitScenes, scene.name) < 0) return;
         RallyGameSession.RestoreSavedState();
-        if (RallyGameSession.SelectedVehicle == RallyGameSession.VehicleName) return;
+        // Clone the pristine split-screen rig before applying independent visual selections.
+        if (RallyGameSession.LocalPlayerCount == 2 || RallyGameSession.SelectedVehicle == RallyGameSession.VehicleName) return;
         var player = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<JrsVehicleController>())
             .FirstOrDefault(c => c.name == RallyGameSession.VehicleName && c.GetComponentInParent<RallyBotController>() == null);
         if (player == null) { Debug.LogError("Selected vehicle: player root not found."); return; }

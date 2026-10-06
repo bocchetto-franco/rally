@@ -29,6 +29,7 @@ public static class RallyGameSession
 
     const string TimeKey = "Rally.LastRaceTime";
     const string VehicleKey = "Rally.SelectedVehicle";
+    const string VehicleTwoKey = "Rally.SelectedVehicleTwo";
     const string CircuitKey = "Rally.SelectedCircuit";
     const string DifficultyKey = "Rally.BotDifficulty";
     public static int LocalPlayerCount { get; private set; } = 1;
@@ -40,6 +41,18 @@ public static class RallyGameSession
     }
 
     public static string SelectedVehicle { get; private set; } = VehicleName;
+    public static string SelectedVehicleTwo { get; private set; } = VehicleName;
+    public static string VehicleForPlayer(int player) => player == 0 ? SelectedVehicle : SelectedVehicleTwo;
+    public static int VehicleIndexForPlayer(int player) => Mathf.Max(0, Array.IndexOf(RallyPlayerVehicleSelection.Names, VehicleForPlayer(player)));
+    public static void SelectVehicleForPlayer(int player, int index)
+    {
+        if (player == 0) { SelectVehicle(index); return; }
+        if (player != 1 || index < 0 || index >= RallyPlayerVehicleSelection.Names.Length)
+            throw new ArgumentOutOfRangeException(nameof(index));
+        SelectedVehicleTwo = RallyPlayerVehicleSelection.Names[index];
+        PlayerPrefs.SetString(VehicleTwoKey, SelectedVehicleTwo);
+        PlayerPrefs.Save();
+    }
     public static string SelectedCircuit { get; private set; } = CircuitName;
     public static RallyBotDifficulty SelectedBotDifficulty { get; private set; } = RallyBotDifficulty.Medium;
     public static float LastRaceTime { get; private set; } = -1f;
@@ -73,6 +86,7 @@ public static class RallyGameSession
     public static void SelectCurrentOptions()
     {
         PlayerPrefs.SetString(VehicleKey, SelectedVehicle);
+        PlayerPrefs.SetString(VehicleTwoKey, SelectedVehicleTwo);
         PlayerPrefs.SetString(CircuitKey, SelectedCircuit);
         PlayerPrefs.SetInt(DifficultyKey, (int)SelectedBotDifficulty);
         PlayerPrefs.Save();
@@ -92,6 +106,9 @@ public static class RallyGameSession
         SelectedVehicle = PlayerPrefs.GetString(VehicleKey, VehicleName);
         if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicle) < 0)
             SelectedVehicle = VehicleName;
+        SelectedVehicleTwo = PlayerPrefs.GetString(VehicleTwoKey, VehicleName);
+        if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicleTwo) < 0)
+            SelectedVehicleTwo = VehicleName;
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);
         if (Array.IndexOf(CircuitNames, SelectedCircuit) < 0)
             SelectedCircuit = CircuitName;
@@ -175,6 +192,13 @@ public sealed class RallyMenuController : MonoBehaviour
     GameObject mainMenuHint;
     RallyMenuNavigation menuNavigation;
     bool waitingForStartInput;
+    GameObject frontendCanvas;
+    readonly bool[] localReady = new bool[2];
+    Button[][] localVehicleButtons;
+    Button[] localReadyButtons;
+    TextMeshProUGUI[] localVehicleTitles, localDeviceLabels;
+    RallyMenuNavigation[] localNavigations;
+    Button localRaceButton;
 
     public void Configure(RallyMenuScreen targetScreen) => screen = targetScreen;
 
@@ -193,6 +217,19 @@ public sealed class RallyMenuController : MonoBehaviour
 
     void Update()
     {
+        if (localDeviceLabels != null)
+            for (int i = 0; i < 2; i++)
+            {
+                string caption = RallyLocalDevices.Label(i);
+                if (localDeviceLabels[i].text != caption) localDeviceLabels[i].text = caption;
+                bool available = RallyLocalDevices.GamepadFor(i) != null || RallyLocalDevices.UsesKeyboard(i);
+                if (localReadyButtons[i].interactable != available)
+                {
+                    localReadyButtons[i].interactable = available;
+                    if (!available) localReady[i] = false;
+                    RefreshLocalSelection();
+                }
+            }
         if (waitingForStartInput)
         {
             Color color = introPrompt.color;
@@ -207,10 +244,9 @@ public sealed class RallyMenuController : MonoBehaviour
 
     static bool GamepadButtonPressed()
     {
-        Gamepad pad = Gamepad.current;
-        if (pad == null) return false;
-        foreach (InputControl control in pad.allControls)
-            if (control is ButtonControl button && button.wasPressedThisFrame) return true;
+        foreach (Gamepad pad in Gamepad.all)
+            foreach (InputControl control in pad.allControls)
+                if (control is ButtonControl button && button.wasPressedThisFrame) return true;
         return false;
     }
 
@@ -232,9 +268,21 @@ public sealed class RallyMenuController : MonoBehaviour
 
     void BuildInterface()
     {
+        if (frontendCanvas != null)
+        {
+            frontendCanvas.SetActive(false);
+            Destroy(frontendCanvas);
+        }
+        localVehicleButtons = null;
+        localDeviceLabels = null;
+        localNavigations = null;
+        difficultyButtons = null;
+        vehicleButtons = null;
+        localReady[0] = localReady[1] = false;
         EnsureEventSystem();
 
         GameObject canvasObject = new GameObject("Rally Frontend Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        frontendCanvas = canvasObject;
         canvasObject.transform.SetParent(transform, false);
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -264,6 +312,8 @@ public sealed class RallyMenuController : MonoBehaviour
                 BuildResults(background);
                 break;
         }
+
+        if (screen == RallyMenuScreen.Selection && RallyGameSession.LocalPlayerCount == 2) return;
 
         // The buttons are created in reading order: tracks, difficulties, then actions.
         // D-Pad up/down (and left/right) can therefore reach every option without a mouse.
@@ -298,6 +348,7 @@ public sealed class RallyMenuController : MonoBehaviour
 
     void BuildSelection(Transform root)
     {
+        if (RallyGameSession.LocalPlayerCount == 2) { BuildLocalSelection(root); return; }
         Text(root, "Title", "PREPARÁ TU PRÓXIMA ETAPA", 58f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 378f), new Vector2(1400f, 74f), Color.white);
         Text(root, "Subtitle", "Elegí tu clásico. Encontrá tu terreno. Salí a competir.", 22f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 315f), new Vector2(1400f, 38f), Muted);
 
@@ -360,13 +411,114 @@ public sealed class RallyMenuController : MonoBehaviour
             int count = i + 1;
             localPlayerButtons[i] = Button(playersCard, "Local Players " + count, count == 1 ? "1 JUGADOR" : "2 JUGADORES · PANTALLA DIVIDIDA",
                 new Vector2(i == 0 ? -230f : 230f, 0f), new Vector2(i == 0 ? 280f : 600f, 52f),
-                () => { RallyGameSession.SelectLocalPlayers(count); RefreshLocalPlayers(); }, false);
+                () => ChangePlayerCount(count), false);
         }
         RefreshLocalPlayers();
-        Text(root, "Split Controls", "2 jugadores: J1 teclado · J2 gamepad/DualSense · pausa compartida", 17f, FontStyles.Normal,
+        Text(root, "Split Controls", "2 jugadores: J1 mando 1 · J2 mando 2 (o teclado si hay un solo mando) · sin bots", 17f, FontStyles.Normal,
             TextAlignmentOptions.Center, new Vector2(0f, -412f), new Vector2(1400f, 30f), Muted);
         Button(root, "Back Button", "VOLVER", new Vector2(-265f, -472f), new Vector2(300f, 74f), BackToMenu, false);
         Button(root, "Race Button", "COMENZAR CARRERA", new Vector2(180f, -472f), new Vector2(520f, 74f), StartRace, true);
+    }
+
+    void ChangePlayerCount(int count)
+    {
+        RallyGameSession.SelectLocalPlayers(count);
+        BuildInterface();
+    }
+
+    void BuildLocalSelection(Transform root)
+    {
+        Text(root, "Title", "CARRERA LOCAL · DOS PILOTOS", 48f, FontStyles.Bold, TextAlignmentOptions.Center,
+            new Vector2(0f, 394f), new Vector2(1500f, 70f), Color.white);
+        Text(root, "Subtitle", "Cada piloto elige su auto y confirma LISTO. J1 elige la pista y comienza la carrera.", 21f,
+            FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 342f), new Vector2(1600f, 40f), Muted);
+        localVehicleButtons = new Button[2][];
+        localReadyButtons = new Button[2];
+        localVehicleTitles = new TextMeshProUGUI[2];
+        localDeviceLabels = new TextMeshProUGUI[2];
+        localNavigations = new RallyMenuNavigation[2];
+        for (int p = 0; p < 2; p++)
+        {
+            int player = p;
+            Color playerColor = p == 0 ? Accent : new Color(.2f, .78f, 1f);
+            var card = PanelRect(root, "Player " + (p + 1) + " Selection", Panel, new Vector2(p == 0 ? -405f : 405f, 80f), new Vector2(770f, 470f));
+            PanelRect(card, "Player Accent", playerColor, new Vector2(-380f, 0f), new Vector2(8f, 470f));
+            Text(card, "Player Title", "JUGADOR " + (p + 1), 32f, FontStyles.Bold, TextAlignmentOptions.Left,
+                new Vector2(-125f, 182f), new Vector2(430f, 50f), playerColor);
+            localDeviceLabels[p] = Text(card, "Device", RallyLocalDevices.Label(p), 18f, FontStyles.Normal,
+                TextAlignmentOptions.Right, new Vector2(215f, 182f), new Vector2(270f, 44f), Muted);
+            localVehicleTitles[p] = Text(card, "Selected Vehicle", "", 40f, FontStyles.Bold,
+                TextAlignmentOptions.Center, new Vector2(0f, 122f), new Vector2(680f, 56f), Color.white);
+            localVehicleButtons[p] = new Button[3];
+            for (int v = 0; v < 3; v++)
+            {
+                int choice = v;
+                localVehicleButtons[p][v] = Button(card, "Player " + (p + 1) + " Vehicle " + v,
+                    RallyGameSession.VehicleDisplayName(v), new Vector2(0f, 46f - v * 68f), new Vector2(640f, 56f),
+                    () => ChooseLocalVehicle(player, choice), false);
+            }
+            localReadyButtons[p] = Button(card, "Player " + (p + 1) + " Ready", "LISTO",
+                new Vector2(0f, -176f), new Vector2(640f, 65f), () => { localReady[player] = !localReady[player]; RefreshLocalSelection(); }, true);
+            localNavigations[p] = card.gameObject.AddComponent<RallyMenuNavigation>();
+            localNavigations[p].ConfigureForLocalPlayer(p);
+        }
+        var track = PanelRect(root, "Shared Circuit Card", Panel, new Vector2(0f, -231f), new Vector2(1580f, 132f));
+        selectedCircuitTitle = Text(track, "Selected Circuit", "", 25f, FontStyles.Bold, TextAlignmentOptions.Left,
+            new Vector2(-530f, 38f), new Vector2(480f, 40f), Accent);
+        selectedCircuitDetails = Text(track, "Circuit Details", "", 17f, FontStyles.Normal, TextAlignmentOptions.Right,
+            new Vector2(440f, 38f), new Vector2(650f, 32f), Muted);
+        selectedTrackPreview = Preview(track, "Selected Track Preview", new Vector2(-720f, -22f), new Vector2(88f, 50f));
+        circuitButtons = new Button[3];
+        for (int i = 0; i < 3; i++)
+        {
+            int choice = i;
+            circuitButtons[i] = Button(track, "Circuit " + (i + 1) + " Button", "CIRCUIT_0" + (i + 1),
+                new Vector2(-440f + i * 475f, -25f), new Vector2(430f, 55f), () => ChooseCircuit(choice), false);
+        }
+        Text(root, "No Bots", "SOLO J1 Y J2 · SIN BOTS", 19f, FontStyles.Bold, TextAlignmentOptions.Center,
+            new Vector2(0f, -326f), new Vector2(1000f, 32f), Muted);
+        localPlayerButtons = new Button[2];
+        localPlayerButtons[0] = Button(root, "Local Players 1", "1 JUGADOR", new Vector2(-435f, -373f), new Vector2(290f, 55f), () => ChangePlayerCount(1), false);
+        localPlayerButtons[1] = Button(root, "Local Players 2", "2 JUGADORES", new Vector2(-80f, -373f), new Vector2(330f, 55f), () => ChangePlayerCount(2), false);
+        Button back = Button(root, "Back Button", "VOLVER", new Vector2(-380f, -457f), new Vector2(330f, 73f), BackToMenu, false);
+        localRaceButton = Button(root, "Race Button", "COMENZAR CARRERA", new Vector2(255f, -457f), new Vector2(660f, 73f), StartRace, true);
+        localNavigations[0].Configure(localVehicleButtons[0][0], localVehicleButtons[0][1], localVehicleButtons[0][2],
+            localReadyButtons[0], circuitButtons[0], circuitButtons[1], circuitButtons[2], localPlayerButtons[0], back, localRaceButton);
+        localNavigations[1].Configure(localVehicleButtons[1][0], localVehicleButtons[1][1], localVehicleButtons[1][2], localReadyButtons[1]);
+        localNavigations[0].SetFocusColor(Accent);
+        localNavigations[1].SetFocusColor(new Color(.2f, .78f, 1f));
+        RefreshCircuitSelection();
+        RefreshLocalPlayers();
+        RefreshLocalSelection();
+    }
+
+    void ChooseLocalVehicle(int player, int index)
+    {
+        RallyGameSession.SelectVehicleForPlayer(player, index);
+        localReady[player] = false;
+        RefreshLocalSelection();
+    }
+
+    void RefreshLocalSelection()
+    {
+        if (localVehicleButtons == null) return;
+        for (int p = 0; p < 2; p++)
+        {
+            int selected = RallyGameSession.VehicleIndexForPlayer(p);
+            localVehicleTitles[p].text = RallyGameSession.VehicleDisplayName(selected);
+            for (int v = 0; v < 3; v++)
+            {
+                bool active = v == selected;
+                Button button = localVehicleButtons[p][v];
+                ColorBlock colors = button.colors;
+                colors.normalColor = active ? Accent : PanelLight;
+                colors.selectedColor = colors.highlightedColor = active ? new Color(1f, .68f, .25f) : new Color(.28f, .22f, .15f);
+                button.colors = colors;
+                button.GetComponentInChildren<TextMeshProUGUI>().color = active ? new Color(.1f, .07f, .04f) : Color.white;
+            }
+            localReadyButtons[p].GetComponentInChildren<TextMeshProUGUI>().text = localReady[p] ? "LISTO" : "CONFIRMAR · LISTO";
+        }
+        localRaceButton.interactable = localReady[0] && localReady[1];
     }
 
     void BuildResults(Transform root)
@@ -401,6 +553,7 @@ public sealed class RallyMenuController : MonoBehaviour
 
     void StartRace()
     {
+        if (RallyGameSession.LocalPlayerCount == 2 && (!localReady[0] || !localReady[1])) return;
         RallyGameSession.SelectCurrentOptions();
         SceneManager.LoadScene(RallyGameSession.SelectedRaceScene);
     }
@@ -411,10 +564,22 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         RallyGameSession.SelectCircuit(index);
         RefreshCircuitSelection();
+        if (localVehicleButtons != null)
+        {
+            localReady[0] = localReady[1] = false;
+            RefreshLocalSelection();
+        }
     }
 
     void RefreshLocalPlayers()
     {
+        if (difficultyButtons != null)
+        {
+            foreach (Button button in difficultyButtons)
+                button.interactable = RallyGameSession.LocalPlayerCount == 1;
+            difficultyButtons[0].transform.parent.Find("Category").GetComponent<TMP_Text>().text =
+                RallyGameSession.LocalPlayerCount == 1 ? "DIFICULTAD BOTS" : "SIN BOTS";
+        }
         for (int i = 0; i < localPlayerButtons.Length; i++)
         {
             var colors = localPlayerButtons[i].colors;

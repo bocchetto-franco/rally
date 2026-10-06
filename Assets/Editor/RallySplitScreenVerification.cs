@@ -22,8 +22,8 @@ public static class RallySplitScreenVerification
     static double phaseAt, deadline;
     static double nextStatusAt;
     static Keyboard keyboard;
-    static DualSenseGamepadHID pad;
-    static Vector3[] botStart;
+    static DualSenseGamepadHID pad, padOne;
+    static Gamepad[] disabledPads;
     static Rigidbody one, two;
     static Collider colliderOne, colliderTwo;
     static Vector3 resetOne, resetTwo;
@@ -66,6 +66,8 @@ public static class RallySplitScreenVerification
         RallyGameSession.RestoreSavedState();
         SessionState.SetInt("Rally.SplitTest.Players", RallyGameSession.LocalPlayerCount);
         SessionState.SetString("Rally.SplitTest.Vehicle", RallyGameSession.SelectedVehicle);
+        SessionState.SetString("Rally.SplitTest.VehicleTwo", RallyGameSession.SelectedVehicleTwo);
+        SessionState.SetBool("Rally.SplitTest.HasVehicleTwo", PlayerPrefs.HasKey("Rally.SelectedVehicleTwo"));
         SessionState.SetString("Rally.SplitTest.Circuit", RallyGameSession.SelectedCircuit);
         foreach (string key in TimeKeys)
         {
@@ -77,6 +79,7 @@ public static class RallySplitScreenVerification
         SessionState.SetBool(ActiveKey, true);
         phase = circuit = minimumFrame = 0;
         deadline = phaseAt = 0;
+        RallyGameSession.SelectLocalPlayers(1);
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/MainMenu.unity");
         EditorApplication.isPlaying = true;
         EditorApplication.isPaused = false;
@@ -137,12 +140,63 @@ public static class RallySplitScreenVerification
                     return;
                 }
                 EditorApplication.isPaused = false;
-                Button twoPlayers = UnityEngine.Object.FindObjectsByType<Button>().First(b => b.name == "Local Players 2");
-                twoPlayers.onClick.Invoke();
+                disabledPads = Gamepad.all.Where(p => p.enabled).ToArray();
+                foreach (Gamepad existing in disabledPads) InputSystem.DisableDevice(existing);
+                keyboard = InputSystem.AddDevice<Keyboard>("Split Test Keyboard");
+                padOne = InputSystem.AddDevice<DualSenseGamepadHID>("Split Test DualSense J1");
+                pad = InputSystem.AddDevice<DualSenseGamepadHID>("Split Test DualSense J2");
+                ButtonNamed("Local Players 2").onClick.Invoke();
                 Require(RallyGameSession.LocalPlayerCount == 2, "Selection button enables two-player mode");
+                Require(RallyLocalDevices.GamepadFor(0) == padOne && RallyLocalDevices.GamepadFor(1) == pad,
+                    "First and second gamepads are assigned automatically and exclusively");
+                Require(Navigation(0) != Navigation(1) && !ButtonNamed("Race Button").interactable,
+                    "Two independent selection panels wait for both players to be ready");
+                Require(!UnityEngine.Object.FindObjectsByType<Button>().Any(b => b.name.StartsWith("Difficulty ")),
+                    "Split-screen selection has no bot difficulty");
+                SendPad(target: padOne, dpad: 4);
+                SendPad(dpad: 4);
+                Next(20);
+            }
+            else if (phase == 20)
+            {
+                Require(Navigation(0).SelectedIndex == 1 && Navigation(1).SelectedIndex == 1, "Both assigned D-Pads move their own focus");
+                SendPad(target: padOne); SendPad(); Next(21);
+            }
+            else if (phase == 21)
+            {
+                SendPad(target: padOne, buttons: 1 << 5); SendPad(buttons: 1 << 5); Next(22);
+            }
+            else if (phase == 22)
+            {
+                Require(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 1,
+                    "Each Cross button confirms its own selected car");
+                SendPad(target: padOne); SendPad(); Next(23);
+            }
+            else if (phase == 23) { SendPad(dpad: 4); Next(24); }
+            else if (phase == 24)
+            {
+                Require(Navigation(0).SelectedIndex == 1 && Navigation(1).SelectedIndex == 2, "J2 navigation cannot move J1 focus");
+                SendPad(); Next(25);
+            }
+            else if (phase == 25) { SendPad(buttons: 1 << 5); Next(26); }
+            else if (phase == 26)
+            {
+                Require(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 2,
+                    "Different car selections persist independently");
+                SendPad(target: padOne); SendPad();
                 RallyGameSession.SelectCircuit(0);
-                RallyGameSession.SelectVehicle(0);
-                UnityEngine.Object.FindObjectsByType<Button>().First(b => b.name == "Race Button").onClick.Invoke();
+                ButtonNamed("Player 1 Ready").onClick.Invoke();
+                Require(!ButtonNamed("Race Button").interactable, "One ready player cannot launch the race");
+                ButtonNamed("Player 2 Ready").onClick.Invoke();
+                Require(ButtonNamed("Race Button").interactable, "Both ready players enable the shared race");
+                ScreenCapture.CaptureScreenshot("Logs/dual-gamepad-selection.png");
+                // ScreenCapture writes at the end of the frame: let the selection
+                // render before loading the race, otherwise the capture shows the track.
+                Next(27);
+            }
+            else if (phase == 27)
+            {
+                ButtonNamed("Race Button").onClick.Invoke();
                 Next(1);
             }
             else if (phase == 1 && split != null && split.Ready)
@@ -154,12 +208,11 @@ public static class RallySplitScreenVerification
                 colliderTwo = BodyBox(split.PlayerTwo);
                 resetOne = one.position;
                 resetTwo = two.position;
-                keyboard = InputSystem.AddDevice<Keyboard>("Split Test Keyboard");
-                pad = InputSystem.AddDevice<DualSenseGamepadHID>("Split Test DualSense");
-                split.PlayerTwo.GetComponent<RallyLocalPlayerInput>().PairGamepad(pad);
-                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W, Key.D));
+                Require(split.PlayerOne.GetComponent<RallyLocalPlayerInput>().AssignedGamepad == padOne &&
+                    split.PlayerTwo.GetComponent<RallyLocalPlayerInput>().AssignedGamepad == pad, "Menu device ownership persists into the race");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.S, Key.A));
+                SendPad(target: padOne, throttle: 1f, steer: 1f);
                 SendPad(throttle: .65f, steer: -.4f);
-                botStart = Bots().Select(b => b.GetComponentInChildren<Rigidbody>().position).ToArray();
                 Next(2);
             }
             else if (phase == 2)
@@ -168,11 +221,12 @@ public static class RallySplitScreenVerification
                 var inputTwo = split.PlayerTwo.GetComponent<RallyLocalPlayerInput>();
                 File.AppendAllText(Report, $"INPUT: J1 enabled={inputOne.enabled} v={inputOne.Vertical} h={inputOne.Horizontal}; J2 enabled={inputTwo.enabled} v={inputTwo.Vertical} h={inputTwo.Horizontal}; pad trigger={pad.rightTrigger.ReadValue()} stick={pad.leftStick.x.ReadValue()}; keyboard={keyboard.wKey.isPressed}\n");
                 Require(inputOne.Vertical == 1f && inputOne.Horizontal > .9f && inputTwo.Vertical > .5f && inputTwo.Horizontal < -.3f,
-                    "Keyboard and DualSense steer/throttle independently");
+                    "Both DualSense devices steer/throttle independently; unassigned keyboard cannot override");
                 Require(split.PlayerOne.frontLeftWheel.steerAngle > 30f && split.PlayerTwo.frontLeftWheel.steerAngle < -10f,
                     "Independent inputs reach the existing wheel physics");
                 Require(split.PlayerOne.frontLeftWheel.motorTorque > 0f && split.PlayerTwo.frontLeftWheel.motorTorque > 0f, "Both controllers produce motor torque");
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                SendPad(target: padOne);
                 SendPad(buttons: 1 << 5);
                 Next(3);
             }
@@ -234,23 +288,23 @@ public static class RallySplitScreenVerification
                 Require(split.TimerOne.ElapsedTime > 0f && split.TimerTwo.ElapsedTime > 0f, "Both lap clocks tick independently");
                 pauseTimeOne = split.TimerOne.ElapsedTime;
                 pauseTimeTwo = split.TimerTwo.ElapsedTime;
-                UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().SendMessage("Open");
+                SendPad(options: true);
                 Next(8);
             }
             else if (phase == 8)
             {
-                Require(Time.timeScale == 0f && split.TimerOne.ElapsedTime == pauseTimeOne && split.TimerTwo.ElapsedTime == pauseTimeTwo,
-                    "Shared pause freezes both clocks");
-                UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().SendMessage("Close", true);
-                for (int i = 1; i < split.TimerOne.CheckpointCount; i++)
-                    split.TimerOne.OrderedCheckpoints[i].SendMessage("OnTriggerEnter", colliderOne);
-                Next(9);
+                Require(Time.timeScale == 0f && UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().PausedByPlayer == 2,
+                    "J2 Options pauses both players and identifies player two");
+                pauseTimeOne = split.TimerOne.ElapsedTime; pauseTimeTwo = split.TimerTwo.ElapsedTime;
+                SendPad(); SendPad(target: padOne, dpad: 4, options: true);
+                Next(30);
             }
             else if (phase == 9)
             {
                 Require(one.isKinematic && !two.isKinematic && Time.timeScale == 1f && !split.AllFinished,
                     "First finisher stops without ending the second player's race");
-                Require(Bots().Where((b, i) => Vector3.Distance(b.GetComponentInChildren<Rigidbody>().position, botStart[i]) > 2f).Any(), "Existing bots keep moving in the shared race");
+                Require(Bots().Length == 0 && UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 2,
+                    "Only the two local players compete throughout the race");
                 ScreenCapture.CaptureScreenshot("Logs/split-screen-" + SceneManager.GetActiveScene().name + ".png");
                 for (int i = 1; i < split.TimerTwo.CheckpointCount; i++)
                     split.TimerTwo.OrderedCheckpoints[i].SendMessage("OnTriggerEnter", colliderTwo);
@@ -259,28 +313,126 @@ public static class RallySplitScreenVerification
             else if (phase == 10)
             {
                 Require(Time.timeScale == 0f && two.isKinematic && GameObject.Find("Race Finish Canvas") != null, "Both finishers display the paused results menu");
-                RemoveDevices();
                 circuit++;
                 if (circuit < 3)
                 {
                     RallyGameSession.SelectVehicle(circuit);
+                    RallyGameSession.SelectVehicleForPlayer(1, (circuit + 1) % 3);
                     RallyGameSession.SelectCircuit(circuit);
                     SceneManager.LoadScene(RallyGameSession.SelectedRaceScene);
                     Next(1);
                 }
                 else
                 {
-                    RallyGameSession.SelectLocalPlayers(1);
-                    SceneManager.LoadScene("Circuit_01");
-                    Next(11);
+                    InputSystem.RemoveDevice(pad); pad = null;
+                    circuit = 0;
+                    RallyGameSession.SelectCircuit(0);
+                    SceneManager.LoadScene(RallyGameSession.SelectionScene);
+                    Next(43);
                 }
+            }
+            else if (phase == 30)
+            {
+                var pause = UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>();
+                Require(pause.IsOpen && pause.PausedByPlayer == 2 &&
+                    UnityEngine.Object.FindObjectsByType<RallyMenuNavigation>().First(n => n.isActiveAndEnabled).SelectedIndex == 0 &&
+                    split.TimerOne.ElapsedTime == pauseTimeOne && split.TimerTwo.ElapsedTime == pauseTimeTwo,
+                    "The other player's Options/D-Pad cannot steal pause ownership; both clocks remain frozen");
+                SendPad(target: padOne); SendPad(dpad: 4); Next(31);
+            }
+            else if (phase == 31)
+            {
+                Require(UnityEngine.Object.FindObjectsByType<RallyMenuNavigation>().First(n => n.isActiveAndEnabled).SelectedIndex == 1,
+                    "Pause owner D-Pad navigates the shared menu");
+                SendPad(); Next(32);
+            }
+            else if (phase == 32) { SendPad(options: true); Next(33); }
+            else if (phase == 33)
+            {
+                Require(Time.timeScale == 1f && !UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().IsOpen,
+                    "Pause owner Options resumes both players");
+                SendPad();
+                // Also verify player one can open it and use Cross to resume.
+                SendPad(target: padOne, options: true); Next(34);
+            }
+            else if (phase == 34)
+            {
+                Require(Time.timeScale == 0f && UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().PausedByPlayer == 1,
+                    "J1 can independently open the pause menu");
+                SendPad(target: padOne); Next(35);
+            }
+            else if (phase == 35) { SendPad(target: padOne, buttons: 1 << 5); Next(36); }
+            else if (phase == 36)
+            {
+                Require(Time.timeScale == 1f && !UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().IsOpen,
+                    "Owner Cross confirms resume in pause");
+                SendPad(target: padOne);
+                for (int i = 1; i < split.TimerOne.CheckpointCount; i++)
+                    split.TimerOne.OrderedCheckpoints[i].SendMessage("OnTriggerEnter", colliderOne);
+                Next(9);
+            }
+            else if (phase == 43)
+            {
+                Require(RallyLocalDevices.UsesKeyboard(1), "Selection automatically offers keyboard to J2 when only one controller remains");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.DownArrow)); Next(44);
+            }
+            else if (phase == 44)
+            {
+                Require(Navigation(1).SelectedIndex == 1 && Navigation(0).SelectedIndex == 0,
+                    "Keyboard fallback navigates only player two's car panel");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); Next(45);
+            }
+            else if (phase == 45)
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Enter)); Next(46);
+            }
+            else if (phase == 46)
+            {
+                Require(RallyGameSession.VehicleIndexForPlayer(1) == 1, "Keyboard Enter confirms J2's car");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                ButtonNamed("Player 1 Ready").onClick.Invoke(); ButtonNamed("Player 2 Ready").onClick.Invoke();
+                ButtonNamed("Race Button").onClick.Invoke(); Next(40);
+            }
+            else if (phase == 40 && split != null && split.Ready)
+            {
+                Require(RallyLocalDevices.GamepadFor(0) == padOne && RallyLocalDevices.GamepadFor(1) == null &&
+                    RallyLocalDevices.KeyboardPlayer == 1, "With one gamepad, J1 keeps the controller and J2 automatically gets keyboard");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W, Key.A));
+                SendPad(target: padOne, throttle: .8f, steer: .5f);
+                Next(41);
+            }
+            else if (phase == 41)
+            {
+                var inputOne = split.PlayerOne.GetComponent<RallyLocalPlayerInput>();
+                var inputTwo = split.PlayerTwo.GetComponent<RallyLocalPlayerInput>();
+                Require(inputOne.Vertical > .7f && inputOne.Horizontal > .4f && inputTwo.Vertical == 1f && inputTwo.Horizontal < -.9f,
+                    "One-gamepad and keyboard fallback drive different cars");
+                InputSystem.RemoveDevice(padOne);
+                padOne = InputSystem.AddDevice<DualSenseGamepadHID>("Split Test Reconnected J1");
+                Next(42);
+            }
+            else if (phase == 42)
+            {
+                Require(split.PlayerOne.GetComponent<RallyLocalPlayerInput>().AssignedGamepad == padOne &&
+                    RallyLocalDevices.KeyboardPlayer == 1, "Replacement controller is paired without stealing the keyboard player");
+                SendPad(target: padOne);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                RallyGameSession.SelectLocalPlayers(1);
+                SceneManager.LoadScene("Circuit_01"); Next(11);
             }
             else if (phase == 11)
             {
                 Require(RallySplitScreen.Active == null && UnityEngine.Object.FindObjectsByType<RallyRaceHud>().Length == 1 &&
-                    UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 4 && Camera.main.rect == new Rect(0f, 0f, 1f, 1f),
-                    "Single-player still uses one full-screen camera/HUD and three bots");
-                Finish(null);
+                    UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 4 && Camera.main.rect == new Rect(0f, 0f, 1f, 1f) &&
+                    Bots().Length == 3 && Bots().All(b => b.isActiveAndEnabled && b.HasRoute),
+                    "Single-player keeps one full-screen camera/HUD and three active bots: " + SceneManager.GetActiveScene().name);
+                if (++circuit < 3)
+                {
+                    RallyGameSession.SelectCircuit(circuit);
+                    SceneManager.LoadScene(RallyGameSession.SelectedRaceScene);
+                    Next(11);
+                }
+                else Finish(null);
             }
         }
         catch (Exception error) { Finish(error); }
@@ -292,8 +444,10 @@ public static class RallySplitScreenVerification
         Require(split.CameraOne.GetComponent<JrsFollowCamera>().target == split.PlayerOne.transform &&
             split.CameraTwo.GetComponent<JrsFollowCamera>().target == split.PlayerTwo.transform, "Each camera follows its own car");
         Require(UnityEngine.Object.FindObjectsByType<AudioListener>().Count(a => a.isActiveAndEnabled) == 1, "Exactly one audio listener");
-        Require(UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 5, "Ranking includes both players plus three bots");
-        var cars = new[] { split.PlayerOne, split.PlayerTwo }.Concat(Bots().Select(b => b.GetComponentInChildren<JrsVehicleController>())).ToArray();
+        Require(UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 2, "Ranking includes only the two local players");
+        Require(UnityEngine.Object.FindObjectsByType<RallyBotController>(FindObjectsInactive.Include).Length == 0,
+            "No active or inactive bot instances remain in split screen");
+        var cars = new[] { split.PlayerOne, split.PlayerTwo };
         string roadName = SceneManager.GetActiveScene().name == "Circuit_01" ? "Rally_Road_Start_to_Finish" : SceneManager.GetActiveScene().name.Replace("_", "") + "_Road";
         MeshCollider road = GameObject.Find(roadName).GetComponent<MeshCollider>();
         for (int i = 0; i < cars.Length; i++)
@@ -327,19 +481,28 @@ public static class RallySplitScreenVerification
             var manager = (RallyCheckpointManager)serialized.FindProperty("checkpointManager").objectReferenceValue;
             Require(serialized.FindProperty("vehicleBody").objectReferenceValue == manager.VehicleBody, "HUD speed and clock belong to the same player");
         }
+        Require(VisualMatches(split.PlayerOne, RallyGameSession.VehicleForPlayer(0)) &&
+            VisualMatches(split.PlayerTwo, RallyGameSession.VehicleForPlayer(1)), "Both selected car visuals reach their own physics rig");
         File.AppendAllText(Report, "STRUCTURE PASS: " + SceneManager.GetActiveScene().name + "\n");
     }
 
     static RallyBotController[] Bots() => UnityEngine.Object.FindObjectsByType<RallyBotController>().OrderBy(b => b.name).ToArray();
-    static void SendPad(float throttle = 0f, float brake = 0f, float steer = 0f, byte buttons = 0)
+    static void SendPad(float throttle = 0f, float brake = 0f, float steer = 0f, byte buttons = 0, byte dpad = 8, bool options = false, DualSenseGamepadHID target = null)
     {
-        InputSystem.QueueStateEvent(pad, new DualSenseHIDInputReport
+        InputSystem.QueueStateEvent(target ?? pad, new DualSenseHIDInputReport
         {
             leftStickX = (byte)Mathf.RoundToInt((steer + 1f) * 127.5f), leftStickY = 128,
             rightStickX = 128, rightStickY = 128,
             rightTrigger = (byte)Mathf.RoundToInt(throttle * 255f),
-            leftTrigger = (byte)Mathf.RoundToInt(brake * 255f), buttons0 = (byte)(8 | buttons)
+            leftTrigger = (byte)Mathf.RoundToInt(brake * 255f), buttons0 = (byte)(dpad | buttons), buttons1 = options ? (byte)(1 << 5) : (byte)0
         });
+    }
+    static Button ButtonNamed(string name) => UnityEngine.Object.FindObjectsByType<Button>().First(b => b.name == name);
+    static RallyMenuNavigation Navigation(int player) => UnityEngine.Object.FindObjectsByType<RallyMenuNavigation>().First(n => n.LocalPlayer == player);
+    static bool VisualMatches(JrsVehicleController car, string expected)
+    {
+        var visual = car.GetComponentInChildren<RallyVehicleVisual>(true);
+        return expected == RallyGameSession.VehicleName ? visual == null : visual != null && visual.name == expected + " Visual";
     }
     static BoxCollider BodyBox(JrsVehicleController car) => car.GetComponentsInChildren<BoxCollider>().First(b => b.enabled && !b.isTrigger && b.name.Contains("BodyCollider"));
     static void Next(int next) { phase = next; phaseAt = EditorApplication.timeSinceStartup; minimumFrame = Time.frameCount + 3; }
@@ -352,7 +515,11 @@ public static class RallySplitScreenVerification
     {
         if (keyboard != null && keyboard.added) InputSystem.RemoveDevice(keyboard);
         if (pad != null && pad.added) InputSystem.RemoveDevice(pad);
-        keyboard = null; pad = null;
+        if (padOne != null && padOne.added) InputSystem.RemoveDevice(padOne);
+        foreach (Gamepad physical in disabledPads ?? Array.Empty<Gamepad>())
+            if (physical.added) InputSystem.EnableDevice(physical);
+        disabledPads = null;
+        keyboard = null; pad = padOne = null;
     }
     static void RestoreChoices()
     {
@@ -368,6 +535,10 @@ public static class RallySplitScreenVerification
         RallyGameSession.SelectLocalPlayers(SessionState.GetInt("Rally.SplitTest.Players", 1));
         RallyGameSession.SelectVehicle(Mathf.Max(0, Array.IndexOf(RallyPlayerVehicleSelection.Names, SessionState.GetString("Rally.SplitTest.Vehicle", ""))));
         RallyGameSession.SelectCircuit(Mathf.Max(0, Array.IndexOf(RallyGameSession.CircuitNames, SessionState.GetString("Rally.SplitTest.Circuit", ""))));
+        RallyGameSession.SelectVehicleForPlayer(1, Mathf.Max(0, Array.IndexOf(RallyPlayerVehicleSelection.Names, SessionState.GetString("Rally.SplitTest.VehicleTwo", ""))));
+        if (!SessionState.GetBool("Rally.SplitTest.HasVehicleTwo", false)) PlayerPrefs.DeleteKey("Rally.SelectedVehicleTwo");
+        PlayerPrefs.Save();
+        RallyGameSession.RestoreSavedState();
     }
     static void Finish(Exception error)
     {

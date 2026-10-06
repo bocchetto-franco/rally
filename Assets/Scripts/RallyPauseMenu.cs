@@ -16,7 +16,10 @@ public sealed class RallyPauseMenu : MonoBehaviour
     RallyMenuNavigation confirmationNavigation;
     bool isOpen;
     bool cursorWasVisible;
+    readonly bool[] localOptionsHeld = new bool[2];
     bool optionsHeld;
+    TextMeshProUGUI pauseTitle;
+    public int PausedByPlayer { get; private set; } = 1;
     CursorLockMode previousCursorLock;
 
     public bool IsOpen => isOpen;
@@ -40,15 +43,28 @@ public sealed class RallyPauseMenu : MonoBehaviour
             return;
         }
 
-        Gamepad pad = Gamepad.current;
-        bool options = pad != null && pad.startButton.isPressed;
-        bool toggle = (options && !optionsHeld) || Input.GetKeyDown(KeyCode.Escape);
-        optionsHeld = options;
-        if (toggle)
+        bool escape = Input.GetKeyDown(KeyCode.Escape) ||
+            (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame);
+        if (RallySplitScreen.Active != null)
         {
-            if (IsConfirmingExit) CancelExit();
-            else if (isOpen) Close(true);
-            else Open();
+            for (int player = 0; player < 2; player++)
+            {
+                Gamepad pad = RallyLocalDevices.GamepadFor(player);
+                bool held = pad != null && pad.startButton.isPressed;
+                bool pressed = held && !localOptionsHeld[player];
+                localOptionsHeld[player] = held;
+                if (pressed && (!isOpen || PausedByPlayer == player + 1))
+                    Toggle(player, false);
+            }
+            if (escape) Toggle(Mathf.Max(0, RallyLocalDevices.KeyboardPlayer), true);
+        }
+        else
+        {
+            Gamepad pad = Gamepad.current;
+            bool options = pad != null && pad.startButton.isPressed;
+            bool toggle = (options && !optionsHeld) || escape;
+            optionsHeld = options;
+            if (toggle) Toggle(0, escape);
         }
     }
 
@@ -57,9 +73,26 @@ public sealed class RallyPauseMenu : MonoBehaviour
         if (isOpen) Close(true);
     }
 
-    void Open()
+    void Toggle(int player, bool fromKeyboard)
+    {
+        if (IsConfirmingExit) CancelExit();
+        else if (isOpen) Close(true);
+        else OpenForPlayer(player, fromKeyboard);
+    }
+
+    // Retained for existing editor regression checks.
+    void Open() => OpenForPlayer(0, true);
+
+    void OpenForPlayer(int player, bool fromKeyboard)
     {
         if (canvasObject == null) return;
+        PausedByPlayer = player + 1;
+        if (RallySplitScreen.Active != null)
+        {
+            pauseNavigation.ConfigureForLocalPlayer(player, fromKeyboard);
+            confirmationNavigation.ConfigureForLocalPlayer(player, fromKeyboard);
+        }
+        pauseTitle.text = RallySplitScreen.Active != null ? "PAUSA · JUGADOR " + PausedByPlayer : "PAUSA";
         cursorWasVisible = Cursor.visible;
         previousCursorLock = Cursor.lockState;
         isOpen = true;
@@ -127,7 +160,8 @@ public sealed class RallyPauseMenu : MonoBehaviour
         shade.offsetMax = Vector2.zero;
         RectTransform card = Panel(shade, "Pause Card", new Color(.045f, .06f, .085f, .98f), Vector2.zero, new Vector2(700f, 550f));
         Panel(card, "Accent", new Color(1f, .48f, .06f), new Vector2(-344f, 0f), new Vector2(12f, 550f));
-        Label(card, font, "Title", "PAUSA", 60f, new Vector2(0f, 185f), new Vector2(600f, 80f));
+        Label(card, font, "Title", "PAUSA", 48f, new Vector2(0f, 185f), new Vector2(600f, 80f));
+        pauseTitle = card.Find("Title").GetComponent<TextMeshProUGUI>();
         Button resume = CreateButton(card, font, "Resume Button", "REANUDAR", new Vector2(0f, 65f), () => Close(true), true);
         Button restart = CreateButton(card, font, "Restart Button", "REINICIAR CARRERA", new Vector2(0f, -35f), RestartRace, false);
         Button menu = CreateButton(card, font, "Main Menu Button", "VOLVER AL MENÚ PRINCIPAL", new Vector2(0f, -135f), ConfirmExit, false);
