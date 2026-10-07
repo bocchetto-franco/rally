@@ -192,10 +192,9 @@ public sealed class RallySplitScreen : MonoBehaviour
         FitCanvas(canvas, viewport, null);
         var panel = canvas.transform.Find("Player Viewport/Brake Warning") as RectTransform;
         if (panel == null) return;
-        panel.anchoredPosition = new Vector2(0f, -95f);
-        panel.sizeDelta = new Vector2(390f, 115f);
+        panel.anchoredPosition = new Vector2(0f, -196f);
+        panel.sizeDelta = new Vector2(300f, 122f);
         panel.localScale = Vector3.one;
-        panel.GetComponentInChildren<TMP_Text>().fontSize = 42f;
     }
 
     static void FitCanvas(Canvas canvas, Rect viewport, string label)

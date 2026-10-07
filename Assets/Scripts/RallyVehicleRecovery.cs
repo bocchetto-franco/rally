@@ -10,6 +10,11 @@ public sealed class RallyVehicleRecovery : MonoBehaviour
     JrsVehicleController controller;
     bool keyboardWasHeld;
 
+    public bool CanRecover => isActiveAndEnabled && body != null && controller != null &&
+        Time.timeScale > 0f && !body.isKinematic && controller.isActiveAndEnabled &&
+        GetComponentInParent<RallyBotController>() == null &&
+        Vector3.Dot(body.rotation * Vector3.up, Vector3.up) <= 0.5f;
+
     void Awake()
     {
         body = GetComponent<Rigidbody>();
@@ -24,8 +29,8 @@ public sealed class RallyVehicleRecovery : MonoBehaviour
             if (localInput.RecoverPressed) RightVehicle();
             return;
         }
-        bool keyboardHeld = Input.GetKey(KeyCode.T) ||
-            (Keyboard.current != null && Keyboard.current.tKey.isPressed);
+        bool keyboardHeld = Input.GetKey(KeyCode.M) || Input.GetKey(KeyCode.T) ||
+            (Keyboard.current != null && (Keyboard.current.mKey.isPressed || Keyboard.current.tKey.isPressed));
         bool keyboardPressed = keyboardHeld && !keyboardWasHeld;
         keyboardWasHeld = keyboardHeld;
         bool gamepadPressed = RallyGamepadInput.RecoverPressedThisFrame;
@@ -35,11 +40,8 @@ public sealed class RallyVehicleRecovery : MonoBehaviour
 
     public void RightVehicle()
     {
-        if (Time.timeScale <= 0f || body.isKinematic || !controller.isActiveAndEnabled ||
-            GetComponentInParent<RallyBotController>() != null)
-            return;
         // Leave normal driving alone; enable recovery once tilted at least 60 degrees.
-        if (Vector3.Dot(body.rotation * Vector3.up, Vector3.up) > 0.5f)
+        if (!CanRecover)
             return;
 
         Vector3 heading = Vector3.ProjectOnPlane(body.rotation * Vector3.forward, Vector3.up);

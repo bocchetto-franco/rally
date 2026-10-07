@@ -145,7 +145,7 @@ public static class RallyBotsAndCheckpointsSetup
                 Quaternion.LookRotation(tangent, Vector3.up));
             BoxCollider box = gate.AddComponent<BoxCollider>();
             box.isTrigger = true;
-            box.size = new Vector3(width + 6f, 8f, 6f);
+            box.size = new Vector3(width + 14f, 8f, 6f);
             gates[i] = gate.AddComponent<RallyCheckpointTrigger>();
             gates[i].Configure(manager, i);
         }

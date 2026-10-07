@@ -23,7 +23,7 @@ public static class RallyBrakeWarningSetup
     [Serializable]
     sealed class Layout { public Vector3[] centerline = default; public float[] distances = default; public float[] roadWidths = default; }
     sealed class Route { public readonly List<Vector3> points = new List<Vector3>(); public readonly List<float> distance = new List<float>(); public readonly List<float> width = new List<float>(); public float length; }
-    sealed class Curve { public float start, end, angle, radius; }
+    sealed class Curve { public float start, end, angle, radius; public int sign; }
 
     static RallyBrakeWarningSetup()
     {
@@ -50,60 +50,138 @@ public static class RallyBrakeWarningSetup
         if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play mode before installing brake warnings.");
         Directory.CreateDirectory("Logs");
         var report = new List<string>();
-        foreach (string path in ScenePaths) Install(path, report);
-        File.WriteAllLines("Logs/brake-warning-setup.txt", report.Concat(new[] { DateTime.Now.ToString("O") }));
-        AssetDatabase.SaveAssets();
-        Debug.Log("BRAKE_WARNINGS_COMPLETE: " + string.Join(" | ", report));
+        Scene active = SceneManager.GetActiveScene();
+        string backup = "Logs/SceneBackups/PaceNotes_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        Directory.CreateDirectory(backup);
+        try
+        {
+            foreach (string path in ScenePaths)
+            {
+                Scene original = SceneManager.GetSceneByPath(path);
+                bool dirty = original.isLoaded && original.isDirty;
+                string temporary = "Assets/__PaceNotes_" + Path.GetFileName(path);
+                Scene scene = original;
+                bool opened = !original.isLoaded || dirty;
+                if (dirty)
+                {
+                    if (!EditorSceneManager.SaveScene(original, backup + "/Unsaved_" + Path.GetFileName(path), true))
+                        throw new IOException("Could not back up unsaved scene.");
+                    if (File.Exists(temporary)) throw new IOException("A previous pace-note working scene exists: " + temporary);
+                    File.Copy(path, temporary);
+                    AssetDatabase.ImportAsset(temporary, ImportAssetOptions.ForceSynchronousImport);
+                    scene = EditorSceneManager.OpenScene(temporary, OpenSceneMode.Additive);
+                }
+                else if (opened) scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+                try
+                {
+                    if (!EditorSceneManager.SaveScene(scene, backup + "/" + Path.GetFileName(path), true))
+                        throw new IOException("Could not back up " + path);
+                    SceneManager.SetActiveScene(scene);
+                    InstallScene(scene, path, report);
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    if (!EditorSceneManager.SaveScene(scene)) throw new IOException("Could not save " + path);
+                }
+                finally { if (opened) EditorSceneManager.CloseScene(scene, true); }
+                if (dirty)
+                {
+                    File.Copy(temporary, path, true);
+                    AssetDatabase.DeleteAsset(temporary);
+                    SceneManager.SetActiveScene(original);
+                    InstallScene(original, path, new List<string>());
+                    EditorSceneManager.MarkSceneDirty(original);
+                    report.Add("PASS unrelated unsaved edits preserved in " + original.name);
+                }
+            }
+            report.Add("Backup: " + backup);
+            report.Add("COMPLETE: PASS");
+        }
+        catch (Exception e) { report.Add("FAIL: " + e); throw; }
+        finally
+        {
+            if (active.isLoaded) SceneManager.SetActiveScene(active);
+            File.WriteAllLines("Logs/brake-warning-setup.txt", report);
+        }
+        Debug.Log("PACE_NOTES_COMPLETE: " + string.Join(" | ", report));
     }
 
-    static void Install(string path, List<string> report)
+    static void InstallScene(Scene scene, string path, List<string> report)
     {
-        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        GameObject previous = GameObject.Find(RootName);
-        if (previous != null) Object.DestroyImmediate(previous);
+        GameObject previous = FindInScene(scene, RootName);
+        var unchanged = scene.GetRootGameObjects().Where(g => g != previous)
+            .SelectMany(g => g.GetComponentsInChildren<Component>(true))
+            .Where(c => c != null && !(c is Transform)).ToDictionary(c => c, c => EditorJsonUtility.ToJson(c));
 
-        GameObject car = GameObject.Find("Porsche 911 SC Rally");
+        GameObject car = FindInScene(scene, "Porsche 911 SC Rally");
         if (car == null) throw new InvalidOperationException("Porsche not found in " + path);
         Rigidbody body = car.GetComponent<Rigidbody>() ?? car.GetComponentInChildren<Rigidbody>(true);
         if (body == null) throw new InvalidOperationException("Porsche Rigidbody not found in " + path);
 
         string tuningBefore = TuningSignature(car);
-        Route route = LoadRoute(path);
+        Route route = LoadRoute(scene, path);
         List<Curve> curves = FindWarningCurves(route);
         if (curves.Count == 0) throw new InvalidOperationException("No closed curves detected in " + path);
 
         GameObject root = new GameObject(RootName);
         RallyBrakeWarningSystem system = root.AddComponent<RallyBrakeWarningSystem>();
         system.Configure(body);
-        GameObject zones = new GameObject("Brake Warning Triggers");
+        GameObject zones = new GameObject("Rally Pace Notes");
         zones.transform.SetParent(root.transform, false);
 
         for (int i = 0; i < curves.Count; i++) CreateTrigger(zones.transform, system, route, curves[i], i + 1);
 
+        if (previous != null) Object.DestroyImmediate(previous);
         if (tuningBefore != TuningSignature(car)) throw new InvalidOperationException("Vehicle tuning changed while adding brake warnings to " + path);
-        EditorSceneManager.MarkSceneDirty(scene);
-        if (!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Could not save " + path);
-        report.Add($"{Path.GetFileNameWithoutExtension(path)}: {curves.Count} braking zones; " + string.Join(", ", curves.Select(c => $"{c.angle:F0}deg/{TargetSpeed(c):F0}kmh")));
+        foreach (var item in unchanged)
+            if (item.Key == null || item.Value != EditorJsonUtility.ToJson(item.Key))
+                throw new InvalidOperationException("Unrelated scene component changed: " + item.Key);
+        report.Add($"PASS {Path.GetFileNameWithoutExtension(path)}: {curves.Count} pace notes; unrelated components and tuning preserved; " +
+            string.Join(", ", curves.Select(c => $"{(c.sign > 0 ? "R" : "L")}{Grade(c)}{(IsHairpin(c) ? " hairpin" : "")}@{c.start:F0}m/r{c.radius:F0}")));
     }
+
+    static GameObject FindInScene(Scene scene, string name) => scene.GetRootGameObjects()
+        .SelectMany(g => g.GetComponentsInChildren<Transform>(true)).FirstOrDefault(t => t.name == name)?.gameObject;
 
     static void CreateTrigger(Transform parent, RallyBrakeWarningSystem system, Route route, Curve curve, int index)
     {
-        float approach = curve.angle >= 150f ? 95f : curve.angle >= 100f ? 75f : curve.angle >= 70f ? 58f : 45f;
-        float endDistance = Wrap(curve.start - 7f, route.length);
+        int grade = Grade(curve);
+        float approach = IsHairpin(curve) ? 95f : grade <= 2 ? 78f : grade <= 4 ? 60f : 42f;
+        float endDistance = Wrap(curve.start + 10f, route.length);
         float startDistance = Wrap(curve.start - approach, route.length);
         float span = ForwardDistance(startDistance, endDistance, route.length);
-        float middleDistance = Wrap(startDistance + span * .5f, route.length);
-        Sample(route, middleDistance, out Vector3 position, out Vector3 forward, out float width);
-
-        GameObject go = new GameObject($"Brake Zone {index:00} - {curve.angle:F0} deg");
-        go.transform.SetParent(parent, false);
-        go.transform.SetPositionAndRotation(position + Vector3.up * 2.35f, Quaternion.LookRotation(forward, Vector3.up));
-        BoxCollider box = go.AddComponent<BoxCollider>();
-        box.isTrigger = true;
-        box.size = new Vector3(width + 4f, 5f, Mathf.Max(12f, span));
-        RallyBrakeWarningTrigger trigger = go.AddComponent<RallyBrakeWarningTrigger>();
-        trigger.Configure(system, TargetSpeed(curve));
+        var direction = curve.sign > 0 ? RallyBrakeWarningTrigger.TurnDirection.Right : RallyBrakeWarningTrigger.TurnDirection.Left;
+        Sample(route, curve.start, out Vector3 entry, out _, out _);
+        var group = new GameObject($"Note {index:00} - {(curve.sign > 0 ? "Right" : "Left")} {grade}{(IsHairpin(curve) ? " - Hairpin" : "")}");
+        group.transform.SetParent(parent, false);
+        int pieces = Mathf.CeilToInt(span / 12f);
+        for (int i = 0; i < pieces; i++)
+        {
+            float from = startDistance + span * i / pieces, to = startDistance + span * (i + 1) / pieces;
+            Sample(route, from, out Vector3 a, out _, out float widthA);
+            Sample(route, to, out Vector3 b, out Vector3 forward, out float widthB);
+            Vector3 heading = b - a;
+            if (heading.sqrMagnitude < .001f) heading = forward;
+            var go = new GameObject($"Approach {i + 1:00}");
+            go.transform.SetParent(group.transform, false);
+            go.transform.SetPositionAndRotation((a + b) * .5f + Vector3.up * 2.25f, Quaternion.LookRotation(heading, Vector3.up));
+            var box = go.AddComponent<BoxCollider>(); box.isTrigger = true;
+            box.size = new Vector3(Mathf.Max(widthA, widthB) + 6f, 5f, heading.magnitude + 2f);
+            var trigger = go.AddComponent<RallyBrakeWarningTrigger>();
+            trigger.Configure(system, TargetSpeed(curve));
+            trigger.ConfigureNote(direction, grade, IsHairpin(curve), entry);
+        }
     }
+
+    static int Grade(Curve curve)
+    {
+        if (IsHairpin(curve) || curve.radius <= 28f) return 1;
+        if (curve.radius <= 38f) return 2;
+        if (curve.radius <= 55f) return 3;
+        if (curve.radius <= 85f) return 4;
+        if (curve.radius <= 140f) return 5;
+        return 6;
+    }
+
+    static bool IsHairpin(Curve curve) => curve.angle >= 150f && curve.radius <= 40f;
 
     static float TargetSpeed(Curve curve)
     {
@@ -113,14 +191,14 @@ public static class RallyBrakeWarningSetup
         return curve.radius <= 40f ? 58f : 65f;
     }
 
-    static Route LoadRoute(string scenePath)
+    static Route LoadRoute(Scene scene, string scenePath)
     {
         if (scenePath.EndsWith("Circuit_02.unity", StringComparison.Ordinal))
             return FromLayout("Assets/Art/Environment/Circuit02/Circuit02Layout.json");
         if (scenePath.EndsWith("Circuit_03.unity", StringComparison.Ordinal))
             return FromLayout("Assets/Art/Forest/Circuit03/Circuit03Layout.json");
 
-        GameObject roadObject = GameObject.Find("Rally_Road_Start_to_Finish");
+        GameObject roadObject = FindInScene(scene, "Rally_Road_Start_to_Finish");
         ProBuilderMesh road = roadObject == null ? null : roadObject.GetComponent<ProBuilderMesh>();
         if (road == null) throw new InvalidOperationException("Circuit_01 road mesh not found.");
         Vector3[] vertices = road.positions.Select(road.transform.TransformPoint).ToArray();
@@ -177,9 +255,10 @@ public static class RallyBrakeWarningSetup
         int currentSign = 0;
         for (int i = 1; i < route.points.Count - 1; i++)
         {
-            Vector2 a = Flat(route.points[i] - route.points[i - 1]).normalized;
-            Vector2 b = Flat(route.points[i + 1] - route.points[i]).normalized;
-            float signed = Vector2.SignedAngle(a, b);
+            Vector3 a = Vector3.ProjectOnPlane(route.points[i] - route.points[i - 1], Vector3.up).normalized;
+            Vector3 b = Vector3.ProjectOnPlane(route.points[i + 1] - route.points[i], Vector3.up).normalized;
+            // Unity +Z to +X is a positive/right turn. Do not invert this with XZ Vector2 angles.
+            float signed = Vector3.SignedAngle(a, b, Vector3.up);
             float step = Mathf.Max(.01f, route.distance[i + 1] - route.distance[i]);
             int sign = signed > .025f ? 1 : signed < -.025f ? -1 : 0;
             bool curved = sign != 0 && Mathf.Abs(signed) / step > .08f;
@@ -192,7 +271,7 @@ public static class RallyBrakeWarningSetup
             if (current == null || sign != currentSign)
             {
                 FinishCurve(raw, ref current);
-                current = new Curve { start = route.distance[i], end = route.distance[i], angle = 0f };
+                current = new Curve { start = route.distance[i], end = route.distance[i], angle = 0f, sign = sign };
                 currentSign = sign;
             }
             current.end = route.distance[i + 1];
@@ -205,12 +284,13 @@ public static class RallyBrakeWarningSetup
             float arc = Mathf.Max(1f, curve.end - curve.start);
             curve.radius = arc / Mathf.Max(.01f, curve.angle * Mathf.Deg2Rad);
         }
-        List<Curve> selected = raw.Where(c => c.angle >= 68f || (c.angle >= 22f && c.radius <= 45f)).ToList();
+        List<Curve> selected = raw.Where(c => c.angle >= 18f && c.radius <= 220f).ToList();
         var merged = new List<Curve>();
         foreach (Curve curve in selected)
         {
             Curve last = merged.LastOrDefault();
-            if (last != null && curve.start - last.end < 32f)
+            // Opposite bends in a chicane must stay separate left/right calls.
+            if (last != null && last.sign == curve.sign && curve.start - last.end < 8f)
             {
                 float arc = curve.end - last.start;
                 last.end = curve.end;
@@ -244,7 +324,6 @@ public static class RallyBrakeWarningSetup
         width = Mathf.Lerp(route.width[index], route.width[next], t);
     }
 
-    static Vector2 Flat(Vector3 value) => new Vector2(value.x, value.z);
     static float Wrap(float value, float length) => value < 0f ? value + length * Mathf.Ceil(-value / length) : value % length;
     static float ForwardDistance(float from, float to, float length) => to >= from ? to - from : length - from + to;
 

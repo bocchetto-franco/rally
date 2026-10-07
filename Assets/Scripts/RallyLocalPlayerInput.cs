@@ -60,7 +60,8 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
             Horizontal = Mathf.MoveTowards(Horizontal, steer, steeringResponse * Time.deltaTime);
             Handbrake = Input.GetKey(KeyCode.Space) || (keyboard != null && keyboard.spaceKey.isPressed);
             reset = Input.GetKey(KeyCode.R) || (keyboard != null && keyboard.rKey.isPressed);
-            recover = Input.GetKey(KeyCode.T) || (keyboard != null && keyboard.tKey.isPressed);
+            recover = Input.GetKey(KeyCode.M) || Input.GetKey(KeyCode.T) ||
+                (keyboard != null && (keyboard.mKey.isPressed || keyboard.tKey.isPressed));
         }
         else
         {

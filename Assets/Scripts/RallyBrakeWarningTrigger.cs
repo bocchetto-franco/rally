@@ -4,12 +4,22 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public sealed class RallyBrakeWarningTrigger : MonoBehaviour
 {
+    public enum TurnDirection { Left, Right }
     [SerializeField] RallyBrakeWarningSystem warningSystem;
     [SerializeField, Min(5f)] float targetSpeedKph = 55f;
+    [SerializeField] TurnDirection turnDirection;
+    [SerializeField, Range(1, 6), Tooltip("1 = muy cerrada; 6 = muy abierta.")] int cornerGrade = 3;
+    [SerializeField] bool hairpin;
+    [SerializeField] Vector3 curveEntry;
     readonly HashSet<Collider> vehicleContacts = new HashSet<Collider>();
     readonly Dictionary<RallyBrakeWarningSystem, HashSet<Collider>> localContacts = new Dictionary<RallyBrakeWarningSystem, HashSet<Collider>>();
 
     public float TargetSpeedKph => targetSpeedKph;
+    public TurnDirection Direction => turnDirection;
+    public int CornerGrade => Mathf.Clamp(cornerGrade, 1, 6);
+    public bool IsHairpin => hairpin;
+    public Vector3 CurveEntry => curveEntry;
+    public string NoteLabel => (turnDirection == TurnDirection.Right ? "DERECHA" : "IZQUIERDA") + " " + CornerGrade;
 
     public void Configure(RallyBrakeWarningSystem system, float targetSpeed)
     {
@@ -17,6 +27,14 @@ public sealed class RallyBrakeWarningTrigger : MonoBehaviour
         targetSpeedKph = Mathf.Max(5f, targetSpeed);
         BoxCollider box = GetComponent<BoxCollider>();
         box.isTrigger = true;
+    }
+
+    public void ConfigureNote(TurnDirection direction, int grade, bool isHairpin, Vector3 entry)
+    {
+        turnDirection = direction;
+        cornerGrade = Mathf.Clamp(grade, 1, 6);
+        hairpin = isHairpin;
+        curveEntry = entry;
     }
 
     void OnTriggerEnter(Collider other)

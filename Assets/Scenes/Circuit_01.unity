@@ -808,6 +808,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8292623}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &17593301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 17593302}
+  m_Layer: 0
+  m_Name: Note 08 - Right 4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &17593302
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17593301}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1460746458}
+  - {fileID: 334092605}
+  - {fileID: 1511604467}
+  - {fileID: 387463797}
+  - {fileID: 1392703448}
+  - {fileID: 1306565415}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &17759360
 GameObject:
   m_ObjectHideFlags: 0
@@ -1500,6 +1537,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.6888933}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &44762614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 44762615}
+  - component: {fileID: 44762617}
+  - component: {fileID: 44762616}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &44762615
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44762614}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.000000087761975, z: -0, w: 1}
+  m_LocalPosition: {x: 0.000006128671, y: 2.25, z: -19.874699}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &44762616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44762614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &44762617
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44762614}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &47250077
 GameObject:
   m_ObjectHideFlags: 0
@@ -1750,6 +1859,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8693957}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &53846348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 53846349}
+  m_Layer: 0
+  m_Name: Note 06 - Left 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &53846349
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 53846348}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1932415849}
+  - {fileID: 1720010727}
+  - {fileID: 1097302053}
+  - {fileID: 1498752983}
+  - {fileID: 1586063097}
+  - {fileID: 378944117}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &54866325
 GameObject:
   m_ObjectHideFlags: 0
@@ -4295,74 +4441,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8435844907760009538, guid: 65404670c4462f245bddac150eba32ca, type: 3}
   m_PrefabInstance: {fileID: 115918566}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &116348995
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 116348996}
-  - component: {fileID: 116348998}
-  - component: {fileID: 116348997}
-  m_Layer: 0
-  m_Name: Brake Zone 03 - 110 deg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &116348996
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116348995}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.8191522, z: -0, w: 0.5735762}
-  m_LocalPosition: {x: 116.09604, y: 2.35, z: 276.62442}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1847373380}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &116348997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116348995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 45
---- !u!65 &116348998
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 116348995}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 11.531553, y: 5, z: 68}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &117122181
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5386,6 +5464,78 @@ WheelCollider:
   m_LayerOverridePriority: 0
   m_Enabled: 1
   m_ProvidesContacts: 0
+--- !u!1 &135806582
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 135806583}
+  - component: {fileID: 135806585}
+  - component: {fileID: 135806584}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &135806583
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135806582}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 62.500046, y: 2.25, z: -110.000015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &135806584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135806582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &135806585
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135806582}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 16.701706, y: 5, z: 13.666748}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &136763595
 GameObject:
   m_ObjectHideFlags: 0
@@ -7062,6 +7212,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7952394}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &182306088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 182306089}
+  - component: {fileID: 182306091}
+  - component: {fileID: 182306090}
+  m_Layer: 0
+  m_Name: Approach 07
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &182306089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182306088}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.014565709, y: -0, z: -0, w: 0.99989396}
+  m_LocalPosition: {x: 78.7868, y: 2.4101665, z: 248.00388}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &182306090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182306088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &182306091
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 182306088}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 16.236656, y: 5, z: 12.997296}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &183056896
 GameObject:
@@ -12959,6 +13181,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &259049521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 259049522}
+  m_Layer: 0
+  m_Name: Note 04 - Left 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &259049522
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259049521}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 674785489}
+  - {fileID: 2066858371}
+  - {fileID: 1346640429}
+  - {fileID: 1991912109}
+  - {fileID: 381201497}
+  - {fileID: 836978602}
+  - {fileID: 1303211698}
+  - {fileID: 1175768774}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &261066253
 GameObject:
   m_ObjectHideFlags: 0
@@ -13644,6 +13905,150 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 2.891746}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &274950716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 274950717}
+  - component: {fileID: 274950719}
+  - component: {fileID: 274950718}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &274950717
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274950716}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.029043349, y: -0, z: -0, w: 0.9995782}
+  m_LocalPosition: {x: 194.88406, y: -4.3330116, z: 338.5845}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &274950718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274950716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &274950719
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274950716}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.665126}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &277835789
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277835790}
+  - component: {fileID: 277835792}
+  - component: {fileID: 277835791}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &277835790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277835789}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.040948074, y: -0, z: -0, w: 0.9991613}
+  m_LocalPosition: {x: 78.7868, y: 11.678263, z: 182.74399}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &277835791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277835789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &277835792
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277835789}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.9973135}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &278532369
 GameObject:
   m_ObjectHideFlags: 0
@@ -13784,6 +14189,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8428845}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &282351683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 282351684}
+  - component: {fileID: 282351686}
+  - component: {fileID: 282351685}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &282351684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282351683}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.38268334, z: -0, w: 0.9238796}
+  m_LocalPosition: {x: 22.936634, y: 2.25, z: 73.79721}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &282351685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282351683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &282351686
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282351683}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 13.666666}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &282503756
 GameObject:
@@ -14513,6 +14990,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 292446712}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &293780950
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 293780951}
+  - component: {fileID: 293780953}
+  - component: {fileID: 293780952}
+  m_Layer: 0
+  m_Name: Approach 09
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &293780951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293780950}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.09899526, z: -0, w: 0.9950879}
+  m_LocalPosition: {x: 212.2643, y: 2.25, z: 436.40985}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &293780952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293780950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &293780953
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293780950}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.106478, y: 5, z: 13.550083}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &296816958
 GameObject:
   m_ObjectHideFlags: 0
@@ -15170,6 +15719,54 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8435844907760009538, guid: 65404670c4462f245bddac150eba32ca, type: 3}
   m_PrefabInstance: {fileID: 300194057}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &301839713
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 301839715}
+  - component: {fileID: 301839714}
+  m_Layer: 0
+  m_Name: Rally Brake Warnings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &301839714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 301839713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50102aae19df57d4dabe86575ea4f3e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningSystem
+  vehicleBody: {fileID: 1141717642}
+  fullIntensitySpeedExcessKph: 30
+  appearanceDuration: 0.32
+--- !u!4 &301839715
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 301839713}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2115484184}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &303011582
 GameObject:
   m_ObjectHideFlags: 0
@@ -16116,6 +16713,150 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7394876}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &318150725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 318150726}
+  - component: {fileID: 318150728}
+  - component: {fileID: 318150727}
+  m_Layer: 0
+  m_Name: Approach 07
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &318150726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318150725}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.211396, z: -0, w: 0.97740054}
+  m_LocalPosition: {x: 206.79187, y: 2.25, z: 413.979}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &318150727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318150725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &318150728
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318150725}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.000015, y: 5, z: 13.633412}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &320233475
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 320233476}
+  - component: {fileID: 320233478}
+  - component: {fileID: 320233477}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &320233476
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320233475}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.38268366, z: -0, w: 0.92387944}
+  m_LocalPosition: {x: 39.43579, y: 2.25, z: 90.29637}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &320233477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320233475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &320233478
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320233475}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 13.666663}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &321088922
 GameObject:
   m_ObjectHideFlags: 0
@@ -16504,8 +17245,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &329140608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16610,6 +17351,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 332974034}
   m_Mesh: {fileID: 4300000, guid: c5103fc000e74cb4a99535ebc4088aad, type: 2}
+--- !u!1 &334092604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 334092605}
+  - component: {fileID: 334092607}
+  - component: {fileID: 334092606}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &334092605
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334092604}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 255.16043, y: 2.25, z: -12.499939}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &334092606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334092604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &334092607
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334092604}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666748}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &334762000
 GameObject:
   m_ObjectHideFlags: 0
@@ -17706,6 +18519,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8814945}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &367146955
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 367146956}
+  m_Layer: 0
+  m_Name: Note 03 - Right 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &367146956
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 367146955}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 277835790}
+  - {fileID: 2045661317}
+  - {fileID: 1519852424}
+  - {fileID: 1040674283}
+  - {fileID: 1752186644}
+  - {fileID: 1632125516}
+  - {fileID: 182306089}
+  - {fileID: 2140485258}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &371693627
 GameObject:
   m_ObjectHideFlags: 0
@@ -18263,6 +19115,78 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 378609605}
   m_CullTransparentMesh: 1
+--- !u!1 &378944116
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 378944117}
+  - component: {fileID: 378944119}
+  - component: {fileID: 378944118}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &378944117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378944116}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.0000048731954, y: 0.24042723, z: 0.0000012070551, w: 0.9706672}
+  m_LocalPosition: {x: 205.61423, y: 2.2499416, z: 411.56595}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &378944118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378944116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &378944119
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378944116}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 14.999996, y: 5, z: 13.634775}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &379723996
 GameObject:
   m_ObjectHideFlags: 0
@@ -18407,6 +19331,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 380953012}
   m_Mesh: {fileID: 4300000, guid: a31a96c37413db246af0001ad930d950, type: 2}
+--- !u!1 &381201496
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 381201497}
+  - component: {fileID: 381201499}
+  - component: {fileID: 381201498}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &381201497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 381201496}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.81915253, z: -0, w: 0.57357574}
+  m_LocalPosition: {x: 127.84219, y: 2.25, z: 272.34918}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &381201498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 381201496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &381201499
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 381201496}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 12.999996}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &382436779
 GameObject:
   m_ObjectHideFlags: 0
@@ -18863,6 +19859,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.73663}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &387463796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 387463797}
+  - component: {fileID: 387463799}
+  - component: {fileID: 387463798}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &387463797
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387463796}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.0000013079008}
+  m_LocalPosition: {x: 255.16045, y: 2.25, z: -35.833252}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &387463798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387463796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &387463799
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 387463796}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18.000015, y: 5, z: 13.666626}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &389271436
 PrefabInstance:
@@ -19367,6 +20435,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &399393118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 399393119}
+  - component: {fileID: 399393121}
+  - component: {fileID: 399393120}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &399393119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399393118}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.0009081942, y: 0.38268325, z: 0.00037618636, w: 0.9238791}
+  m_LocalPosition: {x: 47.685326, y: 2.2614684, z: 98.5459}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &399393120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399393118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &399393121
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399393118}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 13.666561}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &401229024
 GameObject:
   m_ObjectHideFlags: 0
@@ -19739,6 +20879,78 @@ Transform:
   - {fileID: 905627590}
   m_Father: {fileID: 960598709}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &410784467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 410784468}
+  - component: {fileID: 410784470}
+  - component: {fileID: 410784469}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &410784468
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410784467}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.67889977, z: -0, w: 0.73423105}
+  m_LocalPosition: {x: 50.861206, y: 2.25, z: -109.54469}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &410784469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410784467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &410784470
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410784467}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.105102, y: 5, z: 13.646588}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &411209212
 GameObject:
   m_ObjectHideFlags: 0
@@ -21599,8 +22811,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &456662532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23281,6 +24493,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8648124}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &494791978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 494791979}
+  - component: {fileID: 494791981}
+  - component: {fileID: 494791980}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &494791979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494791978}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.053000238, y: -0, z: -0, w: 0.9985945}
+  m_LocalPosition: {x: 194.88406, y: -3.376937, z: 350.2074}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &494791980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494791978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &494791981
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494791978}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.665851}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &495487676
 GameObject:
   m_ObjectHideFlags: 0
@@ -24690,6 +25974,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.837513}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &520385046
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 520385047}
+  - component: {fileID: 520385049}
+  - component: {fileID: 520385048}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &520385047
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520385046}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.25, z: 26.792053}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &520385048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520385046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &520385049
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520385046}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.221436, y: 5, z: 13.666626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &522110751
 GameObject:
   m_ObjectHideFlags: 0
@@ -25612,74 +26968,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 537903444}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &540047741
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 540047742}
-  - component: {fileID: 540047744}
-  - component: {fileID: 540047743}
-  m_Layer: 0
-  m_Name: Brake Zone 06 - 90 deg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &540047742
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540047741}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 87.500046, y: 2.35, z: -110.000015}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1847373380}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &540047743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540047741}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 55
---- !u!65 &540047744
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540047741}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 16, y: 5, z: 51}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &540798797
 GameObject:
   m_ObjectHideFlags: 0
@@ -61525,6 +62813,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.012301}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &609509870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 609509871}
+  - component: {fileID: 609509873}
+  - component: {fileID: 609509872}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &609509871
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609509870}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.047172125, y: -0, z: -0, w: 0.9988868}
+  m_LocalPosition: {x: 194.88406, y: -3.7000713, z: 346.9393}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &609509872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609509870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &609509873
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609509870}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.665626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &610166395
 GameObject:
   m_ObjectHideFlags: 0
@@ -62995,7 +64355,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.5674744}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &632762994
+--- !u!1 &635285847
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63003,52 +64363,56 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 632762995}
-  - component: {fileID: 632762997}
-  - component: {fileID: 632762996}
+  - component: {fileID: 635285848}
+  - component: {fileID: 635285850}
+  - component: {fileID: 635285849}
   m_Layer: 0
-  m_Name: Brake Zone 02 - 110 deg
+  m_Name: Approach 02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &632762995
+--- !u!4 &635285848
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632762994}
+  m_GameObject: {fileID: 635285847}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 78.7868, y: 6.9239397, z: 213.84148}
+  m_LocalRotation: {x: -0.06365279, y: -0, z: -0, w: 0.99797213}
+  m_LocalPosition: {x: 194.88406, y: -2.409298, z: 358.5321}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1847373380}
+  m_Father: {fileID: 1595467343}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &632762996
+--- !u!114 &635285849
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632762994}
+  m_GameObject: {fileID: 635285847}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 45
---- !u!65 &632762997
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &635285850
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632762994}
+  m_GameObject: {fileID: 635285847}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -63061,75 +64425,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 16, y: 5, z: 68}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &635181805
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 635181806}
-  - component: {fileID: 635181808}
-  - component: {fileID: 635181807}
-  m_Layer: 0
-  m_Name: Brake Zone 04 - 212 deg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &635181806
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 635181805}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 194.88406, y: -2.2802439, z: 358.99103}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1847373380}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &635181807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 635181805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 38
---- !u!65 &635181808
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 635181805}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 16, y: 5, z: 88}
+  m_Size: {x: 18, y: 5, z: 13.666406}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &635674132
 PrefabInstance:
@@ -64895,6 +66191,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.6102266}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &674785488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 674785489}
+  - component: {fileID: 674785491}
+  - component: {fileID: 674785490}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &674785489
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674785488}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.39886948, z: -0, w: 0.91700774}
+  m_LocalPosition: {x: 87.139656, y: 2.25, z: 272.32874}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &674785490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674785488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &674785491
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674785488}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.000006, y: 5, z: 12.910807}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &675813024
 GameObject:
   m_ObjectHideFlags: 0
@@ -65566,74 +66934,6 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 3.1972866}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &693430253
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 693430254}
-  - component: {fileID: 693430256}
-  - component: {fileID: 693430255}
-  m_Layer: 0
-  m_Name: Brake Zone 05 - 90 deg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &693430254
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693430253}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.000010174182}
-  m_LocalPosition: {x: 255.16045, y: 2.35, z: -22.499939}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1847373380}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &693430255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693430253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 55
---- !u!65 &693430256
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693430253}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 16.000004, y: 5, z: 51}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &693586992
 GameObject:
@@ -66381,6 +67681,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7952394}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &722382148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 722382149}
+  - component: {fileID: 722382151}
+  - component: {fileID: 722382150}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &722382149
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722382148}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 74.16673, y: 2.25, z: -110.000015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &722382150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722382148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &722382151
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722382148}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &723747951
 GameObject:
   m_ObjectHideFlags: 0
@@ -66752,74 +68124,6 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.6133347}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &735232678
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 735232679}
-  - component: {fileID: 735232681}
-  - component: {fileID: 735232680}
-  m_Layer: 0
-  m_Name: Brake Zone 01 - 45 deg
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &735232679
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735232678}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.35, z: 8.291992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1847373380}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &735232680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735232678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
-  warningSystem: {fileID: 828526148}
-  targetSpeedKph: 65
---- !u!65 &735232681
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735232678}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 16, y: 5, z: 38.000046}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &736363671
 GameObject:
@@ -67308,8 +68612,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &740053918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69182,6 +70486,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 765172337}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &765474805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 765474806}
+  - component: {fileID: 765474808}
+  - component: {fileID: 765474807}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &765474806
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765474805}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.25, z: 15.125366}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &765474807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765474805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &765474808
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765474805}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666748}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &766583105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69761,6 +71137,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 6.377958}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &781751753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 781751754}
+  m_Layer: 0
+  m_Name: Note 01 - Right 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &781751754
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 781751753}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 44762615}
+  - {fileID: 1048794355}
+  - {fileID: 1903437161}
+  - {fileID: 765474806}
+  - {fileID: 520385047}
+  - {fileID: 1430478708}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &781915836
 GameObject:
   m_ObjectHideFlags: 0
@@ -70160,6 +71573,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &792078660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 792078661}
+  - component: {fileID: 792078663}
+  - component: {fileID: 792078662}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &792078661
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792078660}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 97.500046, y: 2.25, z: -110.000015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &792078662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792078660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &792078663
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 792078660}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666748}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &792290441
 GameObject:
@@ -71794,54 +73279,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7261243}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &828526147
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 828526149}
-  - component: {fileID: 828526148}
-  m_Layer: 0
-  m_Name: Rally Brake Warnings
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &828526148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828526147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50102aae19df57d4dabe86575ea4f3e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningSystem
-  vehicleBody: {fileID: 1141717642}
-  fullIntensitySpeedExcessKph: 30
-  appearanceDuration: 0.32
---- !u!4 &828526149
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 828526147}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1847373380}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &828913807
 GameObject:
   m_ObjectHideFlags: 0
@@ -72010,6 +73447,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 208165587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &836978601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 836978602}
+  - component: {fileID: 836978604}
+  - component: {fileID: 836978603}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &836978602
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836978601}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.8191514, z: -0, w: 0.5735774}
+  m_LocalPosition: {x: 138.17883, y: 2.25, z: 268.58694}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &836978603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836978601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &836978604
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836978601}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 13.000029}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &837241513
 GameObject:
   m_ObjectHideFlags: 0
@@ -72352,6 +73861,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8325396}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &844674538
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 844674539}
+  - component: {fileID: 844674541}
+  - component: {fileID: 844674540}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &844674539
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844674538}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06581794, y: -0, z: -0, w: 0.99783164}
+  m_LocalPosition: {x: 194.88406, y: -0.45574808, z: 373.35504}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &844674540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844674538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &844674541
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844674538}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.197231, y: 5, z: 13.666539}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &846841576
 GameObject:
@@ -73542,6 +75123,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 3.1972508}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &871106010
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 871106011}
+  - component: {fileID: 871106013}
+  - component: {fileID: 871106012}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &871106011
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871106010}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.066040345, y: -0, z: -0, w: 0.997817}
+  m_LocalPosition: {x: 194.88406, y: -1.9907317, z: 361.78992}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &871106012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871106010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &871106013
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 871106010}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666553}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &872743924
 GameObject:
   m_ObjectHideFlags: 0
@@ -74488,6 +76141,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8103957}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &888299980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 888299981}
+  m_Layer: 0
+  m_Name: Note 05 - Right 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &888299981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888299980}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1742957120}
+  - {fileID: 274950717}
+  - {fileID: 494791979}
+  - {fileID: 871106011}
+  - {fileID: 844674539}
+  - {fileID: 2125359023}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &888399180
 GameObject:
   m_ObjectHideFlags: 0
@@ -77002,8 +78692,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 23.090942, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 24.758915, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &938871316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77336,6 +79026,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7285886}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &950975569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 950975570}
+  m_Layer: 0
+  m_Name: Note 09 - Right 4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &950975570
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950975569}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1712605531}
+  - {fileID: 792078661}
+  - {fileID: 1461998586}
+  - {fileID: 722382149}
+  - {fileID: 135806583}
+  - {fileID: 410784468}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &951556253
 GameObject:
   m_ObjectHideFlags: 0
@@ -82136,6 +83863,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 3.7843354}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1040674282
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1040674283}
+  - component: {fileID: 1040674285}
+  - component: {fileID: 1040674284}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1040674283
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040674282}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.095094435, y: -0, z: -0, w: 0.99546826}
+  m_LocalPosition: {x: 78.7868, y: 6.552405, z: 215.31674}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1040674284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040674282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &1040674285
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040674282}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.999923}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1041813454
 GameObject:
   m_ObjectHideFlags: 0
@@ -82188,6 +83987,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.591617}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1042190951
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1042190952}
+  - component: {fileID: 1042190954}
+  - component: {fileID: 1042190953}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1042190952
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042190951}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.3826834, z: -0, w: 0.92387956}
+  m_LocalPosition: {x: 31.18621, y: 2.25, z: 82.0468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1042190953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042190951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &1042190954
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042190951}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.999996, y: 5, z: 13.666667}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1043015728
 GameObject:
@@ -82465,6 +84336,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 1044305136}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1048794354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1048794355}
+  - component: {fileID: 1048794357}
+  - component: {fileID: 1048794356}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1048794355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048794354}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.000000089968914, z: -0, w: 1}
+  m_LocalPosition: {x: 0.000008202202, y: 2.25, z: -8.208012}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1048794356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048794354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &1048794357
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048794354}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666748}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1051636709
 GameObject:
   m_ObjectHideFlags: 0
@@ -83670,6 +85613,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7285914}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1097302052
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1097302053}
+  - component: {fileID: 1097302055}
+  - component: {fileID: 1097302054}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1097302053
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097302052}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.060819678, y: 0.007778556, z: 0.00047398117, w: 0.9981184}
+  m_LocalPosition: {x: 194.97427, y: 0.251781, z: 378.98193}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1097302054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097302052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &1097302055
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097302052}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.970511, y: 5, z: 13.662428}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1099609002
 GameObject:
@@ -86594,8 +88609,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &1143332139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87832,6 +89847,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.723218}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1167574046
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1167574047}
+  - component: {fileID: 1167574049}
+  - component: {fileID: 1167574048}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1167574047
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167574046}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.057408232, y: 0.021559304, z: 0.0012400162, w: 0.9981172}
+  m_LocalPosition: {x: 195.13397, y: 0.5657177, z: 381.6613}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1167574048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167574046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &1167574049
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167574046}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.459113, y: 5, z: 13.652089}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1168381590
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88123,6 +90210,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 3.7661061}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1175768773
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1175768774}
+  - component: {fileID: 1175768776}
+  - component: {fileID: 1175768775}
+  m_Layer: 0
+  m_Name: Approach 08
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1175768774
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175768773}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.77320707, z: -0, w: 0.6341537}
+  m_LocalPosition: {x: 159.04852, y: 2.25, z: 261.87305}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1175768775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175768773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &1175768776
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175768773}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.053448, y: 5, z: 12.941047}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1176902953
 PrefabInstance:
@@ -96039,6 +98198,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 6.379345}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1283438307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1283438308}
+  - component: {fileID: 1283438310}
+  - component: {fileID: 1283438309}
+  m_Layer: 0
+  m_Name: Approach 08
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1283438308
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283438307}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.083279915, z: -0, w: 0.99652624}
+  m_LocalPosition: {x: 210.16104, y: 2.25, z: 425.0119}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1283438309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283438307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &1283438310
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283438307}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.000015, y: 5, z: 13.633569}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1285998203
 GameObject:
   m_ObjectHideFlags: 0
@@ -97051,6 +99282,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8560023}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1303211697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1303211698}
+  - component: {fileID: 1303211700}
+  - component: {fileID: 1303211699}
+  m_Layer: 0
+  m_Name: Approach 07
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1303211698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303211697}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.8191525, z: -0, w: 0.5735759}
+  m_LocalPosition: {x: 148.51547, y: 2.25, z: 264.8247}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1303211699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303211697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &1303211700
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303211697}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 16.239986, y: 5, z: 13.0000105}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1303374377
 GameObject:
   m_ObjectHideFlags: 0
@@ -97246,6 +99549,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 3.4040203}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1306565414
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1306565415}
+  - component: {fileID: 1306565417}
+  - component: {fileID: 1306565416}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1306565415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306565414}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.9992343, z: -0, w: -0.03912479}
+  m_LocalPosition: {x: 254.70512, y: 2.25, z: -59.13879}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1306565416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306565414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &1306565417
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306565414}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.104996, y: 5, z: 13.64661}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1307582741
 GameObject:
@@ -98860,6 +101235,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339647836}
   m_Mesh: {fileID: 4300000, guid: a31a96c37413db246af0001ad930d950, type: 2}
+--- !u!1 &1346640428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1346640429}
+  - component: {fileID: 1346640431}
+  - component: {fileID: 1346640430}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1346640429
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346640428}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.75092924, z: -0, w: 0.66038275}
+  m_LocalPosition: {x: 106.926575, y: 2.25, z: 278.68964}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1346640430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346640428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &1346640431
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346640428}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.00001, y: 5, z: 12.910834}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1349630720
 GameObject:
   m_ObjectHideFlags: 0
@@ -100992,6 +103439,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1391872108}
   m_Mesh: {fileID: 4300000, guid: 9211a18a29debf149a79c3f4023d9c74, type: 2}
+--- !u!1 &1392703447
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1392703448}
+  - component: {fileID: 1392703450}
+  - component: {fileID: 1392703449}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1392703448
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392703447}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.0000006539435}
+  m_LocalPosition: {x: 255.16043, y: 2.25, z: -47.49994}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1392703449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392703447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &1392703450
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392703447}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 16.701298, y: 5, z: 13.666748}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1392849989
 GameObject:
   m_ObjectHideFlags: 0
@@ -102896,6 +105415,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 6.3935905}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1430478707
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1430478708}
+  - component: {fileID: 1430478710}
+  - component: {fileID: 1430478709}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1430478708
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430478707}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.053800087, z: -0, w: 0.9985517}
+  m_LocalPosition: {x: 0.62474597, y: 2.25, z: 38.406307}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1430478709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430478707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &1430478710
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430478707}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.063164, y: 5, z: 13.629202}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1433329008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -104275,6 +106866,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.848935}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1460746457
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1460746458}
+  - component: {fileID: 1460746460}
+  - component: {fileID: 1460746459}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1460746458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1460746457}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 255.16043, y: 2.25, z: -0.83325195}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1460746459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1460746457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &1460746460
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1460746457}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1461425902
 GameObject:
   m_ObjectHideFlags: 0
@@ -104433,6 +107096,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1461998585
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1461998586}
+  - component: {fileID: 1461998588}
+  - component: {fileID: 1461998587}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1461998586
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461998585}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 85.83336, y: 2.25, z: -110.000015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1461998587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461998585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &1461998588
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461998585}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666626}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1464819412
 GameObject:
@@ -106128,6 +108863,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1498752982
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1498752983}
+  - component: {fileID: 1498752985}
+  - component: {fileID: 1498752984}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1498752983
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498752982}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.04146991, y: 0.10850825, z: 0.0045305453, w: 0.99321985}
+  m_LocalPosition: {x: 196.31598, y: 1.4446503, z: 390.42868}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1498752984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498752982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &1498752985
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498752982}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 14.999996, y: 5, z: 13.632726}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1499821681
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -106893,6 +109700,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7196407}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1511604466
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1511604467}
+  - component: {fileID: 1511604469}
+  - component: {fileID: 1511604468}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1511604467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511604466}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.0000013079008}
+  m_LocalPosition: {x: 255.16045, y: 2.25, z: -24.166626}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 17593302}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1511604468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511604466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 255.16046, y: 0, z: -54.99994}
+--- !u!65 &1511604469
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511604466}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18.000015, y: 5, z: 13.666626}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1512911992
 GameObject:
   m_ObjectHideFlags: 0
@@ -107104,6 +109983,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 6.3779764}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1519852423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1519852424}
+  - component: {fileID: 1519852426}
+  - component: {fileID: 1519852425}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1519852424
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519852423}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.09239465, y: -0, z: -0, w: 0.9957225}
+  m_LocalPosition: {x: 78.7868, y: 8.605667, z: 204.51027}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1519852425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519852423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &1519852426
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519852423}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.999756}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1520258975
 GameObject:
@@ -108440,8 +111391,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 20, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 21.048477, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &1540252885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173291,6 +176242,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.839931}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1586063096
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1586063097}
+  - component: {fileID: 1586063099}
+  - component: {fileID: 1586063098}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1586063097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586063096}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.013384117, y: 0.23590057, z: 0.003249343, w: 0.9716796}
+  m_LocalPosition: {x: 200.23322, y: 2.0896947, z: 401.25458}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1586063098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586063096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &1586063099
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586063096}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 14.999996, y: 5, z: 13.6318035}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1587287459
 GameObject:
   m_ObjectHideFlags: 0
@@ -173763,6 +176786,46 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1594441199}
   m_Mesh: {fileID: -2120301298645606303, guid: cbf5bde2596d7fd4f9a20825802edb75, type: 3}
+--- !u!1 &1595467342
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1595467343}
+  m_Layer: 0
+  m_Name: Note 07 - Right 1 - Hairpin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1595467343
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1595467342}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 609509871}
+  - {fileID: 635285848}
+  - {fileID: 1661290586}
+  - {fileID: 1167574047}
+  - {fileID: 1961802959}
+  - {fileID: 1879495446}
+  - {fileID: 318150726}
+  - {fileID: 1283438308}
+  - {fileID: 293780951}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1597092820
 GameObject:
   m_ObjectHideFlags: 0
@@ -175008,6 +178071,78 @@ Transform:
   - {fileID: 620751703}
   m_Father: {fileID: 208165587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1632125515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1632125516}
+  - component: {fileID: 1632125518}
+  - component: {fileID: 1632125517}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1632125516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632125515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.052768692, y: -0, z: -0, w: 0.99860674}
+  m_LocalPosition: {x: 78.7868, y: 3.149863, z: 237.03928}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1632125517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632125515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &1632125518
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632125515}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.9977865}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1633417947
 GameObject:
   m_ObjectHideFlags: 0
@@ -176523,6 +179658,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.72334}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1661290585
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1661290586}
+  - component: {fileID: 1661290588}
+  - component: {fileID: 1661290587}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1661290586
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661290585}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06726461, y: -0, z: -0, w: 0.9977352}
+  m_LocalPosition: {x: 194.88406, y: -0.88523245, z: 370.09854}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1661290587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661290585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &1661290588
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661290585}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.752674, y: 5, z: 13.666607}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1663748988
 GameObject:
@@ -181111,8 +184318,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!4 &1710902579
 Transform:
   m_ObjectHideFlags: 0
@@ -181233,6 +184440,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8119254}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1712605530
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1712605531}
+  - component: {fileID: 1712605533}
+  - component: {fileID: 1712605532}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1712605531
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712605530}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 109.16673, y: 2.25, z: -110.000015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 950975570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1712605532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712605530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 55
+  turnDirection: 1
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 55.000046, y: 0, z: -110.000015}
+--- !u!65 &1712605533
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712605530}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666626}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1713754324
 GameObject:
@@ -181578,6 +184857,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.8630357}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1720010726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1720010727}
+  - component: {fileID: 1720010729}
+  - component: {fileID: 1720010728}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1720010727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720010726}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06765189, y: -0, z: -0, w: 0.997709}
+  m_LocalPosition: {x: 194.88406, y: -1.2436943, z: 367.4146}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1720010728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720010726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &1720010729
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720010726}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.97657, y: 5, z: 13.666636}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1720574386
 GameObject:
@@ -182422,6 +185773,78 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1742957119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1742957120}
+  - component: {fileID: 1742957122}
+  - component: {fileID: 1742957121}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1742957120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742957119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.0012093682, y: -0, z: -0, w: 0.9999993}
+  m_LocalPosition: {x: 194.88406, y: -4.6575565, z: 326.9294}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1742957121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742957119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &1742957122
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742957119}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.664768}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1745586635
 GameObject:
   m_ObjectHideFlags: 0
@@ -182935,6 +186358,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751416451}
   m_Mesh: {fileID: 7797456487010206922, guid: cbf5bde2596d7fd4f9a20825802edb75, type: 3}
+--- !u!1 &1752186643
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1752186644}
+  - component: {fileID: 1752186646}
+  - component: {fileID: 1752186645}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1752186644
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752186643}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.08126299, y: -0, z: -0, w: 0.9966927}
+  m_LocalPosition: {x: 78.7868, y: 4.6202536, z: 226.14412}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1752186645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752186643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &1752186646
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752186643}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.999059}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1753502051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -185584,8 +189079,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 24.496674, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 25.75653, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &1818614157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186917,43 +190412,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 5.4400287}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &1847373379
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1847373380}
-  m_Layer: 0
-  m_Name: Brake Warning Triggers
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1847373380
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1847373379}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 735232679}
-  - {fileID: 632762995}
-  - {fileID: 116348996}
-  - {fileID: 635181806}
-  - {fileID: 693430254}
-  - {fileID: 540047742}
-  m_Father: {fileID: 828526149}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1850090732
 GameObject:
   m_ObjectHideFlags: 0
@@ -187717,6 +191175,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.723218}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1879495445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1879495446}
+  - component: {fileID: 1879495448}
+  - component: {fileID: 1879495447}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1879495446
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879495445}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.007626376, y: 0.25896594, z: 0.002044793, w: 0.9658542}
+  m_LocalPosition: {x: 201.476, y: 2.1580665, z: 403.6418}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1879495447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879495445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &1879495448
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879495445}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.000005, y: 5, z: 13.643785}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1884079209
 GameObject:
@@ -189184,6 +192714,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 1903427945}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1903437160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1903437161}
+  - component: {fileID: 1903437163}
+  - component: {fileID: 1903437162}
+  m_Layer: 0
+  m_Name: Approach 03
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1903437161
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903437160}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.00000039650897, z: -0, w: 1}
+  m_LocalPosition: {x: 0.0000046259233, y: 2.25, z: 3.4586773}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 781751754}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1903437162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903437160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 0, y: 0, z: 34.292038}
+--- !u!65 &1903437163
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903437160}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.66663}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1905131066
 GameObject:
   m_ObjectHideFlags: 0
@@ -190506,6 +194108,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8435844907760009538, guid: 65404670c4462f245bddac150eba32ca, type: 3}
   m_PrefabInstance: {fileID: 1929636157}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1932415848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1932415849}
+  - component: {fileID: 1932415851}
+  - component: {fileID: 1932415850}
+  m_Layer: 0
+  m_Name: Approach 01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1932415849
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932415848}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.0609017, y: -0, z: -0, w: 0.9981438}
+  m_LocalPosition: {x: 194.88406, y: -2.7403297, z: 355.84485}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53846349}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1932415850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932415848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 203.83287, y: 0, z: 407.80157}
+--- !u!65 &1932415851
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932415848}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 13.666222}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1933910796
 GameObject:
   m_ObjectHideFlags: 0
@@ -192381,6 +196055,78 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3244254081578900121, guid: c357aeecf7c72094f84f1d960d4015c6, type: 3}
   m_PrefabInstance: {fileID: 1960921025}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1961802958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1961802959}
+  - component: {fileID: 1961802961}
+  - component: {fileID: 1961802960}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1961802959
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961802958}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.03546056, y: 0.13828126, z: 0.0049543343, w: 0.9897456}
+  m_LocalPosition: {x: 196.97385, y: 1.6499143, z: 393.0225}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1595467343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1961802960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961802958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 32
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 1
+  curveEntry: {x: 211.16037, y: 0, z: 432.41425}
+--- !u!65 &1961802961
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1961802958}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.00001, y: 5, z: 13.632062}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1967273839
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -192982,6 +196728,43 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.7951784}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1979002806
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1979002807}
+  m_Layer: 0
+  m_Name: Note 02 - Left 4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1979002807
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979002806}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 282351684}
+  - {fileID: 1042190952}
+  - {fileID: 320233476}
+  - {fileID: 399393119}
+  - {fileID: 2083150287}
+  - {fileID: 2001423828}
+  m_Father: {fileID: 2115484184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1979425975
 GameObject:
   m_ObjectHideFlags: 0
@@ -193931,6 +197714,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1990996574}
   m_Mesh: {fileID: 4300000, guid: f0edaee5bc4fd8a43878b85207da1f13, type: 2}
+--- !u!1 &1991912108
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1991912109}
+  - component: {fileID: 1991912111}
+  - component: {fileID: 1991912110}
+  m_Layer: 0
+  m_Name: Approach 04
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1991912109
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1991912108}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.8191517, z: -0, w: 0.573577}
+  m_LocalPosition: {x: 117.50558, y: 2.25, z: 276.1114}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1991912110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1991912108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &1991912111
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1991912108}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.87156, y: 5, z: 13}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1992118972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -194772,6 +198627,78 @@ Transform:
   - {fileID: 821458629}
   m_Father: {fileID: 540798798}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2001423827
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001423828}
+  - component: {fileID: 2001423830}
+  - component: {fileID: 2001423829}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2001423828
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001423827}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06370071, y: 0.34885025, z: 0.023774253, w: 0.93470883}
+  m_LocalPosition: {x: 63.822205, y: 3.7829638, z: 115.26158}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2001423829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001423827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &2001423830
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001423827}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.062341, y: 5, z: 13.648806}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2001791146
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -195781,8 +199708,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 26.000002, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &2021788269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196205,8 +200132,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 22, y: 4, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 23.008438, y: 8, z: 6}
+  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &2042103810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196318,6 +200245,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1701726375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2045661316
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2045661317}
+  - component: {fileID: 2045661319}
+  - component: {fileID: 2045661318}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2045661317
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045661316}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.07341988, y: -0, z: -0, w: 0.99730116}
+  m_LocalPosition: {x: 78.7868, y: 10.42298, z: 193.66425}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2045661318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045661316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &2045661319
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045661316}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 18, y: 5, z: 12.9986725}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2045776226
 GameObject:
   m_ObjectHideFlags: 0
@@ -196922,6 +200921,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2062814334}
   m_Mesh: {fileID: -6189798361973747854, guid: cbf5bde2596d7fd4f9a20825802edb75, type: 3}
+--- !u!1 &2066858370
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2066858371}
+  - component: {fileID: 2066858373}
+  - component: {fileID: 2066858372}
+  m_Layer: 0
+  m_Name: Approach 02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2066858371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066858370}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.58905053, z: -0, w: 0.8080963}
+  m_LocalPosition: {x: 96.32317, y: 2.25, z: 277.71753}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 259049522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2066858372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066858370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 0
+  cornerGrade: 2
+  hairpin: 0
+  curveEntry: {x: 154.62346, y: 0, z: 262.6016}
+--- !u!65 &2066858373
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066858370}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.00001, y: 5, z: 12.908839}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2071598530
 GameObject:
   m_ObjectHideFlags: 0
@@ -197160,6 +201231,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.61334}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2083150286
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2083150287}
+  - component: {fileID: 2083150289}
+  - component: {fileID: 2083150288}
+  m_Layer: 0
+  m_Name: Approach 05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2083150287
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083150286}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.028523482, y: 0.3825009, z: 0.011814809, w: 0.92343915}
+  m_LocalPosition: {x: 55.925774, y: 2.6328506, z: 106.786354}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1979002807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2083150288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083150286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 0
+  cornerGrade: 4
+  hairpin: 0
+  curveEntry: {x: 61.213203, y: 0.9214774, z: 112.073784}
+--- !u!65 &2083150289
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083150286}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 17.214203, y: 5, z: 13.66321}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2089128825
 GameObject:
@@ -198253,6 +202396,46 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.0123243}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2115484183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2115484184}
+  m_Layer: 0
+  m_Name: Rally Pace Notes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2115484184
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2115484183}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 781751754}
+  - {fileID: 1979002807}
+  - {fileID: 367146956}
+  - {fileID: 259049522}
+  - {fileID: 888299981}
+  - {fileID: 53846349}
+  - {fileID: 1595467343}
+  - {fileID: 17593302}
+  - {fileID: 950975570}
+  m_Father: {fileID: 301839715}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2115826164
 GameObject:
   m_ObjectHideFlags: 0
@@ -198839,6 +203022,78 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2125271719}
   m_Mesh: {fileID: -5794481062833114100, guid: cbf5bde2596d7fd4f9a20825802edb75, type: 3}
+--- !u!1 &2125359022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2125359023}
+  - component: {fileID: 2125359025}
+  - component: {fileID: 2125359024}
+  m_Layer: 0
+  m_Name: Approach 06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2125359023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125359022}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.052389607, y: 0.047406107, z: 0.002489817, w: 0.9974978}
+  m_LocalPosition: {x: 195.43285, y: 0.919978, z: 384.89838}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 888299981}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2125359024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125359022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 65
+  turnDirection: 1
+  cornerGrade: 3
+  hairpin: 0
+  curveEntry: {x: 194.88406, y: -1.7391889, z: 380.79236}
+--- !u!65 &2125359025
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125359022}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 15.06192, y: 5, z: 13.637336}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2125423860
 GameObject:
   m_ObjectHideFlags: 0
@@ -199553,6 +203808,78 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 2.5, z: 4.752882}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2140485257
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2140485258}
+  - component: {fileID: 2140485260}
+  - component: {fileID: 2140485259}
+  m_Layer: 0
+  m_Name: Approach 08
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2140485258
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140485257}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.09123367, z: -0, w: 0.9958295}
+  m_LocalPosition: {x: 79.778435, y: 2.25, z: 258.8667}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 367146956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2140485259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140485257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd54b73e9260e846a3c4c168e37d515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RallyBrakeWarningTrigger
+  warningSystem: {fileID: 301839714}
+  targetSpeedKph: 45
+  turnDirection: 1
+  cornerGrade: 1
+  hairpin: 0
+  curveEntry: {x: 78.7868, y: 0, z: 254.50018}
+--- !u!65 &2140485260
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140485257}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13.053183, y: 5, z: 12.914732}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2140628984
 GameObject:
@@ -203499,10 +207826,10 @@ SceneRoots:
   - {fileID: 1529165891}
   - {fileID: 989373289}
   - {fileID: 278685341}
-  - {fileID: 828526149}
   - {fileID: 700000000010001}
   - {fileID: 650306849}
   - {fileID: 1616457648}
   - {fileID: 553558807}
   - {fileID: 1311811633}
   - {fileID: 1807874359}
+  - {fileID: 301839715}

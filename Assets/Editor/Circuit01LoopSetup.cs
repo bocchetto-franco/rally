@@ -234,14 +234,14 @@ public static class Circuit01LoopSetup
             Sample(d,out var p,out var r,out float w);
             var go = new GameObject(i==0 ? "Checkpoint_00_Start" : i==intervals ? "Checkpoint_Loop_Finish" : $"Checkpoint_{i:00}_{d:F0}m");
             go.transform.SetParent(manager.transform); go.transform.SetPositionAndRotation(p+Vector3.up*2,Quaternion.LookRotation(Vector3.Cross(r,Vector3.up)));
-            go.AddComponent<BoxCollider>().size = new Vector3(w+13,4,2);
+            var box=go.AddComponent<BoxCollider>();box.size=new Vector3(w+14,8,6);box.center=Vector3.up*1.5f;
             gates[i]=go.AddComponent<RallyCheckpointTrigger>(); gates[i].Configure(manager,i);
         }
         manager.Configure(gates); EditorUtility.SetDirty(manager);
         Remove("Race Start Finish Markers"); var lines = new GameObject("Race Start Finish Markers");
         foreach (int i in new[] { 0,intervals })
         {
-            var g=gates[i].transform; float w=g.GetComponent<BoxCollider>().size.x-13;
+            var g=gates[i].transform; float w=g.GetComponent<BoxCollider>().size.x-14;
             var v=new List<Vector3>(); var f=new List<Face>();
             Quad(v,f,new Vector3(-w/2,0,-.4f),new Vector3(-w/2,0,.4f),new Vector3(w/2,0,.4f),new Vector3(w/2,0,-.4f));
             var stripe=ProBuilderMesh.Create(v,f); stripe.name=i==0 ? "Start Line" : "Finish Line";

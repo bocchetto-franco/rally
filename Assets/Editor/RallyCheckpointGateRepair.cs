@@ -79,9 +79,9 @@ public static class RallyCheckpointGateRepair
                 gate.transform.position = new Vector3(gate.transform.position.x, roadHit.point.y + 3.5f, gate.transform.position.z);
 
                 float roadWidth = SampleWidth(layout, expectedDistance);
-                // The old width had only 0.4 m of margin per side. A 3 m shoulder
-                // catches normal rally excursions without reaching the barriers.
-                box.size = new Vector3(roadWidth + 6f, 8f, 6f);
+                // Cover the 6.5 m escape margin up to containment, plus a small
+                // tolerance, so a legal excursion cannot bypass the checkpoint.
+                box.size = new Vector3(roadWidth + 14f, 8f, 6f);
                 gate.Configure(manager, i);
                 gate.transform.SetSiblingIndex(i);
                 gates[i] = gate;
@@ -102,7 +102,7 @@ public static class RallyCheckpointGateRepair
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene))
                 throw new InvalidOperationException("Could not save " + circuit.scenePath);
-            Debug.Log($"CHECKPOINT_GATES_REPAIRED: {scene.name} {count} ordered gates, road width + 6 m, height 8 m, depth 6 m");
+            Debug.Log($"CHECKPOINT_GATES_REPAIRED: {scene.name} {count} ordered gates, road width + 14 m, height 8 m, depth 6 m");
         }
     }
 

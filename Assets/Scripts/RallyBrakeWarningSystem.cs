@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,20 +9,23 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
     [SerializeField, Min(1f)] float fullIntensitySpeedExcessKph = 30f;
     [SerializeField, Min(.1f)] float appearanceDuration = .32f;
 
+    readonly HashSet<RallyBrakeWarningTrigger> zones = new HashSet<RallyBrakeWarningTrigger>();
     CanvasGroup warningGroup;
     RectTransform warningRect;
-    TMP_Text warningText;
-    RallyBrakeWarningTrigger activeTrigger;
+    TMP_Text warningText, directionText;
+    RallyPaceNoteArrow arrow;
+    Image accent;
+    RallyBrakeWarningTrigger activeTrigger, displayedTrigger;
+    string displayedLabel;
+    bool displayedHairpin;
     float appearanceTime;
     bool wasVisible;
-    int displayedTargetSpeed = -1;
 
     public Rigidbody VehicleBody => vehicleBody;
+    public RallyBrakeWarningTrigger ActiveNote => activeTrigger;
+    public float NoteOpacity => warningGroup == null ? 0f : warningGroup.alpha;
 
-    public void Configure(Rigidbody body)
-    {
-        vehicleBody = body;
-    }
+    public void Configure(Rigidbody body) => vehicleBody = body;
 
     void Awake()
     {
@@ -30,66 +34,71 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
             RallyVehicleDynamics dynamics = FindAnyObjectByType<RallyVehicleDynamics>();
             if (dynamics != null) vehicleBody = dynamics.GetComponentInParent<Rigidbody>();
         }
-
         BuildHud();
         HideImmediate();
     }
 
     void Update()
     {
-        if (activeTrigger == null || vehicleBody == null)
+        SelectUpcoming();
+        if (activeTrigger == null || vehicleBody == null || Time.timeScale == 0f)
         {
             HideImmediate();
             return;
         }
-
+        if (displayedTrigger == null || displayedTrigger.transform.parent != activeTrigger.transform.parent ||
+            displayedLabel != activeTrigger.NoteLabel || displayedHairpin != activeTrigger.IsHairpin)
+        {
+            displayedTrigger = activeTrigger;
+            displayedLabel = activeTrigger.NoteLabel;
+            displayedHairpin = activeTrigger.IsHairpin;
+            warningText.text = activeTrigger.CornerGrade.ToString();
+            directionText.text = activeTrigger.Direction == RallyBrakeWarningTrigger.TurnDirection.Right ? "DERECHA" : "IZQUIERDA";
+            if (activeTrigger.IsHairpin) directionText.text += " · HORQUILLA";
+            Color color = activeTrigger.CornerGrade <= 2 ? new Color(1f, .48f, .13f) :
+                activeTrigger.CornerGrade <= 4 ? new Color(1f, .83f, .2f) : new Color(.42f, .93f, .57f);
+            arrow.SetNote(activeTrigger.Direction, activeTrigger.CornerGrade, activeTrigger.IsHairpin);
+            arrow.color = warningText.color = accent.color = color;
+            wasVisible = false;
+        }
         float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
-        float excess = speedKph - activeTrigger.TargetSpeedKph;
-        float alpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(excess / fullIntensitySpeedExcessKph));
-        warningGroup.alpha = alpha;
-        warningGroup.blocksRaycasts = false;
-        warningGroup.interactable = false;
-        int targetSpeed = Mathf.RoundToInt(activeTrigger.TargetSpeedKph);
-        if (targetSpeed != displayedTargetSpeed)
-        {
-            warningText.text = $"<size=70%>▲</size>  BRAKE\n<size=38%>CURVA {targetSpeed} km/h</size>";
-            displayedTargetSpeed = targetSpeed;
-        }
-
-        // Animate size only: opacity remains exactly the speed-based warning value.
-        bool visible = alpha > 0f;
-        if (visible && !wasVisible) appearanceTime = 0f;
-        wasVisible = visible;
-        if (!visible)
-        {
-            warningRect.localScale = Vector3.one;
-            return;
-        }
+        float excess = Mathf.Clamp01((speedKph - activeTrigger.TargetSpeedKph) / fullIntensitySpeedExcessKph);
+        // A pace note remains readable after braking to the recommended speed.
+        warningGroup.alpha = Mathf.Lerp(.78f, 1f, Mathf.SmoothStep(0f, 1f, excess));
+        if (!wasVisible) appearanceTime = 0f;
+        wasVisible = true;
         appearanceTime = Mathf.Min(appearanceTime + Time.deltaTime, appearanceDuration);
         float progress = Mathf.Clamp01(appearanceTime / Mathf.Max(.1f, appearanceDuration));
         float scale = progress < .7f
-            ? Mathf.Lerp(.78f, 1.08f, Mathf.SmoothStep(0f, 1f, progress / .7f))
-            : Mathf.Lerp(1.08f, 1f, Mathf.SmoothStep(0f, 1f, (progress - .7f) / .3f));
+            ? Mathf.Lerp(.84f, 1.04f, Mathf.SmoothStep(0f, 1f, progress / .7f))
+            : Mathf.Lerp(1.04f, 1f, Mathf.SmoothStep(0f, 1f, (progress - .7f) / .3f));
         warningRect.localScale = Vector3.one * scale;
     }
 
     public void Enter(RallyBrakeWarningTrigger trigger)
     {
-        // OnTriggerStay calls Enter repeatedly; replay the pop only for a new zone.
-        if (trigger != null && activeTrigger != trigger)
-        {
-            activeTrigger = trigger;
-            wasVisible = false;
-        }
+        if (trigger != null) zones.Add(trigger);
+        SelectUpcoming();
     }
 
     public void Exit(RallyBrakeWarningTrigger trigger)
     {
-        if (activeTrigger == trigger)
+        zones.Remove(trigger);
+        SelectUpcoming();
+        if (activeTrigger == null) HideImmediate();
+    }
+
+    void SelectUpcoming()
+    {
+        RallyBrakeWarningTrigger next = null;
+        float nearest = float.PositiveInfinity;
+        foreach (var zone in zones)
         {
-            activeTrigger = null;
-            HideImmediate();
+            if (zone == null || !zone.isActiveAndEnabled) continue;
+            float distance = vehicleBody == null ? 0f : (zone.CurveEntry - vehicleBody.position).sqrMagnitude;
+            if (distance < nearest) { nearest = distance; next = zone; }
         }
+        activeTrigger = next;
     }
 
     void HideImmediate()
@@ -100,9 +109,11 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         appearanceTime = 0f;
     }
 
+    void OnDisable() { zones.Clear(); activeTrigger = displayedTrigger = null; HideImmediate(); }
+
     void BuildHud()
     {
-        GameObject canvasObject = new GameObject("Brake Warning Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        var canvasObject = new GameObject("Brake Warning Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
         canvasObject.transform.SetParent(transform, false);
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -111,37 +122,43 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = .5f;
-
-        GameObject panel = new GameObject("Brake Warning", typeof(RectTransform), typeof(CanvasGroup), typeof(Image), typeof(Outline));
+        var panel = new GameObject("Brake Warning", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
         panel.transform.SetParent(canvasObject.transform, false);
-        RectTransform rect = panel.GetComponent<RectTransform>();
-        warningRect = rect;
-        rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1f);
-        rect.pivot = new Vector2(.5f, .5f);
-        rect.anchoredPosition = new Vector2(0f, -200f);
-        rect.sizeDelta = new Vector2(620f, 190f);
-        Image background = panel.GetComponent<Image>();
-        background.color = new Color(.48f, .012f, .018f, .95f);
-        background.raycastTarget = false;
-        Outline border = panel.GetComponent<Outline>();
-        border.effectColor = new Color(1f, .86f, .06f, 1f);
-        border.effectDistance = new Vector2(4f, -4f);
-        border.useGraphicAlpha = false;
+        warningRect = panel.GetComponent<RectTransform>();
+        warningRect.anchorMin = warningRect.anchorMax = new Vector2(.5f, 1f);
+        warningRect.pivot = new Vector2(.5f, .5f);
+        warningRect.anchoredPosition = new Vector2(0f, -270f);
+        warningRect.sizeDelta = new Vector2(430f, 176f);
+        panel.GetComponent<Image>().color = new Color(.045f, .055f, .065f, .94f);
+        panel.GetComponent<Image>().raycastTarget = false;
         warningGroup = panel.GetComponent<CanvasGroup>();
+        warningGroup.blocksRaycasts = warningGroup.interactable = false;
 
-        GameObject label = new GameObject("Brake Label", typeof(RectTransform), typeof(TextMeshProUGUI));
-        label.transform.SetParent(panel.transform, false);
-        RectTransform labelRect = label.GetComponent<RectTransform>();
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = new Vector2(20f, 12f);
-        labelRect.offsetMax = new Vector2(-20f, -12f);
-        warningText = label.GetComponent<TextMeshProUGUI>();
-        warningText.alignment = TextAlignmentOptions.Center;
-        warningText.fontSize = 66f;
-        warningText.fontStyle = FontStyles.Bold;
-        warningText.color = new Color(1f, .9f, .12f, 1f);
-        warningText.raycastTarget = false;
-        warningText.textWrappingMode = TextWrappingModes.NoWrap;
+        var strip = MakeRect("Note accent", panel.transform, new Vector2(0f, 0f), new Vector2(.018f, 1f));
+        accent = strip.gameObject.AddComponent<Image>(); accent.raycastTarget = false;
+        var icon = MakeRect("Curve Arrow", panel.transform, new Vector2(.08f, .22f), new Vector2(.49f, .91f));
+        arrow = icon.gameObject.AddComponent<RallyPaceNoteArrow>(); arrow.raycastTarget = false;
+        warningText = Label("Corner Grade", panel.transform, new Vector2(.52f, .26f), new Vector2(.91f, .97f), 100f);
+        directionText = Label("Corner Direction", panel.transform, new Vector2(.06f, .04f), new Vector2(.94f, .25f), 25f);
+        directionText.color = new Color(.95f, .96f, .98f);
+    }
+
+    static RectTransform MakeRect(string name, Transform parent, Vector2 min, Vector2 max)
+    {
+        var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
+        rect.SetParent(parent, false); rect.anchorMin = min; rect.anchorMax = max;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+        return rect;
+    }
+
+    static TMP_Text Label(string name, Transform parent, Vector2 min, Vector2 max, float size)
+    {
+        var label = MakeRect(name, parent, min, max).gameObject.AddComponent<TextMeshProUGUI>();
+        label.font = Resources.Load<TMP_FontAsset>("MenuFonts/Oswald") ?? TMP_Settings.defaultFontAsset;
+        label.alignment = TextAlignmentOptions.Center; label.fontSize = size;
+        label.fontStyle = FontStyles.Bold; label.raycastTarget = false;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
+        label.enableAutoSizing = true; label.fontSizeMin = size * .7f; label.fontSizeMax = size;
+        return label;
     }
 }

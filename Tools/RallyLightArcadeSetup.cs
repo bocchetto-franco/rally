@@ -18,6 +18,12 @@ public static class RallyLightArcadeSetup
         return "Compilation requested";
     }
 
+    public static string VerifyInPlay()
+    {
+        RallyReplacementVehiclePlayTest.Run();
+        return "Started menu/model/circuit and split-screen driving checks; see Logs/replacement-cars-play.txt";
+    }
+
     // Reload only a clean, single open scene. This removes transient
     // ExecuteAlways prefab changes left by the editor before this task's save.
     public static string ReloadSavedScene()
