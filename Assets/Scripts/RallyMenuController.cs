@@ -22,7 +22,7 @@ public static class RallyGameSession
     public const string RaceScene = "Circuit_01";
     public const string ResultsScene = "RaceResults";
     public const string VehicleName = "Porsche 911 SC Rally";
-    public static readonly string[] VehicleDisplayNames = { "Porsche 911", "Mini Cooper", "Lancia Delta" };
+    public static readonly string[] VehicleDisplayNames = { "Porsche 911", "BMW M3 E30", "Audi Quattro S1" };
     public const string CircuitName = "Circuit 01";
     public static readonly string[] CircuitNames = { "Circuit 01", "Circuit 02", "Circuit 03" };
     public static readonly string[] CircuitScenes = { "Circuit_01", "Circuit_02", "Circuit_03" };
@@ -103,10 +103,10 @@ public static class RallyGameSession
     public static void RestoreSavedState()
     {
         LocalPlayerCount = Mathf.Clamp(PlayerPrefs.GetInt("Rally.LocalPlayers", 1), 1, 2);
-        SelectedVehicle = PlayerPrefs.GetString(VehicleKey, VehicleName);
+        SelectedVehicle = RallyPlayerVehicleSelection.MigrateSavedName(PlayerPrefs.GetString(VehicleKey, VehicleName));
         if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicle) < 0)
             SelectedVehicle = VehicleName;
-        SelectedVehicleTwo = PlayerPrefs.GetString(VehicleTwoKey, VehicleName);
+        SelectedVehicleTwo = RallyPlayerVehicleSelection.MigrateSavedName(PlayerPrefs.GetString(VehicleTwoKey, VehicleName));
         if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicleTwo) < 0)
             SelectedVehicleTwo = VehicleName;
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);

@@ -34,7 +34,10 @@ public static class RallyClassicMiniSetup
             var all = instance.GetComponentsInChildren<Transform>();
             var front = all.First(t => t.name == "wheel_FL");
             var rear = all.First(t => t.name == "wheel_BL");
-            Vector3 forward = (front.position - rear.position).normalized;
+            var frontRight = all.First(t => t.name == "wheel_FR");
+            var rearRight = all.First(t => t.name == "wheel_BR");
+            // Axle midpoints, not one side: front/rear track widths can differ.
+            Vector3 forward = ((front.position + frontRight.position) - (rear.position + rearRight.position)).normalized;
             instance.transform.rotation = Quaternion.FromToRotation(forward, Vector3.forward) * instance.transform.rotation;
 
             // Preserve source transforms under a neutral Unity root. Use wheel bounds, not
@@ -128,7 +131,7 @@ public static class RallyClassicMiniSetup
             RallyGameSession.SelectVehicle(1);
             RallyGameSession.SelectCurrentOptions();
             RallyGameSession.RestoreSavedState();
-            if (RallyGameSession.SelectedVehicle != RallyPlayerVehicleSelection.MiniName) throw new Exception("Selection reset to Porsche.");
+            if (RallyGameSession.SelectedVehicle != RallyPlayerVehicleSelection.BmwName) throw new Exception("Selection reset to Porsche.");
             foreach (var sceneName in RallyGameSession.CircuitScenes)
             {
                 EditorSceneManager.OpenScene("Assets/Scenes/" + sceneName + ".unity");

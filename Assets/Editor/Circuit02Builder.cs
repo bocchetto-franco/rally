@@ -96,7 +96,6 @@ public static class Circuit02Builder
         PlanCrowds(); terrain=BuildTerrain(environment.transform,detailPrototypes);
         BuildWalls(environment.transform);
         BuildWater(environment.transform);
-        BuildHay(environment.transform);
         BuildCrowds(environment.transform);
         BuildVegetation(environment.transform);
         BuildLighting(environment.transform);
@@ -305,17 +304,6 @@ public static class Circuit02Builder
             foreach(var col in mesh.GetComponents<Collider>())Object.DestroyImmediate(col);
         }
     }
-    static void BuildHay(Transform parent)
-    {
-        var root=Root("Circuit 02 - Hay Bales (visual only)",parent);int id=0;
-        foreach(var bend in sections.Where(s=>Mathf.Abs(s.curvature*s.length*Mathf.Rad2Deg)>=89))for(int i=0;i<3;i++)
-        {
-            var s=At(bend.start+bend.length*(.35f+i*.15f));var p=s.p-Mathf.Sign(bend.curvature)*s.right*(s.width/2+3);
-            var mesh=ShapeGenerator.GenerateCylinder(PivotLocation.Center,12,.7f,1.3f,0);mesh.name=$"HayBale_{++id:00}";mesh.transform.SetParent(root.transform);
-            p.y=Ground(p)+.65f;mesh.transform.position=p;mesh.GetComponent<Renderer>().sharedMaterial=Asset<Material>("Assets/Scenes/Circuit_01_HayPlaceholder.mat");
-            foreach(var c in mesh.GetComponents<Collider>())Object.DestroyImmediate(c);
-        }
-    }
     static float Ground(Vector3 p)=>terrain.SampleHeight(p)+terrain.transform.position.y;
     static Bounds BoundsOf(GameObject go){var rs=go.GetComponentsInChildren<Renderer>();var b=rs[0].bounds;foreach(var r in rs)b.Encapsulate(r.bounds);return b;}
     static void BuildCrowds(Transform parent)
@@ -434,7 +422,6 @@ public static class Circuit02Builder
         }
         foreach(var b in basins)if(!col.Raycast(new Ray(b.sample.p+Vector3.up*5,Vector3.down),out var hit,10)||b.sample.p.y-hit.point.y<.23f)throw new Exception("Missing basin depression.");
         if(Object.FindObjectsByType<RallyCheckpointManager>().Length!=0||Object.FindObjectsByType<RallyCheckpointTrigger>().Length!=0||Object.FindObjectsByType<RallyPuddleSlowZone>().Length!=0||Object.FindObjectsByType<RallyRaceFlow>().Length!=0||Object.FindObjectsByType<RallyRaceHud>().Length!=0)throw new Exception("Race logic unexpectedly retained.");
-        if(GameObject.Find("Circuit 02 - Hay Bales (visual only)").GetComponentsInChildren<Rigidbody>().Length!=0)throw new Exception("Hay physics unexpectedly present.");
         Debug.Log("Circuit02 road/terrain fit: maximum gap "+maxGap);
     }
     // Only our disposable generation checkout may reset incomplete generated output.

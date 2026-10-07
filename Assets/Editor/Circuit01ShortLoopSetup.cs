@@ -53,7 +53,7 @@ public static class Circuit01ShortLoopSetup
         Circuit01LoopSetup.RebuildCheckpoints();Circuit01LoopSetup.RebuildBoundaries();
         int removedPuddles=0,removedBales=0;
         foreach(var p in Object.FindObjectsByType<RallyPuddleSlowZone>())if(Circuit01VegetationExpansion.Clearance(p.transform.position,v)>2){Object.DestroyImmediate(p.gameObject);removedPuddles++;}
-        var hay=GameObject.Find("Loop Hay Bales");foreach(Transform child in hay.transform.Cast<Transform>().ToArray())if(Circuit01VegetationExpansion.Clearance(child.position,v)>6){Object.DestroyImmediate(child.gameObject);removedBales++;}
+        var hay=GameObject.Find("Loop Hay Bales");if(hay!=null)foreach(Transform child in hay.transform.Cast<Transform>().ToArray())if(Circuit01VegetationExpansion.Clearance(child.position,v)>6){Object.DestroyImmediate(child.gameObject);removedBales++;}
         FitTerrain(terrain,v);
         int cleared=ClearPlants(terrain,v);
         var crowd=GameObject.Find("Rally Spectators - Outside Barriers");
@@ -99,7 +99,7 @@ public static class Circuit01ShortLoopSetup
             if(i==0&&!manager.IsRunning)throw new Exception("Timer did not start.");
         }
         if(!manager.IsFinished||manager.IsRunning)throw new Exception("Finish did not stop timer.");manager.ResetTimer();
-        int bales=GameObject.Find("Loop Hay Bales").transform.childCount;int puddles=Object.FindObjectsByType<RallyPuddleSlowZone>().Length;
+        var hayRoot=GameObject.Find("Loop Hay Bales");int bales=hayRoot!=null?hayRoot.transform.childCount:0;int puddles=Object.FindObjectsByType<RallyPuddleSlowZone>().Length;
         File.WriteAllText("Logs/short-loop-final-verification.txt",$"Closed loop: {Vector3.Distance(start,end):F6}m endpoint gap. {tested} terrain samples passed; max terrain/road gap {maxGap:F3}m. Trigger callback test: rejected finish before start; all {gates.Length} gates accepted car in order, start activated timer, finish stopped timer; reset after test. Retained {puddles} puddle, {bales} dynamic bales. Vehicle active at {car.transform.position}.\n"+DateTime.Now.ToString("O"));
     }
     static void Planar(ProBuilderMesh mesh,float tile){foreach(var f in mesh.faces)f.manualUV=true;mesh.textures=mesh.positions.Select(p=>new Vector2(p.x/tile,p.z/tile)).ToArray();mesh.ToMesh();mesh.Refresh();mesh.GetComponent<MeshCollider>().sharedMesh=mesh.GetComponent<MeshFilter>().sharedMesh;}

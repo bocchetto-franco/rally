@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Verify every native physics field and dynamic tuning field is unchanged by selection.</summary>
+/// <summary>Preserve tuning; model-specific wheel positions/radii are explicitly allowed.</summary>
 public static class RallyVehiclePhysicsParityTest
 {
     [MenuItem("Tools/Rally/Verify Identical Player Physics")]
@@ -43,12 +43,12 @@ public static class RallyVehiclePhysicsParityTest
                 {
                     Vector3 expected = wheels[i].transform.TransformPoint(wheels[i].center);
                     if (Vector3.Distance(visual.wheels[i].position, expected) > .0001f)
-                        throw new Exception("Visual wheel is not fitted to Porsche axle.");
+                        throw new Exception("Visual wheel is not aligned with its collider axle.");
                     float radius = visual.radii[i] * visual.wheels[i].localScale.x;
                     if (Mathf.Abs(radius - wheels[i].radius) > .0001f) throw new Exception("Visual wheel radius differs.");
                 }
-                Debug.Log("PLAYER_PHYSICS_IDENTICAL " + scene + " / " + choice +
-                    ": Rigidbody, inertia, all colliders/transforms, controller parameters, dynamics and bots unchanged.");
+                Debug.Log("PLAYER_TUNING_PRESERVED " + scene + " / " + choice +
+                    ": Rigidbody, inertia, body collision, controller parameters, dynamics and bots unchanged; wheel positions/radii fitted to model.");
             }
         }
         finally
@@ -58,7 +58,7 @@ public static class RallyVehiclePhysicsParityTest
         }
     }
 
-    static string Snapshot(JrsVehicleController car, RallyVehicleDynamics dynamics, Rigidbody body, Collider[] colliders)
+    public static string Snapshot(JrsVehicleController car, RallyVehicleDynamics dynamics, Rigidbody body, Collider[] colliders)
     {
         var serializedController = new SerializedObject(car);
         var iterator = serializedController.GetIterator();
@@ -75,6 +75,8 @@ public static class RallyVehiclePhysicsParityTest
         }
         return EditorJsonUtility.ToJson(body) + body.centerOfMass.ToString("F8") + body.inertiaTensor.ToString("F8") +
             body.inertiaTensorRotation.ToString("F8") + tuning + EditorJsonUtility.ToJson(dynamics) +
-            string.Join("\n", colliders.Select(c => EditorJsonUtility.ToJson(c) + c.transform.localToWorldMatrix.ToString("F8")));
+            string.Join("\n", colliders.Select(c => c is WheelCollider ?
+                System.Text.RegularExpressions.Regex.Replace(EditorJsonUtility.ToJson(c), "\"m_Radius\"\\s*:\\s*[^,}]+", "\"m_Radius\":0") :
+                EditorJsonUtility.ToJson(c) + c.transform.localToWorldMatrix.ToString("F8")));
     }
 }

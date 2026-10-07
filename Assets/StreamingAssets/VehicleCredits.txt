@@ -1,0 +1,25 @@
+Vehicle artwork attribution
+
+BMW M3 E30 by Martin Trafas (TinoD2), Creative Commons Attribution 4.0.
+https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422
+https://creativecommons.org/licenses/by/4.0/
+Modified: studio removed, front wheels straightened, wheel assemblies prepared,
+uniform scale set to 4.30 m, FBX export and Unity URP material conversion.
+
+Audi Quattro S1 by TonyWony, Creative Commons Attribution 4.0.
+https://sketchfab.com/3d-models/audi-quattro-s1-402697365eaa41a68a543b71d0e0bfa8
+https://creativecommons.org/licenses/by/4.0/
+Modified: Collada-to-FBX conversion, original wheels separated/named, uniform
+scale set to 4.25 m, and Unity URP material conversion.
+
+Archived Lancia Delta HF Integrale Evo 2 by TARANTULA (begemot.988888), CC BY 4.0.
+https://sketchfab.com/3d-models/free-lancia-delta-hf-integrale-evo-2-85614131e0dc4613a948472aaa935fc7
+https://creativecommons.org/licenses/by/4.0/
+Modified: wheel preparation, scale and Unity URP material conversion.
+
+Archived Low Poly Mini Cooper by Gilang Romadhan, CC BY 3.0.
+https://poly.pizza/m/2whNujq5rNd
+https://creativecommons.org/licenses/by/3.0/
+Modified: display base removed, wheels separated, FBX/Unity conversion.
+
+No endorsement by these artists or the vehicle manufacturers is implied.

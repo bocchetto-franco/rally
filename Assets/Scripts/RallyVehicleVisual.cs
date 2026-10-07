@@ -7,4 +7,6 @@ public sealed class RallyVehicleVisual : MonoBehaviour
     public Transform[] wheels;
     public float[] radii;
     public Bounds bodyBounds;
+    [Tooltip("Model authored at real-world scale: keep its proportions and fit only wheel collider geometry.")]
+    public bool useAuthoredScale;
 }

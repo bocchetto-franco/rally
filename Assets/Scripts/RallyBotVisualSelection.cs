@@ -37,7 +37,7 @@ public static class RallyBotVisualSelection
         for (int i = 0; i < bots.Count; i++)
         {
             // Shuffle without replacement: with the current three bots, a race
-            // always has one Porsche, one Mini and one Lancia, in random slots.
+            // always has each current selectable model once, in random slots.
             if (i % models.Length == 0)
                 for (int j = models.Length - 1; j > 0; j--)
                 {

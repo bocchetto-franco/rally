@@ -280,18 +280,17 @@ public static class Circuit01LoopSetup
             AssetDatabase.SaveAssets();
             if (!EditorSceneManager.SaveScene(scene))
                 throw new InvalidOperationException("Interactive props could not be saved.");
-            Debug.Log("CIRCUIT_01_INTERACTIVE_PROPS_OK: 4 puddle brake triggers at 3.5m/s^2 and dynamic hay bales saved.");
+            Debug.Log("CIRCUIT_01_INTERACTIVE_PROPS_OK: puddle brake triggers saved; hay bales removed by project policy.");
         }
         finally { busy = false; }
     }
     static void CreateProps()
     {
         Remove("Loop Puddles"); Remove("Loop Hay Bales"); Remove(InteractivePropsMarker);
-        var waterRoot=new GameObject("Loop Puddles");var hayRoot=new GameObject("Loop Hay Bales");
+        var waterRoot=new GameObject("Loop Puddles");
         var water=Material("Circuit_01_WaterPlaceholder",new Color(.04f,.42f,.8f,.65f));
         water.SetFloat("_Surface",1); water.SetFloat("_SrcBlend",5); water.SetFloat("_DstBlend",10); water.SetFloat("_ZWrite",0);
         water.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");water.SetOverrideTag("RenderType","Transparent");water.renderQueue=3000;
-        var hay=Material("Circuit_01_HayPlaceholder",new Color(.66f,.46f,.12f));
         float[] puddleDistances={100,originalLength+110,total*.66f,total*.88f};
         for(int i=0;i<puddleDistances.Length;i++)
         {
@@ -305,20 +304,6 @@ public static class Circuit01LoopSetup
             var trigger=mesh.gameObject.AddComponent<BoxCollider>();trigger.isTrigger=true;
             trigger.center=new Vector3(0,.45f,0);trigger.size=new Vector3(w,.9f,length);
             mesh.gameObject.AddComponent<RallyPuddleSlowZone>();
-        }
-        int id=0;
-        foreach(var bend in sections.Where(s=>s.curvature!=0 && Mathf.Abs(s.curvature*s.length*Mathf.Rad2Deg)>=90).Take(8))
-        for(int j=0;j<3;j++)
-        {
-            float d=bend.start+bend.length*(.4f+.1f*j);Sample(d,out var p,out var r,out float w);
-            var mesh=ShapeGenerator.GenerateCylinder(PivotLocation.Center,12,.7f,1.3f,0);
-            mesh.name=$"HayBale_{++id:00}_outside_{d:F0}m";mesh.transform.SetParent(hayRoot.transform);
-            mesh.transform.position=p-Mathf.Sign(bend.curvature)*r*(w/2+3)+Vector3.up*.65f;
-            mesh.GetComponent<MeshRenderer>().sharedMaterial=hay;
-            foreach(var col in mesh.GetComponents<Collider>()) UnityEngine.Object.DestroyImmediate(col);
-            var capsule=mesh.gameObject.AddComponent<CapsuleCollider>();capsule.direction=1;capsule.radius=.7f;capsule.height=1.3f;
-            var body=mesh.gameObject.AddComponent<Rigidbody>();body.mass=22;body.linearDamping=.15f;body.angularDamping=.25f;
-            body.interpolation=RigidbodyInterpolation.Interpolate;body.collisionDetectionMode=CollisionDetectionMode.ContinuousDynamic;body.maxAngularVelocity=30;
         }
         new GameObject(InteractivePropsMarker);
         EditorUtility.SetDirty(water);

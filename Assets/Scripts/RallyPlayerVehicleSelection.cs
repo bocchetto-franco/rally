@@ -9,11 +9,11 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class RallyPlayerVehicleSelection
 {
-    public const string MiniName = "Mini Classic Rally";
-    public const string MiniResource = "Vehicles/ClassicMini";
-    public const string LanciaName = "Lancia Delta HF Integrale";
-    public const string LanciaResource = "Vehicles/LanciaDelta";
-    public static readonly string[] Names = { RallyGameSession.VehicleName, MiniName, LanciaName };
+    public const string BmwName = "BMW M3 E30";
+    public const string BmwResource = "Vehicles/BmwE30";
+    public const string AudiName = "Audi Quattro S1";
+    public const string AudiResource = "Vehicles/AudiQuattro";
+    public static readonly string[] Names = { RallyGameSession.VehicleName, BmwName, AudiName };
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Install()
@@ -35,19 +35,19 @@ public static class RallyPlayerVehicleSelection
     }
 
     public static RallyVehicleVisual ApplyMini(JrsVehicleController player)
-        => ApplyVisual(player, MiniName);
+        => ApplyVisual(player, BmwName); // Compatibility with the original editor validation entry.
 
     public static RallyVehicleVisual ApplyVisual(JrsVehicleController player, string vehicleName)
     {
-        if (player.GetComponentInParent<RallyBotController>() != null)
+        if (player.GetComponentInParent<RallyBotController>(true) != null)
             throw new InvalidOperationException("Player selection must never modify a bot.");
         return ApplyVisualOnly(player, vehicleName);
     }
 
-    /// <summary>Changes only a bot's meshes and visual wheel pivots, never its grip profile.</summary>
+    /// <summary>Fits the selected model and wheel geometry, never the bot's grip profile.</summary>
     public static RallyVehicleVisual ApplyBotVisual(JrsVehicleController bot, string vehicleName)
     {
-        if (bot.GetComponentInParent<RallyBotController>() == null)
+        if (bot.GetComponentInParent<RallyBotController>(true) == null)
             throw new InvalidOperationException("Bot visuals require a bot vehicle.");
         if (vehicleName == RallyGameSession.VehicleName)
             return null; // The shared Bot_Car prefab already has the Porsche model.
@@ -58,7 +58,7 @@ public static class RallyPlayerVehicleSelection
     {
         var existing = player.GetComponentInChildren<RallyVehicleVisual>();
         if (existing != null) return existing;
-        string resource = vehicleName == MiniName ? MiniResource : vehicleName == LanciaName ? LanciaResource : null;
+        string resource = vehicleName == BmwName ? BmwResource : vehicleName == AudiName ? AudiResource : null;
         if (resource == null) throw new ArgumentOutOfRangeException(nameof(vehicleName));
         var prefab = Resources.Load<RallyVehicleVisual>(resource);
         if (prefab == null || prefab.wheels.Length != 4 || prefab.radii.Length != 4)
@@ -73,9 +73,14 @@ public static class RallyPlayerVehicleSelection
         visual.transform.localRotation = Quaternion.identity;
         visual.transform.localPosition = Vector3.zero;
 
-        // A shared set of friction numbers is NOT enough: wheelbase, track, radius,
-        // body collision shape and inertia also affect handling. Never refit the
-        // physics to the selected mesh. Fit the VISUAL to the proven Porsche rig.
+        if (visual.useAuthoredScale)
+        {
+            FitAuthoredWheels(root, visual, colliders);
+        }
+        else
+        {
+        // Legacy assets remain supported until replaced. New models must preserve
+        // authored uniform scale instead of being stretched to the Porsche axles.
         Vector3[] source = visual.wheels.Select(w => w.localPosition).ToArray();
         Vector3[] target = colliders.Select(w => root.InverseTransformPoint(w.transform.TransformPoint(w.center))).ToArray();
         Vector3 sourceCenter = source.Aggregate(Vector3.zero, (a, b) => a + b) * .25f;
@@ -99,6 +104,7 @@ public static class RallyPlayerVehicleSelection
             visual.wheels[i].localPosition = target[i];
             visual.wheels[i].localScale = Vector3.one * (colliders[i].radius / visual.radii[i]);
         }
+        }
 
         foreach (var binder in player.GetComponentsInChildren<PorscheVehicleBinder>(true)) binder.enabled = false;
         foreach (var renderer in player.GetComponentsInChildren<MeshRenderer>(true))
@@ -110,7 +116,36 @@ public static class RallyPlayerVehicleSelection
         player.rearLeftWheelTransform = visual.wheels[2];
         player.rearRightWheelTransform = visual.wheels[3];
 
-        // Do not touch ANY physics parameter, transform, collision or inertia state.
+        // Tuning, body collision, mass and inertia stay on the original rig.
         return visual;
     }
+
+    static void FitAuthoredWheels(Transform root, RallyVehicleVisual visual, WheelCollider[] wheels)
+    {
+        Vector3 oldCenter = Vector3.zero, newCenter = Vector3.zero;
+        float oldGround = 0f, newGround = 0f;
+        for (int i = 0; i < 4; i++)
+        {
+            Vector3 old = root.InverseTransformPoint(wheels[i].transform.TransformPoint(wheels[i].center));
+            Vector3 next = root.InverseTransformPoint(visual.wheels[i].position);
+            oldCenter += old * .25f;
+            newCenter += next * .25f;
+            oldGround += (old.y - wheels[i].radius) * .25f;
+            newGround += (next.y - visual.radii[i]) * .25f;
+        }
+        // Match the original rig's ground clearance and axle midpoint, without
+        // changing the car's scale or moving the race root / checkpoint state.
+        Vector3 offset = oldCenter - newCenter;
+        offset.y = oldGround - newGround;
+        visual.transform.localPosition += offset;
+        for (int i = 0; i < 4; i++)
+        {
+            WheelCollider wheel = wheels[i];
+            wheel.transform.position = visual.wheels[i].position - wheel.transform.TransformVector(wheel.center);
+            wheel.radius = visual.radii[i];
+        }
+    }
+
+    public static string MigrateSavedName(string name)
+        => name == "Mini Classic Rally" ? BmwName : name == "Lancia Delta HF Integrale" ? AudiName : name;
 }
