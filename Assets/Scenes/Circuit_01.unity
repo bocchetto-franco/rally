@@ -61040,10 +61040,10 @@ MonoBehaviour:
   rearLeft: {fileID: 1180953520}
   rearRight: {fileID: 965115943}
   botGripProfile: {fileID: 0}
-  vehicleMass: 1450
-  vehicleAngularDamping: 3
+  vehicleMass: 1160
+  vehicleAngularDamping: 2.6
   maximumSteerAngle: 40
-  steeringResponse: 14
+  steeringResponse: 22
   motorForce: 480
   firstGearRatio: 6
   secondGearRatio: 3.75
@@ -61070,8 +61070,8 @@ MonoBehaviour:
   rearSideAsymptoteSlip: 0.72
   rearSideAsymptoteValue: 1.25
   rearSideStiffness: 1.25
-  lateralVelocityCorrection: 3
-  maximumLateralCorrectionAcceleration: 8
+  lateralVelocityCorrection: 5
+  maximumLateralCorrectionAcceleration: 12
   rearGripIncreaseStartKph: 90
   rearGripIncreaseFullKph: 150
   rearGripMultiplierAtFullSpeed: 1.4
@@ -61085,11 +61085,14 @@ MonoBehaviour:
   absMinimumTorqueMultiplier: 0.35
   rearHandbrakeTorque: 3500
   handbrakeRecoveryTorqueMultiplier: 0.55
-  automaticBrakeStartSteering: 0.25
-  automaticBrakeFreeSpeedKph: 120
-  automaticBrakeFullSteerSpeedKph: 48
-  automaticBrakeSpeedRangeKph: 25
-  automaticBrakeMaximumFraction: 0.65
+  automaticBrakeStartSteering: 0.15
+  automaticBrakeFreeSpeedKph: 125
+  automaticBrakeFullSteerSpeedKph: 60
+  automaticBrakeSpeedRangeKph: 20
+  automaticBrakeMaximumFraction: 0.55
+  automaticBrakeEngageRate: 4
+  automaticBrakeReleaseRate: 5
+  automaticBrakeThrottleReduction: 0.95
   minimumDownforceSpeedKph: 65
   downforceCoefficient: 3.2
   maximumDownforce: 4500
@@ -86378,9 +86381,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1141717633}
   serializedVersion: 5
-  m_Mass: 1450
+  m_Mass: 1160
   m_LinearDamping: 0
-  m_AngularDamping: 3
+  m_AngularDamping: 2.6
   m_CenterOfMass: {x: 0, y: -0.45, z: -0.1}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -180385,7 +180388,7 @@ MonoBehaviour:
   sirenButton: {fileID: 1420738667}
   signalLightsButton: {fileID: 1420429414}
   extraLightsButton: {fileID: 39046554}
-  steerSpeed: 6
+  steerSpeed: 22
   cameras:
   - {fileID: 901743558}
 --- !u!4 &1701726375

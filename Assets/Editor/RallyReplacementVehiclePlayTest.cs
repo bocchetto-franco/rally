@@ -87,7 +87,7 @@ public static class RallyReplacementVehiclePlayTest
  {
   var v=c.GetComponentInChildren<RallyVehicleVisual>();var rb=c.GetComponent<Rigidbody>();
   if(v==null||v.name!=name+" Visual"||!v.useAuthoredScale)throw new Exception("Wrong visual: "+name);
-  if(!c.enabled||Mathf.Abs(rb.mass-1450)>.01f||Mathf.Abs(rb.angularDamping-3)>.01f)throw new Exception("Player tuning changed");
+  if(!c.enabled||Mathf.Abs(rb.mass-1160)>.01f||Mathf.Abs(rb.angularDamping-2.6f)>.01f)throw new Exception("Player tuning changed");
  }
  static void Finish(Exception error)
  {

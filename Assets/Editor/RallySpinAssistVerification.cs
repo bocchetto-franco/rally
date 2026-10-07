@@ -46,7 +46,7 @@ public static class RallySpinAssistVerification
 
         var serialized = new SerializedObject(dynamics);
         AssertFloat(serialized, "maximumSteerAngle", 40f);
-        AssertFloat(serialized, "steeringResponse", 14f);
+        AssertFloat(serialized, "steeringResponse", 22f);
         AssertFloat(serialized, "spinAssistYawRateThreshold", 1.25f);
         AssertFloat(serialized, "spinAssistCorrectionStrength", 7f);
         AssertFloat(serialized, "rearHandbrakeTorque", 3500f);
@@ -62,8 +62,8 @@ public static class RallySpinAssistVerification
         AssertFloat(serialized, "rearSideExtremumValue", 1.55f);
         AssertFloat(serialized, "rearSideAsymptoteValue", 1.25f);
         AssertFloat(serialized, "rearSideAsymptoteSlip", 0.72f);
-        AssertFloat(serialized, "lateralVelocityCorrection", 3f);
-        AssertFloat(serialized, "automaticBrakeMaximumFraction", 0.65f);
+        AssertFloat(serialized, "lateralVelocityCorrection", 5f);
+        AssertFloat(serialized, "automaticBrakeMaximumFraction", 0.55f);
 
         MethodInfo calculate = typeof(RallyVehicleDynamics).GetMethod(
             "CalculateSpinAssistAngularAcceleration",
@@ -107,7 +107,7 @@ public static class RallySpinAssistVerification
         if (!Mathf.Approximately(CornerBrake(0f, 160f), 0f) ||
             !Mathf.Approximately(CornerBrake(1f, 40f), 0f) ||
             !(CornerBrake(0.5f, 130f) > 0f && CornerBrake(0.5f, 130f) < CornerBrake(1f, 130f)) ||
-            !Mathf.Approximately(CornerBrake(1f, 130f), 0.65f))
+            !Mathf.Approximately(CornerBrake(1f, 130f), 0.55f))
             throw new InvalidOperationException("Automatic braking is not proportional to steering and excessive speed.");
 
         File.WriteAllText(
