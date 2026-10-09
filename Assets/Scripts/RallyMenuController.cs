@@ -374,7 +374,7 @@ public sealed class RallyMenuController : MonoBehaviour
         selectedCircuitTitle = Text(circuitCard, "Selected Circuit", "", 36f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 151f), new Vector2(580f, 46f), Color.white);
         selectedTrackPreview = Preview(circuitCard, "Selected Track Preview", new Vector2(0f, 58f), new Vector2(580f, 126f));
         selectedCircuitDetails = Text(circuitCard, "Circuit Details", "", 17f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, -26f), new Vector2(580f, 28f), Muted);
-        string[] options = { "CIRCUIT_01  ·  RALLYCROSS", "CIRCUIT_02  ·  DESIERTO", "CIRCUIT_03  ·  BOSQUE" };
+        string[] options = { "CIRCUIT_01  ·  RALLYCROSS", "CIRCUIT_02  ·  SIERRAS", "CIRCUIT_03  ·  BOSQUE" };
         circuitButtons = new Button[options.Length];
         for (int i = 0; i < options.Length; i++)
         {
@@ -635,7 +635,7 @@ public sealed class RallyMenuController : MonoBehaviour
     {
         int selected = Array.IndexOf(RallyGameSession.CircuitNames, RallyGameSession.SelectedCircuit);
         selectedCircuitTitle.text = RallyGameSession.SelectedRaceScene.ToUpperInvariant();
-        selectedCircuitDetails.text = selected == 2 ? "BOSQUE / MONTAÑA · TIERRA HÚMEDA" : "DESIERTO / RALLYCROSS · TIERRA Y RIPIO";
+        selectedCircuitDetails.text = selected == 2 ? "BOSQUE / MONTAÑA · TIERRA HÚMEDA" : selected == 1 ? "MINA CLAVERO / SIERRAS · TIERRA Y ROCA" : "DESIERTO / RALLYCROSS · TIERRA Y RIPIO";
         SetPreview(selectedTrackPreview, Mathf.Max(0, selected));
         backdrop.Show(RallyGameSession.SelectedRaceScene);
         for (int i = 0; i < circuitButtons.Length; i++)
