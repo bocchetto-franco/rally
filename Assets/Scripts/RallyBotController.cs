@@ -64,19 +64,20 @@ public sealed class RallyBotController : MonoBehaviour
     {
         // Retain each bot's serialized speed difference (110/118/126 km/h on the
         // circuits) while applying one selection consistently to every bot.
+        // Reduce the previous difficulty values by 15% / 10% / 8%, respectively.
         switch (RallyGameSession.SelectedBotDifficulty)
         {
             case RallyBotDifficulty.Easy:
-                raceMaxSpeedKph = maxSpeedKph * 0.85f;
-                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness + 0.05f);
+                raceMaxSpeedKph = maxSpeedKph * 0.85f * 0.85f;
+                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness + 0.05f) * 0.85f;
                 break;
             case RallyBotDifficulty.Hard:
-                raceMaxSpeedKph = maxSpeedKph * 1.15f;
-                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness - 0.12f);
+                raceMaxSpeedKph = maxSpeedKph * 1.15f * 0.92f;
+                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness - 0.12f) * 0.92f;
                 break;
             default:
-                raceMaxSpeedKph = maxSpeedKph;
-                raceCornerBrakingAggressiveness = cornerBrakingAggressiveness;
+                raceMaxSpeedKph = maxSpeedKph * 0.90f;
+                raceCornerBrakingAggressiveness = cornerBrakingAggressiveness * 0.90f;
                 break;
         }
     }

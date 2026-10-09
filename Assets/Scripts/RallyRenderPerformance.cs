@@ -76,7 +76,8 @@ public sealed class RallyRenderPerformance : MonoBehaviour
         }
         if (pipeline != null && cameras > 0)
         {
-            QualitySettings.lodBias = cameras > 1 ? .35f : .5f;
+            // Keep a user's lower detail preset instead of overwriting it with Alta's budget.
+            QualitySettings.lodBias = Mathf.Min(previousLodBias, cameras > 1 ? .35f : .5f);
             pipeline.renderScale = cameras > 1 ? .55f : .7f;
             pipeline.shadowDistance = cameras > 1 ? 20f : 30f;
         }

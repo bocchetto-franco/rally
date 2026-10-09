@@ -160,11 +160,13 @@ public enum RallyMenuScreen
 {
     MainMenu,
     Selection,
-    Results
+    Results,
+    Controls,
+    Options
 }
 
 [DisallowMultipleComponent]
-public sealed class RallyMenuController : MonoBehaviour
+public sealed partial class RallyMenuController : MonoBehaviour
 {
     static readonly Color Background = new Color(.035f, .025f, .019f, .66f);
     static readonly Color Panel = new Color(.07f, .058f, .047f, .94f);
@@ -192,6 +194,7 @@ public sealed class RallyMenuController : MonoBehaviour
     GameObject mainMenuHint;
     RallyMenuNavigation menuNavigation;
     bool waitingForStartInput;
+    bool mainMenuRevealed;
     GameObject frontendCanvas;
     readonly bool[] localReady = new bool[2];
     Button[][] localVehicleButtons;
@@ -235,11 +238,19 @@ public sealed class RallyMenuController : MonoBehaviour
             Color color = introPrompt.color;
             color.a = Mathf.Lerp(0.35f, 1f, (Mathf.Sin(Time.unscaledTime * 3.5f) + 1f) * 0.5f);
             introPrompt.color = color;
-            if (Input.anyKeyDown || GamepadButtonPressed()) RevealMainMenu();
+            if (Input.anyKeyDown || (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame) || GamepadButtonPressed()) RevealMainMenu();
             return;
         }
-        if (Input.GetKeyDown(KeyCode.Escape) && screen != RallyMenuScreen.MainMenu)
-            SceneManager.LoadScene(screen == RallyMenuScreen.Selection ? RallyGameSession.MainMenuScene : RallyGameSession.SelectionScene);
+        bool back = Input.GetKeyDown(KeyCode.Escape) ||
+            (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) ||
+            (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame);
+        if (back && screen != RallyMenuScreen.MainMenu)
+        {
+            if (screen == RallyMenuScreen.Controls || screen == RallyMenuScreen.Options)
+                OpenFrontendPage(RallyMenuScreen.MainMenu);
+            else
+                SceneManager.LoadScene(screen == RallyMenuScreen.Selection ? RallyGameSession.MainMenuScene : RallyGameSession.SelectionScene);
+        }
     }
 
     static bool GamepadButtonPressed()
@@ -253,6 +264,7 @@ public sealed class RallyMenuController : MonoBehaviour
     void RevealMainMenu()
     {
         waitingForStartInput = false;
+        mainMenuRevealed = true;
         introCard.SetActive(false);
         mainMenuCard.SetActive(true);
         mainMenuHint.SetActive(true);
@@ -278,6 +290,8 @@ public sealed class RallyMenuController : MonoBehaviour
         localNavigations = null;
         difficultyButtons = null;
         vehicleButtons = null;
+        optionControls = null;
+        waitingForStartInput = false;
         localReady[0] = localReady[1] = false;
         EnsureEventSystem();
 
@@ -311,6 +325,12 @@ public sealed class RallyMenuController : MonoBehaviour
             case RallyMenuScreen.Results:
                 BuildResults(background);
                 break;
+            case RallyMenuScreen.Controls:
+                BuildControls(background);
+                break;
+            case RallyMenuScreen.Options:
+                BuildOptions(background);
+                break;
         }
 
         if (screen == RallyMenuScreen.Selection && RallyGameSession.LocalPlayerCount == 2) return;
@@ -318,10 +338,11 @@ public sealed class RallyMenuController : MonoBehaviour
         // The buttons are created in reading order: tracks, difficulties, then actions.
         // D-Pad up/down (and left/right) can therefore reach every option without a mouse.
         menuNavigation = canvasObject.AddComponent<RallyMenuNavigation>();
-        menuNavigation.Configure(canvasObject.GetComponentsInChildren<Button>(true));
+        if (optionControls != null) menuNavigation.ConfigureControls(optionControls);
+        else menuNavigation.Configure(canvasObject.GetComponentsInChildren<Button>(true));
         menuNavigation.SetFocusColor(new Color(1f, .78f, .32f, 1f));
         menuNavigation.FocusChanged += PreviewFocusedVehicle;
-        if (screen == RallyMenuScreen.MainMenu) menuNavigation.enabled = false;
+        if (waitingForStartInput) menuNavigation.enabled = false;
     }
 
     void BuildMainMenu(Transform root)
@@ -331,19 +352,22 @@ public sealed class RallyMenuController : MonoBehaviour
         Text(root, "Subtitle", "Tres clásicos. Tres pistas. Todo por recorrer.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-390f, -25f), new Vector2(900f, 60f), Muted);
         PanelRect(root, "Title Accent", Accent, new Vector2(-862f, 94f), new Vector2(12f, 250f));
 
-        RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 440f));
+        RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 640f));
         mainMenuCard = card.gameObject;
-        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 150f), new Vector2(460f, 36f), Accent);
-        Text(card, "Circuit", RallyGameSession.SelectedCircuit.Replace(' ', '_').ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 87f), new Vector2(460f, 60f), Color.white);
-        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicleDisplayName.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 5f), new Vector2(460f, 80f), Muted);
-        Button(card, "Play Button", "JUGAR", new Vector2(0f, -125f), new Vector2(470f, 86f), StartSelection, true);
+        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 250f), new Vector2(460f, 36f), Accent);
+        Text(card, "Circuit", RallyGameSession.SelectedCircuit.Replace(' ', '_').ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 187f), new Vector2(460f, 60f), Color.white);
+        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicleDisplayName.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 105f), new Vector2(460f, 80f), Muted);
+        Button(card, "Play Button", "JUGAR", new Vector2(0f, -25f), new Vector2(470f, 86f), StartSelection, true);
+        Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -130f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
+        Button(card, "Options Button", "OPCIONES", new Vector2(0f, -225f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);
         mainMenuHint = Text(root, "Hint", "CRUZ / ENTER: seleccionar    D-PAD: navegar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-355f, -475f), new Vector2(970f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.85f)).gameObject;
         introCard = PanelRect(root, "Continue Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 280f)).gameObject;
         Text(introCard.transform, "Continue Label", "PRESIONÁ CUALQUIER BOTÓN\nPARA CONTINUAR", 32f, FontStyles.Bold, TextAlignmentOptions.Center, Vector2.zero, new Vector2(520f, 120f), Accent);
         introPrompt = introCard.GetComponentInChildren<TextMeshProUGUI>();
-        mainMenuCard.SetActive(false);
-        mainMenuHint.SetActive(false);
-        waitingForStartInput = true;
+        mainMenuCard.SetActive(mainMenuRevealed);
+        mainMenuHint.SetActive(mainMenuRevealed);
+        introCard.SetActive(!mainMenuRevealed);
+        waitingForStartInput = !mainMenuRevealed;
     }
 
     void BuildSelection(Transform root)

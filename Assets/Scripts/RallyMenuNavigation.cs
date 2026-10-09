@@ -11,7 +11,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     public event System.Action<Button> FocusChanged;
     static readonly Dictionary<EventSystem, int> navigationUsers = new Dictionary<EventSystem, int>();
     static readonly Dictionary<EventSystem, bool> previousNavigationEvents = new Dictionary<EventSystem, bool>();
-    Button[] buttons;
+    Selectable[] buttons;
     Outline[] outlines;
     Vector3[] originalScales;
     int selectedIndex;
@@ -48,8 +48,11 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     }
 
     public void Configure(params Button[] orderedButtons)
+        => ConfigureControls(orderedButtons);
+
+    public void ConfigureControls(params Selectable[] orderedControls)
     {
-        buttons = orderedButtons;
+        buttons = orderedControls;
         outlines = new Outline[buttons.Length];
         originalScales = new Vector3[buttons.Length];
         for (int i = 0; i < buttons.Length; i++)
@@ -113,16 +116,25 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         bool left = pad != null && pad.dpad.left.isPressed;
         bool right = pad != null && pad.dpad.right.isPressed;
         bool south = pad != null && pad.buttonSouth.isPressed;
-        bool previous = (up && !upHeld) || (left && !leftHeld) ||
-            (KeyboardAllowed && (KeyPressed(Key.UpArrow, KeyCode.UpArrow) || KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
-        bool next = (down && !downHeld) || (right && !rightHeld) ||
-            (KeyboardAllowed && (KeyPressed(Key.DownArrow, KeyCode.DownArrow) || KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
+        if (localPlayer < 0 && eventSystem != null)
+            for (int i = 0; i < buttons.Length; i++)
+                if (Usable(i) && i != selectedIndex && eventSystem.currentSelectedGameObject == buttons[i].gameObject)
+                { Select(i); break; }
+        bool decrease = (left && !leftHeld) || (KeyboardAllowed && KeyPressed(Key.LeftArrow, KeyCode.LeftArrow));
+        bool increase = (right && !rightHeld) || (KeyboardAllowed && KeyPressed(Key.RightArrow, KeyCode.RightArrow));
+        Slider slider = Usable(selectedIndex) ? buttons[selectedIndex] as Slider : null;
+        bool previous = (up && !upHeld) || (slider == null && decrease) ||
+            (KeyboardAllowed && KeyPressed(Key.UpArrow, KeyCode.UpArrow));
+        bool next = (down && !downHeld) || (slider == null && increase) ||
+            (KeyboardAllowed && KeyPressed(Key.DownArrow, KeyCode.DownArrow));
         bool confirm = (south && !southHeld) ||
             (KeyboardAllowed && (KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
         upHeld = up; downHeld = down; leftHeld = left; rightHeld = right; southHeld = south;
         if (previous) Move(-1);
         else if (next) Move(1);
-        if (confirm && Usable(selectedIndex)) buttons[selectedIndex].onClick.Invoke();
+        else if (slider != null && (decrease || increase))
+            slider.value = Mathf.Clamp(slider.value + (increase ? .05f : -.05f), slider.minValue, slider.maxValue);
+        if (confirm && Usable(selectedIndex) && buttons[selectedIndex] is Button button) button.onClick.Invoke();
     }
 
     bool Usable(int index) => index >= 0 && index < buttons.Length && buttons[index] != null &&
@@ -148,6 +160,6 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         // Local panels keep independent outlines; one global selected object cannot represent both.
         if (localPlayer < 0 && eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)
             eventSystem.SetSelectedGameObject(buttons[selectedIndex].gameObject);
-        if (buttons[selectedIndex] != null) FocusChanged?.Invoke(buttons[selectedIndex]);
+        if (buttons[selectedIndex] is Button button) FocusChanged?.Invoke(button);
     }
 }

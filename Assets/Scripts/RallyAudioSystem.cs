@@ -43,7 +43,11 @@ public sealed class RallyAudioSystem : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void Start() => SelectMusic(SceneManager.GetActiveScene());
+    void Start()
+    {
+        RallyUserSettings.ApplyAudio();
+        SelectMusic(SceneManager.GetActiveScene());
+    }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) => SelectMusic(scene);
 
     void SelectMusic(Scene scene)
