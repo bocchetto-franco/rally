@@ -96,7 +96,7 @@ public sealed class RallyRaceHud : MonoBehaviour
         RallyLocalPlayerInput local = vehicleBody.GetComponent<RallyLocalPlayerInput>();
         Gamepad pad = local != null ? local.AssignedGamepad : Gamepad.current;
         bool keyboard = local == null || local.Device == RallyLocalPlayerInput.InputDevice.Keyboard;
-        string control = keyboard ? "M" : "";
+        string control = keyboard ? (local != null ? RallyLocalKeyboard.RecoveryLabel(local.PlayerIndex) : "M") : "";
         if (pad != null && (local == null || !keyboard))
             control += (control.Length > 0 ? " / " : "") + (pad is DualShockGamepad ? "Cuadrado" : "X");
         string text = "RESTABLECER AUTO · " + control;

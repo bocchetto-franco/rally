@@ -120,15 +120,15 @@ public sealed class RallyMenuNavigation : MonoBehaviour
             for (int i = 0; i < buttons.Length; i++)
                 if (Usable(i) && i != selectedIndex && eventSystem.currentSelectedGameObject == buttons[i].gameObject)
                 { Select(i); break; }
-        bool decrease = (left && !leftHeld) || (KeyboardAllowed && KeyPressed(Key.LeftArrow, KeyCode.LeftArrow));
-        bool increase = (right && !rightHeld) || (KeyboardAllowed && KeyPressed(Key.RightArrow, KeyCode.RightArrow));
+        bool decrease = (left && !leftHeld) || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuLeft(localPlayer) : KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
+        bool increase = (right && !rightHeld) || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuRight(localPlayer) : KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
         Slider slider = Usable(selectedIndex) ? buttons[selectedIndex] as Slider : null;
         bool previous = (up && !upHeld) || (slider == null && decrease) ||
-            (KeyboardAllowed && KeyPressed(Key.UpArrow, KeyCode.UpArrow));
+            (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuUp(localPlayer) : KeyPressed(Key.UpArrow, KeyCode.UpArrow)));
         bool next = (down && !downHeld) || (slider == null && increase) ||
-            (KeyboardAllowed && KeyPressed(Key.DownArrow, KeyCode.DownArrow));
+            (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuDown(localPlayer) : KeyPressed(Key.DownArrow, KeyCode.DownArrow)));
         bool confirm = (south && !southHeld) ||
-            (KeyboardAllowed && (KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
+            (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.Confirm(localPlayer) : KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
         upHeld = up; downHeld = down; leftHeld = left; rightHeld = right; southHeld = south;
         if (previous) Move(-1);
         else if (next) Move(1);

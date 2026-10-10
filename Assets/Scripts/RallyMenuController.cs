@@ -184,6 +184,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
     TextMeshProUGUI selectedCircuitTitle;
     TextMeshProUGUI selectedCircuitDetails;
     Button[] circuitButtons;
+    Button[] secondCircuitButtons;
     Button[] difficultyButtons;
     Button[] vehicleButtons;
     Button[] localPlayerButtons;
@@ -290,6 +291,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
         localNavigations = null;
         difficultyButtons = null;
         vehicleButtons = null;
+        secondCircuitButtons = null;
         optionControls = null;
         waitingForStartInput = false;
         localReady[0] = localReady[1] = false;
@@ -438,7 +440,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
                 () => ChangePlayerCount(count), false);
         }
         RefreshLocalPlayers();
-        Text(root, "Split Controls", "2 jugadores: J1 mando 1 · J2 mando 2 (o teclado si hay un solo mando) · sin bots", 17f, FontStyles.Normal,
+        Text(root, "Split Controls", "2 jugadores: dos mandos o teclado compartido · J1 WASD/Espacio · J2 flechas/Enter · sin bots", 17f, FontStyles.Normal,
             TextAlignmentOptions.Center, new Vector2(0f, -412f), new Vector2(1400f, 30f), Muted);
         Button(root, "Back Button", "VOLVER", new Vector2(-265f, -472f), new Vector2(300f, 74f), BackToMenu, false);
         Button(root, "Race Button", "COMENZAR CARRERA", new Vector2(180f, -472f), new Vector2(520f, 74f), StartRace, true);
@@ -454,7 +456,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
     {
         Text(root, "Title", "CARRERA LOCAL · DOS PILOTOS", 48f, FontStyles.Bold, TextAlignmentOptions.Center,
             new Vector2(0f, 394f), new Vector2(1500f, 70f), Color.white);
-        Text(root, "Subtitle", "Cada piloto elige su auto y confirma LISTO. J1 elige la pista y comienza la carrera.", 21f,
+        Text(root, "Subtitle", "Cada piloto elige su auto. Ambos pueden elegir la pista compartida y confirmar LISTO.", 21f,
             FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 342f), new Vector2(1600f, 40f), Muted);
         localVehicleButtons = new Button[2][];
         localReadyButtons = new Button[2];
@@ -486,21 +488,24 @@ public sealed partial class RallyMenuController : MonoBehaviour
             localNavigations[p] = card.gameObject.AddComponent<RallyMenuNavigation>();
             localNavigations[p].ConfigureForLocalPlayer(p);
         }
-        var track = PanelRect(root, "Shared Circuit Card", Panel, new Vector2(0f, -231f), new Vector2(1580f, 132f));
+        var track = PanelRect(root, "Shared Circuit Card", Panel, new Vector2(0f, -251f), new Vector2(1580f, 172f));
         selectedCircuitTitle = Text(track, "Selected Circuit", "", 25f, FontStyles.Bold, TextAlignmentOptions.Left,
-            new Vector2(-530f, 38f), new Vector2(480f, 40f), Accent);
+            new Vector2(-530f, 58f), new Vector2(480f, 40f), Accent);
         selectedCircuitDetails = Text(track, "Circuit Details", "", 17f, FontStyles.Normal, TextAlignmentOptions.Right,
-            new Vector2(440f, 38f), new Vector2(650f, 32f), Muted);
+            new Vector2(440f, 58f), new Vector2(650f, 32f), Muted);
         selectedTrackPreview = Preview(track, "Selected Track Preview", new Vector2(-720f, -22f), new Vector2(88f, 50f));
         circuitButtons = new Button[3];
+        secondCircuitButtons = new Button[3];
         for (int i = 0; i < 3; i++)
         {
             int choice = i;
             circuitButtons[i] = Button(track, "Circuit " + (i + 1) + " Button", "CIRCUIT_0" + (i + 1),
-                new Vector2(-440f + i * 475f, -25f), new Vector2(430f, 55f), () => ChooseCircuit(choice), false);
+                new Vector2(-440f + i * 475f, 9f), new Vector2(430f, 42f), () => ChooseCircuit(choice), false);
+            secondCircuitButtons[i] = Button(track, "Player 2 Circuit " + (i + 1), "J2 · CIRCUIT_0" + (i + 1),
+                new Vector2(-440f + i * 475f, -49f), new Vector2(430f, 42f), () => ChooseCircuit(choice), false);
         }
-        Text(root, "No Bots", "SOLO J1 Y J2 · SIN BOTS", 19f, FontStyles.Bold, TextAlignmentOptions.Center,
-            new Vector2(0f, -326f), new Vector2(1000f, 32f), Muted);
+        Text(root, "No Bots", "TECLADO: J1 WASD + ESPACIO · J2 FLECHAS + ENTER · O UN MANDO POR JUGADOR", 18f, FontStyles.Normal, TextAlignmentOptions.Center,
+            new Vector2(0f, 304f), new Vector2(1600f, 32f), Muted);
         localPlayerButtons = new Button[2];
         localPlayerButtons[0] = Button(root, "Local Players 1", "1 JUGADOR", new Vector2(-435f, -373f), new Vector2(290f, 55f), () => ChangePlayerCount(1), false);
         localPlayerButtons[1] = Button(root, "Local Players 2", "2 JUGADORES", new Vector2(-80f, -373f), new Vector2(330f, 55f), () => ChangePlayerCount(2), false);
@@ -508,7 +513,8 @@ public sealed partial class RallyMenuController : MonoBehaviour
         localRaceButton = Button(root, "Race Button", "COMENZAR CARRERA", new Vector2(255f, -457f), new Vector2(660f, 73f), StartRace, true);
         localNavigations[0].Configure(localVehicleButtons[0][0], localVehicleButtons[0][1], localVehicleButtons[0][2],
             localReadyButtons[0], circuitButtons[0], circuitButtons[1], circuitButtons[2], localPlayerButtons[0], back, localRaceButton);
-        localNavigations[1].Configure(localVehicleButtons[1][0], localVehicleButtons[1][1], localVehicleButtons[1][2], localReadyButtons[1]);
+        localNavigations[1].Configure(localVehicleButtons[1][0], localVehicleButtons[1][1], localVehicleButtons[1][2], localReadyButtons[1],
+            secondCircuitButtons[0], secondCircuitButtons[1], secondCircuitButtons[2]);
         localNavigations[0].SetFocusColor(Accent);
         localNavigations[1].SetFocusColor(new Color(.2f, .78f, 1f));
         RefreshCircuitSelection();
@@ -662,18 +668,20 @@ public sealed partial class RallyMenuController : MonoBehaviour
         selectedCircuitDetails.text = selected == 2 ? "BOSQUE / MONTAÑA · TIERRA HÚMEDA" : selected == 1 ? "MINA CLAVERO / SIERRAS · TIERRA Y ROCA" : "DESIERTO / RALLYCROSS · TIERRA Y RIPIO";
         SetPreview(selectedTrackPreview, Mathf.Max(0, selected));
         backdrop.Show(RallyGameSession.SelectedRaceScene);
+        for (int j = 0; j < (secondCircuitButtons == null ? 1 : 2); j++)
         for (int i = 0; i < circuitButtons.Length; i++)
         {
+            Button button = j == 0 ? circuitButtons[i] : secondCircuitButtons[i];
             bool active = i == selected;
             Color baseColor = active ? Accent : PanelLight;
-            Image image = circuitButtons[i].GetComponent<Image>();
+            Image image = button.GetComponent<Image>();
             image.color = Color.white;
-            circuitButtons[i].GetComponentInChildren<TextMeshProUGUI>().color = active ? new Color(.10f, .07f, .04f) : Color.white;
-            ColorBlock colors = circuitButtons[i].colors;
+            button.GetComponentInChildren<TextMeshProUGUI>().color = active ? new Color(.10f, .07f, .04f) : Color.white;
+            ColorBlock colors = button.colors;
             colors.normalColor = baseColor;
             colors.highlightedColor = active ? new Color(1f, .62f, .18f) : new Color(.14f, .17f, .22f);
             colors.selectedColor = colors.highlightedColor;
-            circuitButtons[i].colors = colors;
+            button.colors = colors;
         }
     }
 

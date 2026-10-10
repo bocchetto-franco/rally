@@ -56,7 +56,9 @@ public sealed class RallyPauseMenu : MonoBehaviour
                 if (pressed && (!isOpen || PausedByPlayer == player + 1))
                     Toggle(player, false);
             }
-            if (escape) Toggle(Mathf.Max(0, RallyLocalDevices.KeyboardPlayer), true);
+            for (int player = 0; player < 2; player++)
+                if (RallyLocalKeyboard.Pause(player) && (!isOpen || PausedByPlayer == player + 1))
+                    Toggle(player, true);
         }
         else
         {

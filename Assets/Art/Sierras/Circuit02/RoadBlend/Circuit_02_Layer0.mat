@@ -30,11 +30,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 2cc81f6a03c335c44b6114569c43010c, type: 3}
-        m_Scale: {x: 0.25, y: 0.25}
-        m_Offset: {x: 80, y: 133.17299}
+        m_Texture: {fileID: 2800000, guid: b76b824db03344eea8a7781000000001, type: 3}
+        m_Scale: {x: 0.27027026, y: 0.27027026}
+        m_Offset: {x: 86.48649, y: 143.9708}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 80e8b4bf7ee036348abae01b0f86690b, type: 3}
+        m_Texture: {fileID: 2800000, guid: b76b824db03344eea8a7781000000002, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -52,7 +52,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 0
     - _BlendOp: 0
-    - _BumpScale: 0.8
+    - _BumpScale: 0.7
     - _CameraFadingEnabled: 0
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
@@ -72,7 +72,7 @@ Material:
     - _Mode: 0
     - _QueueOffset: -200
     - _ReceiveShadows: 1
-    - _Smoothness: 0.1
+    - _Smoothness: 0.06
     - _SoftParticlesEnabled: 0
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
@@ -81,10 +81,10 @@ Material:
     - _Surface: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.8, g: 0.96, b: 0.91, a: 1}
+    - _BaseColor: {r: 0.98, g: 0.96, b: 0.88, a: 1}
     - _BaseColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
-    - _Color: {r: 0.8, g: 0.96, b: 0.91, a: 1}
+    - _Color: {r: 0.97999996, g: 0.96, b: 0.88, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

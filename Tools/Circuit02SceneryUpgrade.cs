@@ -63,26 +63,30 @@ public static class Circuit02SceneryUpgrade
   return true;
  }
  static string Protected(Scene scene)=>string.Join("\n",scene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<Component>(true)).Where(c=>c!=null&&
-  ((c is Collider&&!(c is TerrainCollider))||c is Rigidbody||c is ProBuilderMesh||c is MonoBehaviour||
+  ((c is Collider&&!(c is TerrainCollider))||c is Rigidbody||c is ProBuilderMesh||(c is MonoBehaviour&&!(c is UnityEngine.Rendering.Universal.UniversalAdditionalLightData))||
   c.transform.root.name=="AI_Waypoints"||c.transform.root.name=="Starting Grid"||c.transform.root.name=="Race HUD"||c.transform.root.name=="Porsche 911 SC Rally"||c.transform.root.name.StartsWith("Bot_Car")||
   c.GetComponentsInParent<Transform>(true).Any(t=>t.name=="Circuit 02 - Crowds Outside Boundaries"||t.name=="Circuit 02 - Water Basins (visual only)")))
   .OrderBy(c=>c.GetEntityId().ToString()).Select(c=>c.GetEntityId()+":"+EditorJsonUtility.ToJson(c)+":"+EditorJsonUtility.ToJson(c.transform)));
- public static void Build()
+ public static void Build()=>BuildCore(false);
+ public static void RetryFailed()=>BuildCore(true);
+ static void BuildCore(bool retry)
  {
-  Idle();if(File.Exists(Folder+"/SierraTerrainDetailed.asset"))throw new Exception("Already authored; do not duplicate.");
+  Idle();if(retry){string previousBaseline=File.ReadAllText(Log+"/baseline.txt").Trim();if(!File.ReadAllText(Log+"/build.txt").Contains("FAILED:")||!File.ReadAllBytes(ScenePath).SequenceEqual(File.ReadAllBytes(previousBaseline)))throw new Exception("Retry requires an unchanged source scene after a failed build.");}
+  else if(File.Exists(Folder+"/SierraTerrainDetailed.asset"))throw new Exception("Already authored; do not duplicate.");
   var setup=EditorSceneManager.GetSceneManagerSetup();Directory.CreateDirectory(Log);Directory.CreateDirectory(Folder+"/Meshes");Directory.CreateDirectory(Folder+"/Materials");AssetDatabase.Refresh();
   string backup="Logs/SceneBackups/Circuit02Scenery_"+DateTime.Now.ToString("yyyyMMdd_HHmmss");Directory.CreateDirectory(backup);File.Copy(ScenePath,backup+"/Circuit_02.unity");File.WriteAllText(Log+"/baseline.txt",backup+"/Circuit_02.unity");
   report=new StringBuilder("Circuit_02 scenery upgrade\nBackup: "+backup+"\n");random=new System.Random(81026);plants.Clear();occupied.Clear();minimumMargin=10000;
   try {
    var scene=EditorSceneManager.OpenScene(ScenePath);Read();string before=Protected(scene);
    if(GameObject.Find(RootName)!=null)throw new Exception("Duplicate root.");
-   if(!AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(data),Folder+"/SierraTerrainDetailed.asset"))throw new Exception("Terrain copy failed.");
+   if(retry){var copy=Asset<TerrainData>(Folder+"/SierraTerrainDetailed.asset");if(copy==data)throw new Exception("Scene already uses upgraded terrain.");EditorUtility.CopySerialized(data,copy);EditorUtility.SetDirty(copy);}
+   else if(!AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(data),Folder+"/SierraTerrainDetailed.asset"))throw new Exception("Terrain copy failed.");
    data=Asset<TerrainData>(Folder+"/SierraTerrainDetailed.asset");terrain.terrainData=data;terrain.GetComponent<TerrainCollider>().terrainData=data;
    root=new GameObject(RootName).transform;
    Step("relief",Sculpt);Step("textures",Paint);Step("existing rocks",RegroundOldRocks);Step("new rocks",Rocks);Step("shrub patches",Shrubs);Step("instanced grasses",Grass);Step("isolated trees",Trees);Step("lighting",Lighting);
    terrain.heightmapPixelError=7;terrain.basemapDistance=180; // local visual precision, no global quality changes
    terrain.Flush();EditorUtility.SetDirty(data);
-   if(Protected(scene)!=before)throw new Exception("Protected physics/route/gameplay changed; refusing scene save.");
+   string after=Protected(scene);if(after!=before){var afterLines=new HashSet<string>(after.Split('\n'));File.WriteAllLines(Log+"/protection-diff.txt",before.Split('\n').Where(line=>!afterLines.Contains(line)));throw new Exception("Protected physics/route/gameplay changed; refusing scene save. See protection-diff.txt");}
    if(root.GetComponentsInChildren<Collider>().Length!=0||root.GetComponentsInChildren<MonoBehaviour>().Length!=0)throw new Exception("Scenery added gameplay components.");
    if(!GameObject.Find("Porsche 911 SC Rally").activeInHierarchy)throw new Exception("Player no longer active.");
    AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(scene);if(!EditorSceneManager.SaveScene(scene))throw new Exception("Save failed.");
@@ -174,7 +178,10 @@ public static class Circuit02SceneryUpgrade
    var group=new GameObject("Scrub patch "+patches.ToString("000"));group.transform.SetParent(root,false);group.transform.position=center;
    var renderHigh=new List<Renderer>();var renderLow=new List<Renderer>();int patchCount=0;
    for(int kind=0;kind<2;kind++){
-    var prefab=Asset<GameObject>(Source+"/"+(kind==0?"wild_rooibos_bush_upright":"searsia_lucida_optimized")+" Sierra.prefab");var source=prefab.GetComponent<MeshFilter>().sharedMesh;var mat=prefab.GetComponent<Renderer>().sharedMaterial;var high=new List<CombineInstance>();var low=new List<CombineInstance>();int added=0;
+    var prefab=Asset<GameObject>(Source+"/"+(kind==0?"wild_rooibos_bush_upright":"searsia_lucida_optimized")+" Sierra.prefab");var source=prefab.GetComponent<MeshFilter>().sharedMesh;var mat=prefab.GetComponent<Renderer>().sharedMaterial;
+    var refined=AssetDatabase.LoadAssetAtPath<Mesh>(Folder+"/Meshes/RooibosFull.asset");if(kind==0&&refined!=null)source=refined;
+    var refinedMaterial=AssetDatabase.LoadAssetAtPath<Material>(Folder+"/Materials/Scrub_"+(kind+1)+".mat");if(refinedMaterial!=null)mat=refinedMaterial;
+    var high=new List<CombineInstance>();var low=new List<CombineInstance>();int added=0;
     // Most silhouettes use the 1.4k-vertex shrub; the denser leafy mesh is an accent.
     for(int trial=0;trial<90&&added<(kind==0?11:1);trial++){
      var q=center+new Vector3(R(-10,10),0,R(-10,10));float scale=kind==0?R(.85f,1.65f):R(.9f,1.5f);float radius=kind==0?scale*.8f:scale*.45f;
@@ -240,9 +247,136 @@ public static class Circuit02SceneryUpgrade
     for(int z=0;z<d.detailPatchCount;z++)for(int x=0;x<d.detailPatchCount;x++)detailCounts[l]+=d.ComputeDetailInstanceTransforms(x,z,l,1,out var b).Length;
    }
    foreach(var layer in d.terrainLayers){if(layer.diffuseTexture==null||layer.normalMapTexture==null)throw new Exception("Missing PBR map.");if(layer.diffuseTexture.width>2048||layer.normalMapTexture.width>2048)throw new Exception("Texture over budget.");}
+   if(d.alphamapTextures.Any(a=>AssetDatabase.GetAssetPath(a)!=AssetDatabase.GetAssetPath(d)))throw new Exception("Terrain paint is not independent.");
+   layout=JsonUtility.FromJson<Layout>(File.ReadAllText("Assets/Art/Environment/Circuit02/Circuit02Layout.json"));
+   var ids=Enumerable.Range(0,layout.centerline.Length).Where(i=>i%6==0||i==layout.centerline.Length-1).ToArray();route=ids.Select(i=>layout.centerline[i]).ToArray();widths=ids.Select(i=>layout.roadWidths[i]).ToArray();
+   var original=Asset<TerrainData>(Source+"/SierraTerrain.asset");int n=d.heightmapResolution,protectedSamples=0;var originalHeights=original.GetHeights(0,0,n,n);var currentHeights=d.GetHeights(0,0,n,n);
+   for(int z=0;z<n;z++)for(int x=0;x<n;x++){
+    var p=t.transform.position+new Vector3(x*d.size.x/(n-1),0,z*d.size.z/(n-1));if(Edge(p)>18&&Crowd(p)>14&&Creek(p)>9)continue;
+    if(originalHeights[z,x]!=currentHeights[z,x])throw new Exception("Protected terrain height changed at "+x+","+z);protectedSamples++;
+   }
+   if(!all.Single(x=>x.name=="Porsche 911 SC Rally").gameObject.activeSelf)throw new Exception("Player is inactive.");
    var result=new{waypoints=points,terrain=AssetDatabase.GetAssetPath(d),layers=d.terrainLayers.Length,detailInstances=detailCounts,renderers=renderers.Length,lodGroups=environment.GetComponentsInChildren<LODGroup>().Length,sceneryColliders=0,playerActive=all.Single(x=>x.name=="Porsche 911 SC Rally").gameObject.activeSelf};
-   File.WriteAllText(Log+"/audit.txt","COMPLETE: PASS\n"+JsonUtility.ToJson(new AuditCounts{waypoints=points,detailInstances=detailCounts,renderers=renderers.Length},true));return result;
+   File.WriteAllText(Log+"/audit.txt","COMPLETE: PASS\nProtected terrain samples bit-identical: "+protectedSamples+"\nTerrain alpha subassets private; no missing materials, no new colliders, player active; PBR maps <=2048.\n"+JsonUtility.ToJson(new AuditCounts{waypoints=points,detailInstances=detailCounts,renderers=renderers.Length},true));return result;
   }finally{EditorSceneManager.ClosePreviewScene(scene);}
+ }
+ public static void RefineAppearance()
+ {
+  Idle();var setup=EditorSceneManager.GetSceneManagerSetup();
+  string backup="Logs/SceneBackups/Circuit02Appearance_"+DateTime.Now.ToString("yyyyMMdd_HHmmss");Directory.CreateDirectory(backup);
+  File.Copy(ScenePath,backup+"/Circuit_02.unity");File.Copy(Folder+"/SierraTerrainDetailed.asset",backup+"/Terrain.asset");
+  try {
+   var scene=EditorSceneManager.OpenScene(ScenePath);Read();string before=Protected(scene);
+   var layers=data.terrainLayers;
+   // Fine gravel, not large square rock slabs, at the driveable shoulder.
+   layers[0].diffuseTexture=Asset<Texture2D>("Assets/Art/RoadSurfaces/rocky_trail_02/diff.jpg");
+   layers[0].normalMapTexture=Asset<Texture2D>("Assets/Art/RoadSurfaces/rocky_trail_02/nor_gl.jpg");
+   layers[0].tileSize=Vector2.one*3.7f;layers[0].diffuseRemapMax=new Vector4(.98f,.96f,.88f,1);layers[0].normalScale=.7f;
+   layers[3].diffuseTexture=Asset<Texture2D>("Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_diff_2k.jpg");
+   layers[3].normalMapTexture=Asset<Texture2D>("Assets/Art/Environment/PolyHaven/dry_ground_01/dry_ground_01_nor_gl_2k.jpg");
+   layers[3].tileSize=Vector2.one*7.9f;layers[3].diffuseRemapMax=new Vector4(.9f,.94f,.85f,1);layers[3].normalScale=.65f;
+   foreach(var layer in layers)EditorUtility.SetDirty(layer);
+   // Local copies only: retain thin leaves through mip levels instead of bright fragmented cards.
+   var copies=new Dictionary<Material,Material>();
+   for(int i=0;i<3;i++){
+    var original=Asset<Material>(Source+"/Plant_"+i+".mat");string path=Folder+"/Materials/Scrub_"+i+".mat";
+    var material=AssetDatabase.LoadAssetAtPath<Material>(path);if(material==null){material=new Material(original);AssetDatabase.CreateAsset(material,path);}
+    string texturePath=Folder+"/Materials/PlantAlbedo_"+i+".png";
+    if(!File.Exists(texturePath)&&!AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(original.GetTexture("_BaseMap")),texturePath))throw new Exception("Cannot copy vegetation albedo.");
+    var importer=(TextureImporter)AssetImporter.GetAtPath(texturePath);importer.mipMapsPreserveCoverage=true;importer.alphaTestReferenceValue=.25f;importer.alphaIsTransparency=true;importer.SaveAndReimport();
+    material.SetTexture("_BaseMap",Asset<Texture2D>(texturePath));material.SetTexture("_MainTex",Asset<Texture2D>(texturePath));
+    material.SetColor("_BaseColor",new Color(.96f,.97f,.83f));material.SetColor("_Color",new Color(.96f,.97f,.83f));
+    material.SetFloat("_Cutoff",.25f);material.SetFloat("_Smoothness",0);material.SetFloat("_BumpScale",.35f);material.SetFloat("_OcclusionStrength",.35f);
+    material.SetFloat("_SpecularHighlights",0);material.SetFloat("_EnvironmentReflections",0);material.SetTexture("_MetallicGlossMap",null);material.DisableKeyword("_METALLICSPECGLOSSMAP");
+    material.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");material.EnableKeyword("_ENVIRONMENTREFLECTIONS_OFF");EditorUtility.SetDirty(material);copies.Add(original,material);
+   }
+   root=GameObject.Find(RootName).transform;
+   foreach(var renderer in root.GetComponentsInChildren<MeshRenderer>(true))renderer.sharedMaterials=renderer.sharedMaterials.Select(m=>copies.TryGetValue(m,out var replacement)?replacement:m).ToArray();
+   var prototypes=data.detailPrototypes;
+   for(int i=0;i<prototypes.Length;i++){
+    var go=Object.Instantiate(prototypes[i].prototype);go.name="Sierra detail refined "+i;
+    go.GetComponent<Renderer>().sharedMaterial=copies[Asset<Material>(Source+"/Plant_"+i+".mat")];
+    prototypes[i].prototype=PrefabUtility.SaveAsPrefabAsset(go,Folder+"/Materials/Detail_"+i+".prefab");Object.DestroyImmediate(go);
+   }
+   data.detailPrototypes=prototypes;EditorUtility.SetDirty(data);terrain.Flush();
+   if(Protected(scene)!=before)throw new Exception("Protected gameplay changed.");
+   AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
+   File.WriteAllText(Log+"/appearance.txt","Fine gravel shoulders and varied dry soil replace slab-like tiling. Private vegetation albedo imports preserve alpha coverage; neutral matte foliage, reduced clipping. No geometry, heights, placements or gameplay modified.\nBackup: "+backup+"\nCOMPLETE: PASS\n");
+  }finally{EditorSceneManager.RestoreSceneManagerSetup(setup);}
+ }
+ public static object InspectVegetation()
+ {
+  return new[]{"grass_medium_01","wild_rooibos_bush"}.Select(id=>new{
+   id,meshes=Asset<GameObject>("Assets/Art/Environment/PolyHaven/"+id+"/"+id+".fbx").GetComponentsInChildren<MeshFilter>(true).Select(f=>new{name=f.name,vertices=f.sharedMesh.vertexCount,submeshes=f.sharedMesh.subMeshCount,bounds=f.sharedMesh.bounds.ToString(),uv=f.sharedMesh.uv.Length,materials=f.GetComponent<Renderer>().sharedMaterials.Select(m=>m==null?"NULL":m.name).ToArray()}).ToArray()
+  }).ToArray();
+ }
+ public static object TerrainReferences()=>new[]{Source+"/SierraTerrain.asset",Folder+"/SierraTerrainDetailed.asset"}.Select(path=>{
+  var d=Asset<TerrainData>(path);return new{path,layers=d.terrainLayers.Length,alphas=d.alphamapTextures.Select(t=>new{path=AssetDatabase.GetAssetPath(t),name=t.name,id=t.GetEntityId().ToString()}).ToArray()};}).ToArray();
+ public static void DetachTerrainPaint()
+ {
+  Idle();string path=Folder+"/SierraTerrainDetailed.asset",oldPath=Source+"/SierraTerrain.asset";var d=Asset<TerrainData>(path);
+  var maps=d.GetAlphamaps(0,0,d.alphamapWidth,d.alphamapHeight);var textures=d.alphamapTextures;
+  if(textures.All(t=>AssetDatabase.GetAssetPath(t)==path))return; // One-off repair; never overwrite a later historical-terrain edit.
+  string backup="Logs/SceneBackups/Circuit02PaintOwnership_"+DateTime.Now.ToString("yyyyMMdd_HHmmss");Directory.CreateDirectory(backup);File.Copy(path,backup+"/Detailed.asset");File.Copy(oldPath,backup+"/Previous.asset");
+  // CopySerialized aliases Terrain alpha subassets. Rebuild native data through public setters
+  // so all painted textures belong to this scenery asset, not the historical terrain.
+  var fresh=new TerrainData{name=d.name,heightmapResolution=d.heightmapResolution,alphamapResolution=d.alphamapResolution,baseMapResolution=d.baseMapResolution,size=d.size};
+  fresh.SetHeights(0,0,d.GetHeights(0,0,d.heightmapResolution,d.heightmapResolution));fresh.SetHoles(0,0,d.GetHoles(0,0,d.holesResolution,d.holesResolution));
+  fresh.terrainLayers=d.terrainLayers;fresh.SetAlphamaps(0,0,maps);fresh.SetDetailResolution(d.detailResolution,d.detailResolutionPerPatch);fresh.SetDetailScatterMode(d.detailScatterMode);fresh.detailPrototypes=d.detailPrototypes;
+  for(int layer=0;layer<d.detailPrototypes.Length;layer++)fresh.SetDetailLayer(0,0,layer,d.GetDetailLayer(0,0,d.detailWidth,d.detailHeight,layer));
+  fresh.treePrototypes=d.treePrototypes;fresh.treeInstances=d.treeInstances;fresh.wavingGrassAmount=d.wavingGrassAmount;fresh.wavingGrassSpeed=d.wavingGrassSpeed;fresh.wavingGrassStrength=d.wavingGrassStrength;fresh.wavingGrassTint=d.wavingGrassTint;
+  int changed=fresh.alphamapTextures.Length;foreach(var texture in fresh.alphamapTextures)AssetDatabase.AddObjectToAsset(texture,d);
+  EditorUtility.CopySerialized(fresh,d);Object.DestroyImmediate(fresh);EditorUtility.SetDirty(d);AssetDatabase.SaveAssetIfDirty(d);
+  if(d.alphamapTextures.Any(t=>AssetDatabase.GetAssetPath(t)!=path))throw new Exception("Paint texture still belongs to original terrain; original not restored.");
+  var info=new System.Diagnostics.ProcessStartInfo("git","show HEAD:"+oldPath){RedirectStandardOutput=true,RedirectStandardError=true,UseShellExecute=false,CreateNoWindow=true};byte[] original;
+  using(var process=System.Diagnostics.Process.Start(info))using(var bytes=new MemoryStream()){process.StandardOutput.BaseStream.CopyTo(bytes);process.WaitForExit();if(process.ExitCode!=0)throw new Exception(process.StandardError.ReadToEnd());original=bytes.ToArray();}
+  if(original.Length<100000)throw new Exception("Invalid original terrain blob.");
+  File.WriteAllBytes(oldPath,original);AssetDatabase.ImportAsset(oldPath,ImportAssetOptions.ForceUpdate);
+  var actual=d.GetAlphamaps(0,0,d.alphamapWidth,d.alphamapHeight);float delta=0;for(int z=0;z<d.alphamapHeight;z++)for(int x=0;x<d.alphamapWidth;x++)for(int l=0;l<d.alphamapLayers;l++)delta=Mathf.Max(delta,Mathf.Abs(maps[z,x,l]-actual[z,x,l]));
+  if(delta>.00001f)throw new Exception("Paint changed after detachment: "+delta);
+  File.WriteAllText(Log+"/paint-ownership.txt","COMPLETE: PASS\nDetached "+changed+" shared alpha references into new TerrainData subassets; new paint unchanged (max delta "+delta+"). Original Terrain restored byte-for-byte from HEAD; modified intermediate backup retained at "+backup+".\n");
+ }
+ public static void NaturalGrassColor()
+ {
+  Idle();var color=new Texture2D(2,2,TextureFormat.RGBA32,false);var alpha=new Texture2D(2,2,TextureFormat.RGBA32,false);
+  try{
+   color.LoadImage(File.ReadAllBytes("Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_diff_1k.jpg"));
+   alpha.LoadImage(File.ReadAllBytes("Assets/Art/Environment/PolyHaven/grass_medium_01/grass_medium_01_alpha_1k.png"));
+   if(color.width!=alpha.width||color.height!=alpha.height)throw new Exception("Grass map sizes differ.");
+   var rgb=color.GetPixels32();var mask=alpha.GetPixels32();for(int i=0;i<rgb.Length;i++)rgb[i].a=mask[i].r;
+   color.SetPixels32(rgb);color.Apply();string path=Folder+"/Materials/PlantAlbedo_0.png";File.WriteAllBytes(path,color.EncodeToPNG());AssetDatabase.ImportAsset(path,ImportAssetOptions.ForceUpdate);
+   File.WriteAllText(Log+"/grass-color.txt","COMPLETE: PASS\nOriginal green Poly Haven grass RGB plus original alpha mask, packed without recoloring. Replaces overexposed dry variant only on private C02 material.\n");
+  }finally{Object.DestroyImmediate(color);Object.DestroyImmediate(alpha);}
+ }
+ static Mesh PlantVariant(string id,string variant,float height,float maxRadius,string path)
+ {
+  var source=Asset<GameObject>("Assets/Art/Environment/PolyHaven/"+id+"/"+id+".fbx").GetComponentsInChildren<MeshFilter>(true).Single(f=>f.name==variant);
+  var mesh=Object.Instantiate(source.sharedMesh);var points=mesh.vertices.Select(p=>source.transform.localToWorldMatrix.MultiplyPoint3x4(p)).ToArray();
+  var bounds=new Bounds(points[0],Vector3.zero);foreach(var p in points)bounds.Encapsulate(p);
+  float scale=Mathf.Min(height/bounds.size.y,maxRadius/new Vector2(bounds.extents.x,bounds.extents.z).magnitude);
+  mesh.vertices=points.Select(p=>(p-new Vector3(bounds.center.x,bounds.min.y,bounds.center.z))*scale).ToArray();
+  var triangles=mesh.triangles;mesh.subMeshCount=1;mesh.SetTriangles(triangles,0);mesh.RecalculateNormals();mesh.RecalculateTangents();mesh.RecalculateBounds();
+  MeshUtility.SetMeshCompression(mesh,ModelImporterMeshCompression.Medium);AssetDatabase.CreateAsset(mesh,path);return mesh;
+ }
+ public static void FullerVegetation()
+ {
+  Idle();var setup=EditorSceneManager.GetSceneManagerSetup();
+  try {
+   var scene=EditorSceneManager.OpenScene(ScenePath);Read();string before=Protected(scene);root=GameObject.Find(RootName).transform;
+   var grass=PlantVariant("grass_medium_01","grass_medium_01_small_b_LOD0",.55f,.65f,Folder+"/Meshes/GrassClump.asset");
+   PlantVariant("wild_rooibos_bush","wild_rooibos_bush_d",1.3f,.78f,Folder+"/Meshes/RooibosFull.asset");
+   string prefabPath=Folder+"/Materials/Detail_0.prefab";var content=PrefabUtility.LoadPrefabContents(prefabPath);
+   try{content.GetComponent<MeshFilter>().sharedMesh=grass;PrefabUtility.SaveAsPrefabAsset(content,prefabPath);}finally{PrefabUtility.UnloadPrefabContents(content);}
+   // Only new shrub patches are replaced; existing public, trees, rocks and all gameplay are retained.
+   foreach(var child in root.Cast<Transform>().Where(t=>t.name.StartsWith("Scrub patch ")).ToArray())Object.DestroyImmediate(child.gameObject);
+   occupied.Clear();plants.Clear();foreach(Transform child in root)if(child.GetComponentsInChildren<Renderer>().Length>0)occupied.Add(BoundsOf(child.gameObject));
+   var old=GameObject.Find("Rocky outcrops - beyond containment");foreach(Transform child in old.transform)occupied.Add(BoundsOf(child.gameObject));
+   random=new System.Random(81026);minimumMargin=10000;report=new StringBuilder("Fuller existing vegetation variants\n");Shrubs();
+   data.RefreshPrototypes();terrain.Flush();EditorUtility.SetDirty(data);
+   if(before!=Protected(scene))throw new Exception("Protected gameplay changed.");
+   AssetDatabase.SaveAssets();EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
+   report.AppendLine("Grass changed from tiny_b (30 vertices) to small_b (700 vertices); 3273-vertex rooibos_d replaces sparse 1409-vertex rooibos_e. Local copies only, same Terrain detail maps. Minimum new shrub edge margin: "+minimumMargin+"m.\nCOMPLETE: PASS");File.WriteAllText(Log+"/vegetation.txt",report.ToString());
+  }finally{EditorSceneManager.RestoreSceneManagerSetup(setup);}
  }
  [Serializable] class AuditCounts{public int waypoints,renderers;public int[] detailInstances;}
  public static void Compress()
@@ -257,6 +391,18 @@ public static class Circuit02SceneryUpgrade
   Idle();var originals=Asset<GameObject>("Assets/Art/Forest/Prefabs/PineA.prefab").GetComponent<Renderer>().sharedMaterials;
   for(int i=0;i<originals.Length;i++){var material=Asset<Material>(Folder+"/Materials/Pine_"+i+".mat");material.SetColor("_BaseColor",originals[i].GetColor("_BaseColor")*new Color(.9f,.92f,.8f));EditorUtility.SetDirty(material);}AssetDatabase.SaveAssets();
  }
+ public static string DiagnoseLightingGuard()
+ {
+  Idle();var setup=EditorSceneManager.GetSceneManagerSetup();
+  try {
+   var scene=EditorSceneManager.OpenScene(ScenePath);string before=Protected(scene);
+   GameObject.Find("Directional Light").transform.rotation=Quaternion.Euler(36,-42,0);
+   string after=Protected(scene);var afterSet=new HashSet<string>(after.Split('\n'));var changed=before.Split('\n').Where(line=>!afterSet.Contains(line)).ToArray();
+   File.WriteAllText(Log+"/lighting-guard.txt",string.Join("\n",changed));return "Changed protected lines from changing ONLY requested sunlight direction: "+changed.Length+". See lighting-guard.txt";
+  }finally{EditorSceneManager.RestoreSceneManagerSetup(setup);}
+ }
+ public static object State()=>new{playing=EditorApplication.isPlaying,changingPlay=EditorApplication.isPlayingOrWillChangePlaymode,compiling=EditorApplication.isCompiling,baking=StaticOcclusionCulling.isRunning,scenes=Enumerable.Range(0,SceneManager.sceneCount).Select(i=>new{SceneManager.GetSceneAt(i).path,SceneManager.GetSceneAt(i).isDirty}).ToArray()};
+ public static void StopMenuPreview(){if(EditorApplication.isPlaying&&SceneManager.GetActiveScene().path=="Assets/Scenes/VehicleCircuitSelection.unity")EditorApplication.isPlaying=false;else throw new Exception("Not the observed menu preview; refusing to interrupt another scene.");}
  public static void ArchiveFailedAttempt()
  {
   Idle();string baseline=File.ReadAllText(Log+"/baseline.txt").Trim();

@@ -45,23 +45,17 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
         bool reset, recover;
         if (device == InputDevice.Keyboard || (device == InputDevice.Automatic && RallyLocalDevices.UsesKeyboard(playerIndex)))
         {
-            Keyboard keyboard = Keyboard.current;
-            bool accelerate = RallyGamepadInput.KeyboardVertical > 0f ||
-                (keyboard != null && (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed));
-            bool brake = RallyGamepadInput.KeyboardVertical < 0f ||
-                (keyboard != null && (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed));
+            bool accelerate = RallyLocalKeyboard.Accelerate(playerIndex);
+            bool brake = RallyLocalKeyboard.Brake(playerIndex);
             Vertical = accelerate ? 1f : brake ? -1f : 0f;
             Brake = brake ? 1f : 0f;
-            bool left = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) ||
-                (keyboard != null && (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed));
-            bool right = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) ||
-                (keyboard != null && (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed));
+            bool left = RallyLocalKeyboard.Left(playerIndex);
+            bool right = RallyLocalKeyboard.Right(playerIndex);
             steer = left ? -1f : right ? 1f : 0f;
             Horizontal = Mathf.MoveTowards(Horizontal, steer, steeringResponse * Time.deltaTime);
-            Handbrake = Input.GetKey(KeyCode.Space) || (keyboard != null && keyboard.spaceKey.isPressed);
-            reset = Input.GetKey(KeyCode.R) || (keyboard != null && keyboard.rKey.isPressed);
-            recover = Input.GetKey(KeyCode.M) || Input.GetKey(KeyCode.T) ||
-                (keyboard != null && (keyboard.mKey.isPressed || keyboard.tKey.isPressed));
+            Handbrake = RallyLocalKeyboard.Handbrake(playerIndex);
+            reset = RallyLocalKeyboard.Reset(playerIndex);
+            recover = RallyLocalKeyboard.Recover(playerIndex);
         }
         else
         {

@@ -46,7 +46,7 @@ public static class RallyLocalDevices
         }
     }
 
-    public static bool UsesKeyboard(int player) => KeyboardPlayer == player;
+    public static bool UsesKeyboard(int player) => player >= 0 && player < 2 && GamepadFor(player) == null;
     public static string Label(int player) => "J" + (player + 1) + " · " +
-        (GamepadFor(player) != null ? "MANDO" : UsesKeyboard(player) ? "TECLADO" : "CONECTÁ UN MANDO");
+        (GamepadFor(player) != null ? "MANDO" : player == 0 ? "WASD + ESPACIO" : "FLECHAS + ENTER");
 }

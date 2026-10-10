@@ -125,7 +125,7 @@ public static class RallySplitScreenVerification
         InputSystem.settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
         double now = EditorApplication.timeSinceStartup;
-        if (deadline == 0) { deadline = now + 240; phaseAt = now; }
+        if (deadline == 0) { deadline = now + 480; phaseAt = now; }
         if (now > deadline) { Finish(new Exception("Split-screen test timed out at phase " + phase)); return; }
         if (now - phaseAt < .4 || Time.frameCount < minimumFrame) return;
         try
@@ -202,6 +202,11 @@ public static class RallySplitScreenVerification
             else if (phase == 1 && split != null && split.Ready)
             {
                 ValidateStructure(split);
+                // This suite drives controls near the grid then dispatches gates explicitly.
+                // Disable automatic gate overlaps only in the disposable Play scene,
+                // so physics during reset/recovery cannot advance either timer unexpectedly.
+                foreach (var gate in split.TimerOne.OrderedCheckpoints)
+                    gate.GetComponent<BoxCollider>().enabled = false;
                 one = split.PlayerOne.GetComponent<Rigidbody>();
                 two = split.PlayerTwo.GetComponent<Rigidbody>();
                 colliderOne = BodyBox(split.PlayerOne);
@@ -278,6 +283,9 @@ public static class RallySplitScreenVerification
             {
                 Require(Vector3.Dot(two.transform.up, Vector3.up) > .9f, "DualSense recovery rights only player two");
                 SendPad();
+                // Recovery/physics can overlap the start gate before this isolated dispatch assertion.
+                split.TimerOne.ResetTimer();
+                split.TimerTwo.ResetTimer();
                 split.TimerOne.OrderedCheckpoints[0].SendMessage("OnTriggerEnter", colliderTwo);
                 Require(split.TimerTwo.NextCheckpoint == 1 && split.TimerOne.NextCheckpoint == 0, "Shared gate dispatches to the correct player's timer");
                 split.TimerOne.OrderedCheckpoints[0].SendMessage("OnTriggerEnter", colliderOne);
@@ -397,7 +405,7 @@ public static class RallySplitScreenVerification
             {
                 Require(RallyLocalDevices.GamepadFor(0) == padOne && RallyLocalDevices.GamepadFor(1) == null &&
                     RallyLocalDevices.KeyboardPlayer == 1, "With one gamepad, J1 keeps the controller and J2 automatically gets keyboard");
-                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W, Key.A));
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.UpArrow, Key.LeftArrow));
                 SendPad(target: padOne, throttle: .8f, steer: .5f);
                 Next(41);
             }
@@ -416,6 +424,67 @@ public static class RallySplitScreenVerification
                 Require(split.PlayerOne.GetComponent<RallyLocalPlayerInput>().AssignedGamepad == padOne &&
                     RallyLocalDevices.KeyboardPlayer == 1, "Replacement controller is paired without stealing the keyboard player");
                 SendPad(target: padOne);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                InputSystem.RemoveDevice(padOne);
+                padOne = null;
+                SceneManager.LoadScene(RallyGameSession.SelectionScene); Next(50);
+            }
+            else if (phase == 50)
+            {
+                Require(RallyLocalDevices.UsesKeyboard(0) && RallyLocalDevices.UsesKeyboard(1), "Both players can use shared keyboard without controllers");
+                ButtonNamed("Player 2 Circuit 2").onClick.Invoke();
+                Require(RallyGameSession.SelectedRaceScene == "Circuit_02", "J2 can select the shared track");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.S, Key.DownArrow)); Next(57);
+            }
+            else if (phase == 57)
+            {
+                Require(Navigation(0).SelectedIndex == 1 && Navigation(1).SelectedIndex == 1, "Shared keyboard moves both independent selection focuses");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); Next(58);
+            }
+            else if (phase == 58)
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Space, Key.Enter)); Next(59);
+            }
+            else if (phase == 59)
+            {
+                Require(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 1, "Space and Enter confirm their own car selections");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                ButtonNamed("Player 1 Ready").onClick.Invoke(); ButtonNamed("Player 2 Ready").onClick.Invoke();
+                ButtonNamed("Race Button").onClick.Invoke(); Next(51);
+            }
+            else if (phase == 51 && split != null && split.Ready)
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W, Key.A, Key.Space)); Next(52);
+            }
+            else if (phase == 52)
+            {
+                var first = split.PlayerOne.GetComponent<RallyLocalPlayerInput>();
+                var second = split.PlayerTwo.GetComponent<RallyLocalPlayerInput>();
+                Require(first.Vertical == 1f && first.Horizontal < -.9f && first.Handbrake && second.Vertical == 0f && second.Horizontal == 0f && !second.Handbrake,
+                    "WASD and Space affect J1 only");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.UpArrow, Key.RightArrow, Key.Enter)); Next(53);
+            }
+            else if (phase == 53)
+            {
+                var first = split.PlayerOne.GetComponent<RallyLocalPlayerInput>();
+                var second = split.PlayerTwo.GetComponent<RallyLocalPlayerInput>();
+                Require(second.Vertical == 1f && second.Horizontal > .9f && second.Handbrake && first.Vertical == 0f && first.Horizontal == 0f && !first.Handbrake,
+                    "Arrows and Enter affect J2 only");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.P)); Next(54);
+            }
+            else if (phase == 54)
+            {
+                var pause = UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>();
+                Require(pause.IsOpen && pause.PausedByPlayer == 2 && Time.timeScale == 0f, "P pauses as J2");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); Next(55);
+            }
+            else if (phase == 55)
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.P)); Next(56);
+            }
+            else if (phase == 56)
+            {
+                Require(!UnityEngine.Object.FindAnyObjectByType<RallyPauseMenu>().IsOpen && Time.timeScale == 1f, "J2 resumes using P");
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState());
                 RallyGameSession.SelectLocalPlayers(1);
                 SceneManager.LoadScene("Circuit_01"); Next(11);

@@ -34,8 +34,8 @@ public sealed partial class RallyMenuController
         ControlColumn(root, "Gamepad Controls", "DUALSENSE / GAMEPAD", 375f,
             new[] { "Acelerar", "Frenar", "Dirección", "Freno de mano", "Enderezar auto volcado", "Volver al checkpoint", "Pausa", "Navegar / confirmar", "Volver atrás" },
             new[] { "R2 / RT (analógico)", "L2 / LT (analógico)", "Stick izquierdo", "Cruz / A", "Cuadrado / X", "Triángulo / Y", "Options / Start", "D-Pad / Cruz (A)", "Círculo / B" });
-        Text(root, "Controls Note", "Enderezar conserva tu progreso. Volver al checkpoint reposiciona el auto.\nOpciones: arriba/abajo elige un control; izquierda/derecha ajusta el volumen. Mouse también disponible.",
-            20f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -329f), new Vector2(1440f, 68f), Muted);
+        Text(root, "Controls Note", "Enderezar conserva tu progreso. Volver al checkpoint reposiciona el auto.\n2P: J1 WASD / Espacio / R / T / Escape · J2 flechas / Enter / Backspace / Shift derecho / P.\nMenús 2P: J1 WASD + Espacio; J2 flechas + Enter. Un mando por jugador también disponible.",
+            18f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -329f), new Vector2(1440f, 94f), Muted);
         Button(root, "Back Button", "VOLVER", new Vector2(0f, -441f), new Vector2(380f, 74f), () => OpenFrontendPage(RallyMenuScreen.MainMenu), false);
     }
 

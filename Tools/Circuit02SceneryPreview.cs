@@ -28,7 +28,7 @@ public static class Circuit02SceneryPreview
   var extra=camera.GetUniversalAdditionalCameraData();extra.requiresColorTexture=true;extra.requiresDepthTexture=true;
   target=new RenderTexture(1440,900,24);camera.targetTexture=target;index=0;frame=0;Pose();File.WriteAllText(Log+"/preview.txt","RUNNING\n");EditorApplication.update+=Tick;
  }
- static void Pose(){camera.transform.SetPositionAndRotation(positions[index],Quaternion.LookRotation(look[index]-positions[index]));frame=0;}
+ static void Pose(){camera.farClipPlane=index==4?1200:650;camera.transform.SetPositionAndRotation(positions[index],Quaternion.LookRotation(look[index]-positions[index]));frame=0;}
  static void Tick()
  {
   try {
