@@ -11,11 +11,16 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
     [Range(0f, 60f)] public float particlesPerWheelPerSecond = 12f;
 
     ParticleSystem spray;
-    JrsVehicleController[] vehicles;
-    float nextVehicleSearch;
+    struct VehicleSample { public JrsVehicleController car; public Rigidbody body; }
+    static VehicleSample[] vehicles;
+    static float nextVehicleSearch;
+    static UnityEngine.SceneManagement.Scene cachedScene;
     float emissionRemainder;
     readonly System.Random random = new System.Random();
     float Range(float min, float max) => Mathf.Lerp(min, max, (float)random.NextDouble());
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetVehicleCache() { vehicles = null; nextVehicleSearch = 0f; }
 
     void Start()
     {
@@ -52,17 +57,23 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
     void FixedUpdate()
     {
         if (spray == null || Time.timeScale <= 0f) return;
-        if (vehicles == null || Time.time >= nextVehicleSearch)
+        if (vehicles == null || cachedScene != gameObject.scene || Time.time >= nextVehicleSearch)
         {
-            vehicles = FindObjectsByType<JrsVehicleController>();
+            // All puddles reuse one lookup; cache bodies instead of GetComponent in each wheel loop.
+            var cars = FindObjectsByType<JrsVehicleController>();
+            vehicles = new VehicleSample[cars.Length];
+            for (int i = 0; i < cars.Length; i++)
+                vehicles[i] = new VehicleSample { car = cars[i], body = cars[i].GetComponent<Rigidbody>() };
+            cachedScene = gameObject.scene;
             nextVehicleSearch = Time.time + 5f;
         }
-        foreach (var car in vehicles)
+        foreach (var sample in vehicles)
         {
+            var car = sample.car;
             if (car == null || !car.isActiveAndEnabled) continue;
             Vector3 p = transform.InverseTransformPoint(car.transform.position) - localCenter;
             if (Mathf.Abs(p.x) > halfSize.x + 3 || Mathf.Abs(p.z) > halfSize.y + 4) continue;
-            var body = car.GetComponent<Rigidbody>();
+            var body = sample.body;
             if (body == null) continue;
             float kph = body.linearVelocity.magnitude * 3.6f;
             if (kph < minimumSpeedKph) continue;

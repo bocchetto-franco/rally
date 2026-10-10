@@ -126,8 +126,8 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
         panel.transform.SetParent(canvasObject.transform, false);
         warningRect = panel.GetComponent<RectTransform>();
         warningRect.anchorMin = warningRect.anchorMax = new Vector2(.5f, 1f);
-        warningRect.pivot = new Vector2(.5f, .5f);
-        warningRect.anchoredPosition = new Vector2(0f, -270f);
+        warningRect.pivot = new Vector2(.5f, 1f);
+        warningRect.anchoredPosition = new Vector2(0f, -28f);
         warningRect.sizeDelta = new Vector2(430f, 176f);
         panel.GetComponent<Image>().color = new Color(.045f, .055f, .065f, .94f);
         panel.GetComponent<Image>().raycastTarget = false;

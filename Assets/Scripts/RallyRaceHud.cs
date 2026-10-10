@@ -33,6 +33,7 @@ public sealed class RallyRaceHud : MonoBehaviour
     {
         PreparePositionPanel();
         PrepareSpeedPanel();
+        PrepareTimingPanel();
         PrepareRecoveryPanel();
     }
 
@@ -124,6 +125,7 @@ public sealed class RallyRaceHud : MonoBehaviour
         PrepareSpeedPanel();
         timeText = time;
         checkpointText = checkpoint;
+        PrepareTimingPanel();
         Refresh();
     }
 
@@ -147,6 +149,27 @@ public sealed class RallyRaceHud : MonoBehaviour
         if (panel != null && panel.name == "Position Panel")
             panel.sizeDelta = new Vector2(Mathf.Max(panel.sizeDelta.x, 300f), Mathf.Max(panel.sizeDelta.y, 168f));
         label.sizeDelta = new Vector2(Mathf.Max(label.sizeDelta.x, 280f), Mathf.Max(label.sizeDelta.y, 144f));
+    }
+
+    void PrepareTimingPanel()
+    {
+        if (timeText == null || !(timeText.transform.parent is RectTransform panel)) return;
+        panel.anchorMin = panel.anchorMax = Vector2.one;
+        panel.pivot = Vector2.one;
+        panel.anchoredPosition = new Vector2(-28f, -28f);
+        panel.sizeDelta = new Vector2(500f, 132f);
+        timeText.fontSize = 44f;
+        RectTransform time = timeText.rectTransform;
+        time.anchorMin = time.anchorMax = time.pivot = new Vector2(.5f, 1f);
+        time.anchoredPosition = new Vector2(0f, -12f);
+        time.sizeDelta = new Vector2(470f, 58f);
+        if (checkpointText != null)
+        {
+            RectTransform checkpoint = checkpointText.rectTransform;
+            checkpoint.anchorMin = checkpoint.anchorMax = checkpoint.pivot = new Vector2(.5f, 1f);
+            checkpoint.anchoredPosition = new Vector2(0f, -74f);
+            checkpoint.sizeDelta = new Vector2(470f, 42f);
+        }
     }
 
     void Update() => Refresh();

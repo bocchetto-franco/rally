@@ -41,6 +41,8 @@ public sealed class RallyRacePositions : MonoBehaviour
     private float startDistance;
     private Racer[] racers;
     private Racer player;
+    private float nextProgressUpdate;
+    private const float ProgressUpdateInterval = .1f;
 
     public int PlayerPosition { get; private set; } = 1;
     public int RacerCount => racers == null ? 1 : racers.Length;
@@ -144,12 +146,22 @@ public sealed class RallyRacePositions : MonoBehaviour
             }
         }
         racers = entries.ToArray();
+        RefreshPositions();
     }
 
     private void Update()
     {
+        if (Time.time < nextProgressUpdate)
+            return;
+        RefreshPositions();
+    }
+
+    // Shared 10 Hz progress table; neither HUD needs a new route projection per render frame.
+    public void RefreshPositions()
+    {
         if (racers == null)
             return;
+        nextProgressUpdate = Time.time + ProgressUpdateInterval;
         foreach (Racer racer in racers)
             UpdateProgress(racer);
 

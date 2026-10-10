@@ -7,6 +7,9 @@ using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Profiling;
+using Unity.Profiling.LowLevel.Unsafe;
+using System.Globalization;
 
 /// <summary>Repeatable rendered fly-through using the actual one/two-player setup.</summary>
 [InitializeOnLoad]
@@ -22,6 +25,19 @@ public static class RallyRenderBenchmark
     static long draws, triangles;
     static int renderedFrames;
     static int lastRenderedFrame = -1;
+    sealed class Metric
+    {
+        public string name;
+        public ProfilerRecorder recorder;
+        public double sum;
+        public int count;
+        public bool bytes;
+    }
+    static readonly List<Metric> Metrics = new List<Metric>();
+    static readonly FrameTiming[] Timings = new FrameTiming[1];
+    static double gpuTotal;
+    static int gpuSamples;
+    static ulong lastGpuTimestamp;
 
     static RallyRenderBenchmark()
     {
@@ -40,9 +56,48 @@ public static class RallyRenderBenchmark
     [MenuItem("Tools/Rally/Performance/Benchmark All Circuits - 1 and 2 Players")]
     public static void Start() => StartRun("optimized");
 
+    // Both labels retain the currently configured runtime budget; "baseline" is historical.
+    public static void MeasureBefore() => StartRun("intermediate-before");
+    public static void MeasureAfter() => StartRun("intermediate-after");
+    public static void MeasureControlledBefore() => StartRun("intermediate-controlled-before");
+    public static void MeasureControlledAfter() => StartRun("intermediate-controlled-after");
+
+    static void BeginMetrics()
+    {
+        EndMetrics();
+        var handles = new List<ProfilerRecorderHandle>();
+        ProfilerRecorderHandle.GetAvailable(handles);
+        string[] names = { "CPU Main Thread Frame Time", "CPU Render Thread Frame Time", "GPU Frame Time",
+            "PlayerLoop", "RenderPipelineManager.DoRenderLoop_Internal", "RenderLoop.Draw",
+            "Gfx.WaitForPresentOnGfxThread", "Gfx.PresentFrame", "Physics.Simulate",
+            "Physics.Processing", "Physics.FetchResults", "BehaviourUpdate", "BehaviourFixedUpdate",
+            "BehaviourLateUpdate", "Canvas.BuildBatch", "GC.Alloc", "GC Allocated In Frame" };
+        var descriptions = handles.Select(ProfilerRecorderHandle.GetDescription).ToArray();
+        File.AppendAllText(Result, "Available profiling markers: " + string.Join(", ",
+            descriptions.Where(d => names.Contains(d.Name)).Select(d => d.Name)) + "\n");
+        foreach (string name in names)
+        {
+            var description = descriptions.FirstOrDefault(d => d.Name == name);
+            if (description.Name != name) continue;
+            var recorder = ProfilerRecorder.StartNew(description.Category, name, 1,
+                ProfilerRecorderOptions.StartImmediately | ProfilerRecorderOptions.WrapAroundWhenCapacityReached |
+                ProfilerRecorderOptions.SumAllSamplesInFrame);
+            if (recorder.Valid) Metrics.Add(new Metric { name = name, recorder = recorder, bytes = description.UnitType.ToString() == "Bytes" });
+            else recorder.Dispose();
+        }
+        gpuTotal = 0; gpuSamples = 0;
+        lastGpuTimestamp = FrameTimingManager.GetLatestTimings(1, Timings) > 0 ? Timings[0].frameStartTimestamp : 0;
+    }
+
+    static void EndMetrics()
+    {
+        foreach (var metric in Metrics) metric.recorder.Dispose();
+        Metrics.Clear();
+    }
+
     static void StartRun(string label)
     {
-        if (EditorApplication.isPlayingOrWillChangePlaymode || EditorSceneManager.GetActiveScene().isDirty)
+        if (EditorApplication.isPlayingOrWillChangePlaymode || StaticOcclusionCulling.isRunning || EditorSceneManager.GetActiveScene().isDirty)
             throw new InvalidOperationException("Save the scene and leave Play before benchmarking.");
         Directory.CreateDirectory("Logs");
         SessionState.SetString(Prefix + "PreviousScene", EditorSceneManager.GetActiveScene().path);
@@ -62,6 +117,7 @@ public static class RallyRenderBenchmark
 
     static void LoadCase()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode || !SessionState.GetBool(Prefix + "Running", false)) return;
         cameras = null;
         route = null;
         int index = SessionState.GetInt(Prefix + "Case", 0);
@@ -79,6 +135,16 @@ public static class RallyRenderBenchmark
     static void Poll()
     {
         if (EditorApplication.isCompiling || EditorApplication.isUpdating) return;
+        if (!EditorApplication.isPlayingOrWillChangePlaymode && SessionState.GetBool(Prefix + "Running", false))
+        {
+            // Some editor sessions lose the exit event or do not pump delayCall after Play.
+            if (SessionState.GetBool(Prefix + "Advance", false)) ModeChanged(PlayModeStateChange.EnteredEditMode);
+            if (SessionState.GetBool(Prefix + "TransitionPending", false))
+            {
+                EditorApplication.delayCall -= LoadCase;
+                LoadCase();
+            }
+        }
         if (!EditorApplication.isPlayingOrWillChangePlaymode && SessionState.GetBool(Prefix + "Running", false) &&
             !SessionState.GetBool(Prefix + "Advance", false) && !SessionState.GetBool(Prefix + "TransitionPending", false))
             Restore(); // A script reload can consume the pending EnteredEditMode event.
@@ -150,6 +216,28 @@ public static class RallyRenderBenchmark
             route = Enumerable.Range(0, points.childCount).Select(i => points.GetChild(i).position).ToArray();
             // Stop completion/pause menus from interrupting the fly-through.
             foreach (var flow in UnityEngine.Object.FindObjectsByType<RallyRaceFlow>()) flow.enabled = false;
+            if (SessionState.GetString(Prefix + "Label", "") == "intermediate-controlled-before")
+            {
+                // Reconstruct the previous visual budget in the disposable Play copy only.
+                // Original texture caps are imported separately before starting this A/B pass.
+                foreach (var root in SceneManager.GetActiveScene().GetRootGameObjects())
+                {
+                    foreach (var group in root.GetComponentsInChildren<LODGroup>(true))
+                    {
+                        var levels = group.GetLODs();
+                        for (int i = 0; i < levels.Length; i++) levels[i].screenRelativeTransitionHeight /= 1.25f;
+                        group.SetLODs(levels);
+                    }
+                    foreach (var terrain in root.GetComponentsInChildren<Terrain>(true))
+                    {
+                        terrain.detailObjectDistance = 65f; terrain.detailObjectDensity = .65f;
+                        terrain.treeDistance = 650f; terrain.treeBillboardDistance = 55f;
+                        terrain.heightmapPixelError = expectedScene == "Circuit_02" ? 7f : 20f;
+                        terrain.basemapDistance = expectedScene == "Circuit_02" ? 180f : 80f;
+                    }
+                }
+                File.AppendAllText(Result, "Controlled old LOD/Terrain budget applied to unsaved Play copy.\n");
+            }
             SessionState.SetInt(Prefix + "VSync", QualitySettings.vSyncCount);
             SessionState.SetInt(Prefix + "Target", Application.targetFrameRate);
             QualitySettings.vSyncCount = 0;
@@ -157,6 +245,7 @@ public static class RallyRenderBenchmark
             Type gameView = TypeCache.GetTypesDerivedFrom<EditorWindow>().FirstOrDefault(t => t.FullName == "UnityEditor.GameView");
             if (gameView != null) EditorWindow.GetWindow(gameView).Focus();
             Frames.Clear(); draws = triangles = renderedFrames = 0; lastRenderedFrame = -1;
+            BeginMetrics();
             began = EditorApplication.timeSinceStartup;
             lastFrame = 0;
         }
@@ -191,6 +280,18 @@ public static class RallyRenderBenchmark
             $"avg triangles {triangles / Math.Max(1, renderedFrames)}, frames {Frames.Count}; " +
             $"coverage {coverage:P0}; GPU {SystemInfo.graphicsDeviceName}" +
             (coverage < .9 ? " [PARTIAL SAMPLE: not a valid full-route FPS]" : "") + "\n");
+        foreach (var metric in Metrics)
+        {
+            double average = metric.sum / Math.Max(1, metric.count);
+            bool bytes = metric.bytes;
+            File.AppendAllText(Result, "  PROFILE " + metric.name + ": " +
+                (bytes ? average : average / 1000000).ToString("F3", CultureInfo.InvariantCulture) +
+                (bytes ? " bytes/frame" : " ms/frame") + "; samples " + metric.count + "\n");
+        }
+        File.AppendAllText(Result, gpuSamples > 0 ? "  GPU timing: " +
+            (gpuTotal / gpuSamples).ToString("F3", CultureInfo.InvariantCulture) + " ms/frame\n" :
+            "  GPU timing: unavailable from FrameTimingManager on this Editor/device; do not infer a GPU duration.\n");
+        EndMetrics();
         SessionState.SetBool(Prefix + "Advance", true);
         EditorApplication.isPlaying = false;
     }
@@ -216,6 +317,14 @@ public static class RallyRenderBenchmark
             draws += UnityStats.drawCalls;
             triangles += UnityStats.triangles;
             renderedFrames++;
+            foreach (var metric in Metrics)
+                if (metric.recorder.Count > 0) { metric.sum += metric.recorder.LastValue; metric.count++; }
+            FrameTimingManager.CaptureFrameTimings();
+            if (FrameTimingManager.GetLatestTimings(1, Timings) > 0 && Timings[0].frameStartTimestamp > lastGpuTimestamp)
+            {
+                lastGpuTimestamp = Timings[0].frameStartTimestamp;
+                if (Timings[0].gpuFrameTime > 0) { gpuTotal += Timings[0].gpuFrameTime; gpuSamples++; }
+            }
         }
         lastFrame = now;
     }
@@ -236,6 +345,7 @@ public static class RallyRenderBenchmark
 
     static void Restore()
     {
+        EndMetrics();
         cameras = null;
         route = null;
         SessionState.SetBool(Prefix + "Running", false);
