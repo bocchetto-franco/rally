@@ -37,6 +37,13 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
         device = source;
         steeringResponse = response;
         assignedGamepad = null;
+        NotifyRecoveryBinding();
+    }
+
+    void NotifyRecoveryBinding()
+    {
+        RallyVehicleRecovery recovery = GetComponent<RallyVehicleRecovery>();
+        if (recovery != null) recovery.BindLocalInput(this);
     }
 
     void Update()

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,15 +12,31 @@ public sealed class RallyBrakeWarningTrigger : MonoBehaviour
     [SerializeField, Range(1, 6), Tooltip("1 = muy cerrada; 6 = muy abierta.")] int cornerGrade = 3;
     [SerializeField] bool hairpin;
     [SerializeField] Vector3 curveEntry;
-    readonly HashSet<Collider> vehicleContacts = new HashSet<Collider>();
-    readonly Dictionary<RallyBrakeWarningSystem, HashSet<Collider>> localContacts = new Dictionary<RallyBrakeWarningSystem, HashSet<Collider>>();
+    readonly HashSet<Collider> vehicleContacts = new HashSet<Collider>(8);
+    readonly Dictionary<RallyBrakeWarningSystem, HashSet<Collider>> localContacts = new Dictionary<RallyBrakeWarningSystem, HashSet<Collider>>(2);
+    readonly Dictionary<Rigidbody, RallyLocalPlayerInput> localInputs = new Dictionary<Rigidbody, RallyLocalPlayerInput>(8);
+
+    IEnumerator Start()
+    {
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
+        // Reserve each player's contacts before their first note trigger.
+        foreach (var entry in RallyVehiclePresentationCache.ForScene(gameObject.scene))
+        {
+            if (entry.body == null) continue;
+            localInputs[entry.body] = entry.input;
+            if (entry.input != null && entry.input.BrakeWarnings != null && !localContacts.ContainsKey(entry.input.BrakeWarnings))
+                localContacts.Add(entry.input.BrakeWarnings, new HashSet<Collider>(8));
+        }
+    }
 
     public float TargetSpeedKph => targetSpeedKph;
     public TurnDirection Direction => turnDirection;
     public int CornerGrade => Mathf.Clamp(cornerGrade, 1, 6);
     public bool IsHairpin => hairpin;
     public Vector3 CurveEntry => curveEntry;
-    public string NoteLabel => (turnDirection == TurnDirection.Right ? "DERECHA" : "IZQUIERDA") + " " + CornerGrade;
+    static readonly string[] RightLabels = { "DERECHA 1", "DERECHA 2", "DERECHA 3", "DERECHA 4", "DERECHA 5", "DERECHA 6" };
+    static readonly string[] LeftLabels = { "IZQUIERDA 1", "IZQUIERDA 2", "IZQUIERDA 3", "IZQUIERDA 4", "IZQUIERDA 5", "IZQUIERDA 6" };
+    public string NoteLabel => (turnDirection == TurnDirection.Right ? RightLabels : LeftLabels)[CornerGrade - 1];
 
     public void Configure(RallyBrakeWarningSystem system, float targetSpeed)
     {
@@ -65,20 +82,26 @@ public sealed class RallyBrakeWarningTrigger : MonoBehaviour
     {
         foreach (var entry in localContacts)
             if (entry.Key != null) entry.Key.Exit(this);
-        localContacts.Clear();
+        foreach (var entry in localContacts) entry.Value.Clear();
         vehicleContacts.Clear();
         if (warningSystem != null) warningSystem.Exit(this);
     }
 
     bool TrackLocalPlayer(Collider other)
     {
-        var input = other.attachedRigidbody != null ? other.attachedRigidbody.GetComponent<RallyLocalPlayerInput>() : null;
+        Rigidbody body = other.attachedRigidbody;
+        if (body == null) return false;
+        if (!localInputs.TryGetValue(body, out var input))
+        {
+            input = body.GetComponent<RallyLocalPlayerInput>();
+            localInputs.Add(body, input);
+        }
         if (input == null) return false;
         var system = input.BrakeWarnings;
         if (system == null) return true;
         if (!localContacts.TryGetValue(system, out var contacts))
         {
-            contacts = new HashSet<Collider>();
+            contacts = new HashSet<Collider>(8);
             localContacts.Add(system, contacts);
         }
         contacts.Add(other);

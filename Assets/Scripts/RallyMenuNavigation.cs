@@ -20,6 +20,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     EventSystem eventSystem;
     bool upHeld, downHeld, leftHeld, rightHeld, southHeld;
     Gamepad previousPad;
+    Button[] vehicleCycle;
 
     public int SelectedIndex => selectedIndex;
     public int LocalPlayer => localPlayer;
@@ -49,6 +50,16 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     public void Configure(params Button[] orderedButtons)
         => ConfigureControls(orderedButtons);
+
+    // Only selection panels opt in. Sliders and all other menus retain their controls.
+    public void ConfigureVehicleCycle(Button[] cars) => vehicleCycle = cars;
+
+    public void FocusVehicle(Button car)
+    {
+        if (buttons == null) return;
+        int index = System.Array.IndexOf(buttons, car);
+        if (Usable(index)) Select(index);
+    }
 
     public void ConfigureControls(params Selectable[] orderedControls)
     {
@@ -108,6 +119,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     void Update()
     {
+        if (RallyRaceLoading.IsInputBlocked) return;
         if (buttons == null || buttons.Length == 0) return;
         Gamepad pad = Pad;
         if (pad != previousPad) SeedHeld(); // Reconnect without submitting a held button.
@@ -130,7 +142,10 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         bool confirm = (south && !southHeld) ||
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.Confirm(localPlayer) : KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
         upHeld = up; downHeld = down; leftHeld = left; rightHeld = right; southHeld = south;
-        if (previous) Move(-1);
+        int carIndex = vehicleCycle == null || !Usable(selectedIndex) ? -1 : System.Array.IndexOf(vehicleCycle, buttons[selectedIndex]);
+        if (carIndex >= 0 && (decrease || increase))
+            FocusVehicle(vehicleCycle[(carIndex + (increase ? 1 : vehicleCycle.Length - 1)) % vehicleCycle.Length]);
+        else if (previous) Move(-1);
         else if (next) Move(1);
         else if (slider != null && (decrease || increase))
             slider.value = Mathf.Clamp(slider.value + (increase ? .05f : -.05f), slider.minValue, slider.maxValue);

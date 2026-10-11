@@ -11,6 +11,9 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     bool running;
     bool finished;
     Rigidbody vehicleBody;
+    RallyLocalPlayerInput localInput;
+    int formattedMilliseconds = -1;
+    string cachedFormattedTime;
     Vector3 resetPosition;
     Quaternion resetRotation;
     bool hasResetPose;
@@ -27,6 +30,7 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     public void BindVehicle(Rigidbody body)
     {
         vehicleBody = body;
+        localInput = body != null ? body.GetComponent<RallyLocalPlayerInput>() : null;
         resetPosition = body.position;
         resetRotation = body.rotation;
         hasResetPose = true;
@@ -43,9 +47,13 @@ public sealed class RallyCheckpointManager : MonoBehaviour
     {
         get
         {
-            int minutes = Mathf.FloorToInt(elapsedTime / 60f);
-            float seconds = elapsedTime - minutes * 60f;
-            return $"{minutes:00}:{seconds:00.000}";
+            int milliseconds = Mathf.Max(0, Mathf.RoundToInt(elapsedTime * 1000f));
+            if (milliseconds != formattedMilliseconds)
+            {
+                cachedFormattedTime = $"{milliseconds / 60000:00}:{milliseconds / 1000 % 60:00}.{milliseconds % 1000:000}";
+                formattedMilliseconds = milliseconds;
+            }
+            return cachedFormattedTime;
         }
     }
 
@@ -55,11 +63,16 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         CacheInitialVehiclePose();
     }
 
+    void Start()
+    {
+        // Split-screen adds/rebinds local inputs during its earlier Start.
+        localInput = vehicleBody != null ? vehicleBody.GetComponent<RallyLocalPlayerInput>() : null;
+    }
+
     void Update()
     {
         if (Time.timeScale == 0f)
             return;
-        RallyLocalPlayerInput localInput = vehicleBody != null ? vehicleBody.GetComponent<RallyLocalPlayerInput>() : null;
         bool reset = localInput != null ? localInput.ResetPressed :
             (Input.GetKeyDown(KeyCode.R) || RallyGamepadInput.ResetPressedThisFrame);
         if (!finished && reset)
@@ -94,6 +107,8 @@ public sealed class RallyCheckpointManager : MonoBehaviour
         if (vehicleBody != null && attachedBody != vehicleBody)
             return;
 
+        if (vehicleBody != attachedBody)
+            localInput = attachedBody.GetComponent<RallyLocalPlayerInput>();
         vehicleBody = attachedBody;
         StoreCheckpointPose(checkpointIndex);
 
@@ -140,6 +155,7 @@ public sealed class RallyCheckpointManager : MonoBehaviour
             break;
         }
         vehicleBody = vehicle != null ? vehicle.GetComponent<Rigidbody>() : null;
+        localInput = vehicleBody != null ? vehicleBody.GetComponent<RallyLocalPlayerInput>() : null;
         if (vehicleBody == null)
             return;
 

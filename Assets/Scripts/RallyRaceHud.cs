@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,9 +21,14 @@ public sealed class RallyRaceHud : MonoBehaviour
     int displayedTotalLaps = -1;
     int displayedCheckpoint = -1;
     int displayedCheckpointCount = -1;
-    float displayedElapsedTime = -1f;
+    int displayedTimerTick = -1;
+    int displayedTimeMilliseconds = -1;
     bool displayedFinish;
     RallyVehicleRecovery recovery;
+    RallyLocalPlayerInput localInput;
+    Gamepad displayedRecoveryPad;
+    int displayedRecoveryPlayer = -1;
+    bool displayedRecoveryKeyboard, displayedRecoverySplit, recoveryLabelCached;
     GameObject recoveryPanel;
     TMP_Text recoveryText;
 
@@ -87,21 +93,27 @@ public sealed class RallyRaceHud : MonoBehaviour
     {
         if (!Application.isPlaying) return;
         PrepareRecoveryPanel();
-        if (recovery == null && vehicleBody != null)
-            recovery = vehicleBody.GetComponent<RallyVehicleRecovery>();
         bool visible = recovery != null && recovery.CanRecover &&
             (checkpointManager == null || !checkpointManager.IsFinished);
         if (recoveryPanel.activeSelf != visible) recoveryPanel.SetActive(visible);
         if (!visible) return;
 
-        RallyLocalPlayerInput local = vehicleBody.GetComponent<RallyLocalPlayerInput>();
+        RallyLocalPlayerInput local = localInput;
         Gamepad pad = local != null ? local.AssignedGamepad : Gamepad.current;
         bool keyboard = local == null || local.Device == RallyLocalPlayerInput.InputDevice.Keyboard;
+        int player = local != null ? local.PlayerIndex : -1;
+        bool split = RallyLocalKeyboard.Split;
+        if (recoveryLabelCached && displayedRecoveryPad == pad && displayedRecoveryPlayer == player &&
+            displayedRecoveryKeyboard == keyboard && displayedRecoverySplit == split) return;
         string control = keyboard ? (local != null ? RallyLocalKeyboard.RecoveryLabel(local.PlayerIndex) : "M") : "";
         if (pad != null && (local == null || !keyboard))
             control += (control.Length > 0 ? " / " : "") + (pad is DualShockGamepad ? "Cuadrado" : "X");
-        string text = "RESTABLECER AUTO · " + control;
-        if (recoveryText.text != text) recoveryText.text = text;
+        recoveryText.SetText("RESTABLECER AUTO · " + control);
+        displayedRecoveryPad = pad;
+        displayedRecoveryPlayer = player;
+        displayedRecoveryKeyboard = keyboard;
+        displayedRecoverySplit = split;
+        recoveryLabelCached = true;
     }
 
     void PrepareSpeedPanel()
@@ -121,6 +133,8 @@ public sealed class RallyRaceHud : MonoBehaviour
         checkpointManager = manager;
         vehicleBody = body;
         recovery = null;
+        CacheVehicleReferences();
+        ResetDisplayedValues();
         speedText = speed;
         PrepareSpeedPanel();
         timeText = time;
@@ -133,6 +147,7 @@ public sealed class RallyRaceHud : MonoBehaviour
     {
         racePositions = positions;
         positionText = position;
+        displayedPosition = displayedRacerCount = displayedLap = displayedTotalLaps = -1;
         PreparePositionPanel();
         Refresh();
     }
@@ -172,6 +187,21 @@ public sealed class RallyRaceHud : MonoBehaviour
         }
     }
 
+    IEnumerator Start()
+    {
+        // Newly added recovery components and both split-screen rigs finish Start
+        // before this one-off bind. Never poll for optional components per frame.
+        yield return null;
+        CacheVehicleReferences();
+    }
+
+    void CacheVehicleReferences()
+    {
+        recovery = vehicleBody != null ? vehicleBody.GetComponent<RallyVehicleRecovery>() : null;
+        localInput = vehicleBody != null ? vehicleBody.GetComponent<RallyLocalPlayerInput>() : null;
+        recoveryLabelCached = false;
+    }
+
     void Update() => Refresh();
 
     public void BindPlayer(RallyCheckpointManager manager, Rigidbody body, RallyRacePositions positions)
@@ -179,11 +209,17 @@ public sealed class RallyRaceHud : MonoBehaviour
         checkpointManager = manager;
         vehicleBody = body;
         recovery = null;
+        CacheVehicleReferences();
         racePositions = positions;
+        ResetDisplayedValues();
+        Refresh();
+    }
+
+    void ResetDisplayedValues()
+    {
         displayedSpeed = displayedPosition = displayedRacerCount = displayedLap = displayedTotalLaps = -1;
         displayedCheckpoint = displayedCheckpointCount = -1;
-        displayedElapsedTime = -1f;
-        Refresh();
+        displayedTimerTick = displayedTimeMilliseconds = -1;
     }
 
     void Refresh()
@@ -198,9 +234,14 @@ public sealed class RallyRaceHud : MonoBehaviour
             if (position != displayedPosition || racerCount != displayedRacerCount ||
                 lap != displayedLap || totalLaps != displayedTotalLaps)
             {
-                string rank = racePositions == null ? "—/—" : $"{position}°/{racerCount}";
-                string lapLabel = checkpointManager == null ? "Vuelta —/—" : $"Vuelta {lap}/{totalLaps}";
-                positionText.text = $"{rank}\n<size=28>{lapLabel}</size>";
+                if (racePositions != null && checkpointManager != null)
+                    positionText.SetText("{0}°/{1}\n<size=28>Vuelta {2}/{3}</size>", position, racerCount, lap, totalLaps);
+                else if (racePositions != null)
+                    positionText.SetText("{0}°/{1}\n<size=28>Vuelta —/—</size>", (float)position, (float)racerCount);
+                else if (checkpointManager != null)
+                    positionText.SetText("—/—\n<size=28>Vuelta {0}/{1}</size>", (float)lap, (float)totalLaps);
+                else
+                    positionText.SetText("—/—\n<size=28>Vuelta —/—</size>");
                 displayedPosition = position;
                 displayedRacerCount = racerCount;
                 displayedLap = lap;
@@ -214,7 +255,7 @@ public sealed class RallyRaceHud : MonoBehaviour
             int roundedSpeed = Mathf.RoundToInt(speedKph);
             if (roundedSpeed != displayedSpeed)
             {
-                speedText.text = $"{roundedSpeed:000} <size=40%>km/h</size>";
+                speedText.SetText("{0:000} <size=40%>km/h</size>", roundedSpeed);
                 displayedSpeed = roundedSpeed;
             }
         }
@@ -225,11 +266,17 @@ public sealed class RallyRaceHud : MonoBehaviour
         if (timeText != null)
         {
             float elapsed = checkpointManager.ElapsedTime;
+            // Presentation only: 30 Hz instead of rebuilding two TMP meshes every
+            // rendered frame. The actual clock and final milliseconds are unchanged.
+            int timerTick = Mathf.FloorToInt(elapsed * 30f);
             bool finished = checkpointManager.IsFinished;
-            if (elapsed != displayedElapsedTime || finished != displayedFinish)
+            int milliseconds = Mathf.Max(0, Mathf.RoundToInt(elapsed * 1000f));
+            if (timerTick != displayedTimerTick || finished != displayedFinish || milliseconds < displayedTimeMilliseconds)
             {
-                timeText.text = $"{(finished ? "META" : "TIEMPO")}  {checkpointManager.FormattedTime}";
-                displayedElapsedTime = elapsed;
+                timeText.SetText(finished ? "META  {0:00}:{1:00}.{2:000}" : "TIEMPO  {0:00}:{1:00}.{2:000}",
+                    milliseconds / 60000, milliseconds / 1000 % 60, milliseconds % 1000);
+                displayedTimerTick = timerTick;
+                displayedTimeMilliseconds = milliseconds;
                 displayedFinish = finished;
             }
         }
@@ -239,7 +286,7 @@ public sealed class RallyRaceHud : MonoBehaviour
             int count = checkpointManager.RaceCheckpointCount;
             if (completed != displayedCheckpoint || count != displayedCheckpointCount)
             {
-                checkpointText.text = $"Checkpoint {completed}/{count}";
+                checkpointText.SetText("Checkpoint {0}/{1}", (float)completed, (float)count);
                 displayedCheckpoint = completed;
                 displayedCheckpointCount = count;
             }

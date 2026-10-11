@@ -47,6 +47,11 @@ public static class RallyLocalDevices
     }
 
     public static bool UsesKeyboard(int player) => player >= 0 && player < 2 && GamepadFor(player) == null;
-    public static string Label(int player) => "J" + (player + 1) + " · " +
-        (GamepadFor(player) != null ? "MANDO" : player == 0 ? "WASD + ESPACIO" : "FLECHAS + ENTER");
+    public static string Label(int player)
+    {
+        // Selection checks these labels every frame for hot-plug changes.
+        if (player == 0) return GamepadFor(0) != null ? "J1 · MANDO" : "J1 · WASD + ESPACIO";
+        if (player == 1) return GamepadFor(1) != null ? "J2 · MANDO" : "J2 · FLECHAS + ENTER";
+        return "J" + (player + 1) + " · FLECHAS + ENTER";
+    }
 }

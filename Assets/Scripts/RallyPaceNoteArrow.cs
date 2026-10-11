@@ -9,6 +9,7 @@ public sealed class RallyPaceNoteArrow : MaskableGraphic
     RallyBrakeWarningTrigger.TurnDirection direction;
     int grade = 3;
     bool hairpin;
+    readonly List<Vector2> points = new List<Vector2>(34);
     static readonly float[] Angles = { 150f, 115f, 90f, 65f, 40f, 23f };
 
     public void SetNote(RallyBrakeWarningTrigger.TurnDirection turn, int number, bool isHairpin)
@@ -23,7 +24,9 @@ public sealed class RallyPaceNoteArrow : MaskableGraphic
     {
         vh.Clear();
         float angle = (hairpin ? 180f : Angles[grade - 1]) * Mathf.Deg2Rad;
-        var points = new List<Vector2> { new Vector2(0f, -.48f), new Vector2(0f, -.12f) };
+        points.Clear();
+        points.Add(new Vector2(0f, -.48f));
+        points.Add(new Vector2(0f, -.12f));
         const float radius = .36f;
         const int arcSegments = 32;
         for (int i = 1; i <= arcSegments; i++)

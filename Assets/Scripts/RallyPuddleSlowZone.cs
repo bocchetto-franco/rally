@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,8 +20,10 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
     [SerializeField, Min(0f)] float maximumContinuousParticlesPerSecond = 36f;
     [SerializeField] ParticleSystem splashParticles;
 
-    readonly Dictionary<Rigidbody, int> vehicleOverlaps = new Dictionary<Rigidbody, int>();
-    readonly List<Rigidbody> staleBodies = new List<Rigidbody>();
+    struct VehicleOverlap { public int count; public JrsVehicleController vehicle; }
+    readonly Dictionary<Rigidbody, VehicleOverlap> vehicleOverlaps = new Dictionary<Rigidbody, VehicleOverlap>(8);
+    readonly Dictionary<Rigidbody, JrsVehicleController> knownVehicles = new Dictionary<Rigidbody, JrsVehicleController>(8);
+    readonly List<Rigidbody> staleBodies = new List<Rigidbody>(8);
     Material runtimeSplashMaterial;
     float splashEmissionAccumulator;
 
@@ -40,35 +43,54 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
         GetComponent<BoxCollider>().isTrigger = true;
     }
 
+    IEnumerator Start()
+    {
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
+        foreach (var entry in RallyVehiclePresentationCache.ForScene(gameObject.scene))
+            if (entry.body != null) knownVehicles[entry.body] = entry.car;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         Rigidbody body = GetVehicleBody(other);
         if (body == null)
             return;
 
-        vehicleOverlaps.TryGetValue(body, out int overlapCount);
-        vehicleOverlaps[body] = overlapCount + 1;
-        if (overlapCount == 0)
+        vehicleOverlaps.TryGetValue(body, out VehicleOverlap overlap);
+        if (overlap.count == 0 && !knownVehicles.TryGetValue(body, out overlap.vehicle))
+        {
+            // Optional future dynamically spawned vehicle: resolve only on entry.
+            overlap.vehicle = body.GetComponent<JrsVehicleController>();
+            knownVehicles[body] = overlap.vehicle;
+        }
+        else if (overlap.count == 0) overlap.vehicle = knownVehicles[body];
+        overlap.count++;
+        vehicleOverlaps[body] = overlap;
+        if (overlap.count == 1)
             EmitEntrySplash(body);
     }
 
     void OnTriggerExit(Collider other)
     {
         Rigidbody body = GetVehicleBody(other);
-        if (body == null || !vehicleOverlaps.TryGetValue(body, out int overlapCount))
+        if (body == null || !vehicleOverlaps.TryGetValue(body, out VehicleOverlap overlap))
             return;
 
-        if (overlapCount <= 1)
+        if (overlap.count <= 1)
             vehicleOverlaps.Remove(body);
         else
-            vehicleOverlaps[body] = overlapCount - 1;
+        {
+            overlap.count--;
+            vehicleOverlaps[body] = overlap;
+        }
     }
 
     void FixedUpdate()
     {
         staleBodies.Clear();
-        foreach (Rigidbody body in vehicleOverlaps.Keys)
+        foreach (var entry in vehicleOverlaps)
         {
+            Rigidbody body = entry.Key;
             if (body == null)
             {
                 staleBodies.Add(body);
@@ -88,7 +110,7 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
             // Counter part of the requested steering force, making the car
             // continue slightly straighter at speed without changing any tire
             // friction curve or fighting a normal low-speed drift.
-            JrsVehicleController vehicle = body.GetComponent<JrsVehicleController>();
+            JrsVehicleController vehicle = entry.Value.vehicle;
             float steering = SteeringInput(vehicle);
             if (aquaplaning > 0f && Mathf.Abs(steering) > 0.05f)
             {

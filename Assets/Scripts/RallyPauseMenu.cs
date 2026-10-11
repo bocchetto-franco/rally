@@ -36,6 +36,7 @@ public sealed class RallyPauseMenu : MonoBehaviour
 
     void Update()
     {
+        if (RallyRaceLoading.IsPreparing) return;
         if (checkpointManager != null && (RallySplitScreen.Active != null ?
             RallySplitScreen.Active.AllFinished : checkpointManager.IsFinished))
         {
@@ -119,7 +120,7 @@ public sealed class RallyPauseMenu : MonoBehaviour
     void RestartRace()
     {
         Close(true);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        RallyRaceLoading.Load(SceneManager.GetActiveScene().name);
     }
 
     void ConfirmExit()

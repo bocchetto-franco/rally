@@ -50,6 +50,7 @@ public sealed class RallyBotController : MonoBehaviour
         waypointPositions = null;
         planarLegs = null;
         planarLegLengths = null;
+        if (Application.isPlaying && vehicleBody != null) EnsureRoute();
     }
 
     public void SetDifficulty(float speedKph, float brakingAggressiveness)
@@ -124,6 +125,8 @@ public sealed class RallyBotController : MonoBehaviour
             vehicleBody = vehicle.GetComponent<Rigidbody>();
         if (vehicle != null)
             vehicle.SetBotInput(this);
+        RallyVehicleRecovery recovery = GetComponent<RallyVehicleRecovery>();
+        if (recovery != null) recovery.MarkAsBot();
         RallyVehicleDynamics dynamics = GetComponent<RallyVehicleDynamics>();
         if (dynamics != null)
             dynamics.SetBotInput(this);
@@ -134,11 +137,12 @@ public sealed class RallyBotController : MonoBehaviour
         // Execute before JrsVehicleController.Start (default execution order), so
         // its wheel visuals are already bound to the selected model.
         RallyBotVisualSelection.ApplyToScene(gameObject.scene);
+        EnsureRoute();
     }
 
     private void FixedUpdate()
     {
-        if (vehicle == null || vehicleBody == null || !EnsureRoute())
+        if (vehicle == null || vehicleBody == null || !routeReady)
         {
             VerticalInput = 0f;
             HorizontalInput = 0f;

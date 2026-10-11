@@ -213,6 +213,14 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         ApplySetup();
     }
 
+    private void Start()
+    {
+        // Optional legacy input is resolved once after scene setup. A missing
+        // object must not cause a global lookup on every physics tick.
+        GameObject inputObject = GameObject.Find("Circuit Keyboard Input");
+        inputController = inputObject != null ? inputObject.GetComponent<JrsInputController>() : null;
+    }
+
     private void FixedUpdate()
     {
         if (vehicleBody == null)
@@ -340,12 +348,6 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     private void UpdateBrakes()
     {
-        if (inputController == null)
-        {
-            GameObject inputObject = GameObject.Find("Circuit Keyboard Input");
-            inputController = inputObject != null ? inputObject.GetComponent<JrsInputController>() : null;
-        }
-
         float forwardSpeedKph = Vector3.Dot(vehicleBody.linearVelocity, vehicleBody.transform.forward) * 3.6f;
         bool legacyBrake = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow) ||
             (inputController != null && inputController.GetLegacyVerticalInput() < -0.1f);

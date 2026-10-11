@@ -104,7 +104,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
         canvasObject.AddComponent<RallyMenuNavigation>().Configure(restart, times, menu);
     }
 
-    void RestartRace() { ResumeTime(); SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
+    void RestartRace() { ResumeTime(); RallyRaceLoading.Load(SceneManager.GetActiveScene().name); }
     void BackToSelection() { ResumeTime(); SceneManager.LoadScene(RallyGameSession.SelectionScene); }
     void ToggleTimes() { if (timesPanel == null) return; timesText.text = BestTimesLabel(); timesPanel.SetActive(!timesPanel.activeSelf); }
     static void ResumeTime() => Time.timeScale = 1f;

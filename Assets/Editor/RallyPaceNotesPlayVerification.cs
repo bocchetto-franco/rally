@@ -76,6 +76,7 @@ public static class RallyPaceNotesPlayVerification
             if (Time.frameCount < minimumFrame) return;
             if (phase == 1)
             {
+                if (RallyRaceLoading.IsPreparing || Time.timeScale <= 0f) return;
                 if (test >= 3 && (RallySplitScreen.Active == null || !RallySplitScreen.Active.Ready)) return;
                 Time.timeScale = 1f;
                 foreach (var audio in UnityEngine.Object.FindObjectsByType<RallyAudioSystem>()) audio.enabled = false;

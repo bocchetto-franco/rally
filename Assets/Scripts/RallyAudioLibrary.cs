@@ -31,5 +31,19 @@ public sealed class RallyAudioLibrary : ScriptableObject
     [Min(0.1f)] public float fullVolumeImpactSpeed = 14f;
     [Min(0.05f)] public float impactCooldown = 0.2f;
 
-    public static RallyAudioLibrary Load() => Resources.Load<RallyAudioLibrary>(ResourcePath);
+    static RallyAudioLibrary cachedLibrary;
+    static bool loaded;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetCache() { cachedLibrary = null; loaded = false; }
+
+    public static RallyAudioLibrary Load()
+    {
+        if (!loaded)
+        {
+            cachedLibrary = Resources.Load<RallyAudioLibrary>(ResourcePath);
+            loaded = true;
+        }
+        return cachedLibrary;
+    }
 }

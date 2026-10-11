@@ -8,22 +8,31 @@ public sealed class RallyVehicleRecovery : MonoBehaviour
 {
     Rigidbody body;
     JrsVehicleController controller;
+    RallyLocalPlayerInput localInput;
+    bool isBot;
+    internal void BindLocalInput(RallyLocalPlayerInput input) => localInput = input;
+    internal void MarkAsBot() => isBot = true;
     bool keyboardWasHeld;
 
     public bool CanRecover => isActiveAndEnabled && body != null && controller != null &&
         Time.timeScale > 0f && !body.isKinematic && controller.isActiveAndEnabled &&
-        GetComponentInParent<RallyBotController>() == null &&
+        !isBot &&
         Vector3.Dot(body.rotation * Vector3.up, Vector3.up) <= 0.5f;
 
     void Awake()
     {
         body = GetComponent<Rigidbody>();
         controller = GetComponent<JrsVehicleController>();
+        isBot = GetComponentInParent<RallyBotController>() != null;
+    }
+
+    void Start()
+    {
+        localInput = GetComponent<RallyLocalPlayerInput>();
     }
 
     void Update()
     {
-        RallyLocalPlayerInput localInput = GetComponent<RallyLocalPlayerInput>();
         if (localInput != null)
         {
             if (localInput.RecoverPressed) RightVehicle();

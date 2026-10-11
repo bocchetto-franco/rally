@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -13,6 +14,8 @@ public sealed class RallyRenderPerformance : MonoBehaviour
     float previousLodBias;
     bool captured;
     float nextUpdate;
+    struct View { public Camera camera; public UniversalAdditionalCameraData data; }
+    View[] views;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Install()
@@ -29,8 +32,9 @@ public sealed class RallyRenderPerformance : MonoBehaviour
         root.AddComponent<RallyRenderPerformance>();
     }
 
-    void Start()
+    IEnumerator Start()
     {
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
         previousLodBias = QualitySettings.lodBias;
         captured = true;
         pipeline = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
@@ -39,6 +43,12 @@ public sealed class RallyRenderPerformance : MonoBehaviour
             previousScale = pipeline.renderScale;
             previousShadowDistance = pipeline.shadowDistance;
         }
+        Camera[] cameras = Camera.allCameras;
+        var list = new System.Collections.Generic.List<View>(2);
+        foreach (Camera camera in cameras)
+            if (camera.gameObject.scene == gameObject.scene && camera.cameraType == CameraType.Game)
+                list.Add(new View { camera = camera, data = camera.GetUniversalAdditionalCameraData() });
+        views = list.ToArray();
         Apply();
     }
 
@@ -56,15 +66,17 @@ public sealed class RallyRenderPerformance : MonoBehaviour
             UnityEditor.SessionState.GetString("Rally.RenderBenchmark.Label", "") == "baseline") return;
 #endif
         int cameras = 0;
-        foreach (Camera camera in Camera.allCameras)
+        if (views == null) return;
+        foreach (View view in views)
         {
-            if (camera.gameObject.scene != gameObject.scene || camera.cameraType != CameraType.Game) continue;
+            Camera camera = view.camera;
+            if (camera == null || !camera.isActiveAndEnabled) continue;
             cameras++;
             camera.useOcclusionCulling = true;
             camera.allowHDR = false;
             camera.allowMSAA = false;
             camera.farClipPlane = Mathf.Min(camera.farClipPlane, 450f);
-            var data = camera.GetUniversalAdditionalCameraData();
+            var data = view.data;
             data.renderPostProcessing = false;
             // The second view reuses lighting, without a second shadow render.
             data.renderShadows = !(camera.rect.height < .9f && camera.depth > 0f);

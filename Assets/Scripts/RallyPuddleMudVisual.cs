@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -11,19 +12,17 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
     [Range(0f, 60f)] public float particlesPerWheelPerSecond = 12f;
 
     ParticleSystem spray;
-    struct VehicleSample { public JrsVehicleController car; public Rigidbody body; }
-    static VehicleSample[] vehicles;
-    static float nextVehicleSearch;
-    static UnityEngine.SceneManagement.Scene cachedScene;
+    RallyVehiclePresentationCache.Vehicle[] vehicles;
     float emissionRemainder;
     readonly System.Random random = new System.Random();
     float Range(float min, float max) => Mathf.Lerp(min, max, (float)random.NextDouble());
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void ResetVehicleCache() { vehicles = null; nextVehicleSearch = 0f; }
-
-    void Start()
+    IEnumerator Start()
     {
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
+        // Split-screen/bot setup is complete. One shared scan at scene entry,
+        // not a FindObjects + allocated array every five seconds while driving.
+        vehicles = RallyVehiclePresentationCache.ForScene(gameObject.scene);
         var go = new GameObject("Mud droplets - visual only");
         go.transform.SetParent(transform, false);
         spray = go.AddComponent<ParticleSystem>();
@@ -57,16 +56,7 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
     void FixedUpdate()
     {
         if (spray == null || Time.timeScale <= 0f) return;
-        if (vehicles == null || cachedScene != gameObject.scene || Time.time >= nextVehicleSearch)
-        {
-            // All puddles reuse one lookup; cache bodies instead of GetComponent in each wheel loop.
-            var cars = FindObjectsByType<JrsVehicleController>();
-            vehicles = new VehicleSample[cars.Length];
-            for (int i = 0; i < cars.Length; i++)
-                vehicles[i] = new VehicleSample { car = cars[i], body = cars[i].GetComponent<Rigidbody>() };
-            cachedScene = gameObject.scene;
-            nextVehicleSearch = Time.time + 5f;
-        }
+        if (vehicles == null) return;
         foreach (var sample in vehicles)
         {
             var car = sample.car;

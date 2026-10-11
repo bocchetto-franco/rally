@@ -200,7 +200,8 @@ public static class RallyVehicleRecoverySmokeTest
             local.Configure(RallyLocalPlayerInput.InputDevice.Keyboard, 22f);
             secondBody.rotation = Quaternion.Euler(0f, 0f, 90f);
             PollHud(secondHud);
-            Check(secondHud.RecoveryPromptText == "RESTABLECER AUTO · M", "Keyboard player sees M only");
+            Check(secondHud.RecoveryPromptText == "RESTABLECER AUTO · " + RallyLocalKeyboard.RecoveryLabel(local.PlayerIndex),
+                "Keyboard player sees current keyboard shortcuts, without gamepad label");
             InputSystem.QueueStateEvent(keyboard, new KeyboardState());
             InputSystem.Update();
             local.SendMessage("Update");

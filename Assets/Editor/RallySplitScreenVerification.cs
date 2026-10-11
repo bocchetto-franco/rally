@@ -199,7 +199,7 @@ public static class RallySplitScreenVerification
                 ButtonNamed("Race Button").onClick.Invoke();
                 Next(1);
             }
-            else if (phase == 1 && split != null && split.Ready)
+            else if (phase == 1 && split != null && split.Ready && !RallyRaceLoading.IsPreparing && Time.timeScale > 0f)
             {
                 ValidateStructure(split);
                 // This suite drives controls near the grid then dispatches gates explicitly.
@@ -401,7 +401,7 @@ public static class RallySplitScreenVerification
                 ButtonNamed("Player 1 Ready").onClick.Invoke(); ButtonNamed("Player 2 Ready").onClick.Invoke();
                 ButtonNamed("Race Button").onClick.Invoke(); Next(40);
             }
-            else if (phase == 40 && split != null && split.Ready)
+            else if (phase == 40 && split != null && split.Ready && !RallyRaceLoading.IsPreparing && Time.timeScale > 0f)
             {
                 Require(RallyLocalDevices.GamepadFor(0) == padOne && RallyLocalDevices.GamepadFor(1) == null &&
                     RallyLocalDevices.KeyboardPlayer == 1, "With one gamepad, J1 keeps the controller and J2 automatically gets keyboard");
@@ -413,6 +413,7 @@ public static class RallySplitScreenVerification
             {
                 var inputOne = split.PlayerOne.GetComponent<RallyLocalPlayerInput>();
                 var inputTwo = split.PlayerTwo.GetComponent<RallyLocalPlayerInput>();
+                File.AppendAllText(Report, $"FALLBACK: p1={inputOne.Vertical:F3}/{inputOne.Horizontal:F3} enabled={inputOne.enabled} p2={inputTwo.Vertical:F3}/{inputTwo.Horizontal:F3} enabled={inputTwo.enabled} keyboard={keyboard.upArrowKey.isPressed}/{keyboard.leftArrowKey.isPressed} currentKeyboard={Keyboard.current == keyboard} dt={Time.deltaTime:F5} scale={Time.timeScale} preparing={RallyRaceLoading.IsPreparing}\n");
                 Require(inputOne.Vertical > .7f && inputOne.Horizontal > .4f && inputTwo.Vertical == 1f && inputTwo.Horizontal < -.9f,
                     "One-gamepad and keyboard fallback drive different cars");
                 InputSystem.RemoveDevice(padOne);
@@ -452,7 +453,7 @@ public static class RallySplitScreenVerification
                 ButtonNamed("Player 1 Ready").onClick.Invoke(); ButtonNamed("Player 2 Ready").onClick.Invoke();
                 ButtonNamed("Race Button").onClick.Invoke(); Next(51);
             }
-            else if (phase == 51 && split != null && split.Ready)
+            else if (phase == 51 && split != null && split.Ready && !RallyRaceLoading.IsPreparing && Time.timeScale > 0f)
             {
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W, Key.A, Key.Space)); Next(52);
             }
@@ -489,7 +490,7 @@ public static class RallySplitScreenVerification
                 RallyGameSession.SelectLocalPlayers(1);
                 SceneManager.LoadScene("Circuit_01"); Next(11);
             }
-            else if (phase == 11)
+            else if (phase == 11 && !RallyRaceLoading.IsPreparing && Time.timeScale > 0f)
             {
                 Require(RallySplitScreen.Active == null && UnityEngine.Object.FindObjectsByType<RallyRaceHud>().Length == 1 &&
                     UnityEngine.Object.FindAnyObjectByType<RallyRacePositions>().RacerCount == 4 && Camera.main.rect == new Rect(0f, 0f, 1f, 1f) &&
