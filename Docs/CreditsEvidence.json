@@ -1,0 +1,477 @@
+{
+  "checked": "2026-10-10",
+  "polyhaven": [
+    {
+      "url": "https://polyhaven.com/a/dry_ground_01",
+      "id": "dry_ground_01",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Dry Ground 01"
+    },
+    {
+      "url": "https://polyhaven.com/a/gravelly_sand",
+      "id": "gravelly_sand",
+      "authors": {
+        "Dario Barresi": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Gravelly Sand"
+    },
+    {
+      "url": "https://polyhaven.com/a/rock_boulder_dry",
+      "id": "rock_boulder_dry",
+      "authors": {
+        "Dimitrios Savva": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Rock Boulder Dry"
+    },
+    {
+      "url": "https://polyhaven.com/a/wild_rooibos_bush",
+      "id": "wild_rooibos_bush",
+      "authors": {
+        "James Ray Cock": "modeling",
+        "Jenelle van Heerden": "photography"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Wild Rooibos Bush"
+    },
+    {
+      "url": "https://polyhaven.com/a/grass_medium_01",
+      "id": "grass_medium_01",
+      "authors": {
+        "Rob Tuytel": "Photography",
+        "Rico Cilliers": "Modeling"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Grass Medium 01"
+    },
+    {
+      "url": "https://polyhaven.com/a/namaqualand_rocks_01",
+      "id": "namaqualand_rocks_01",
+      "authors": {
+        "Greg Zaal": "Photography",
+        "Jenelle van Heerden": "modeling"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Namaqualand Rocks 01"
+    },
+    {
+      "url": "https://polyhaven.com/a/quiver_tree_01",
+      "id": "quiver_tree_01",
+      "authors": {
+        "James Ray Cock": "Photography",
+        "Dario Barresi": "Photography",
+        "Rico Cilliers": "modeling"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Quiver Tree 01"
+    },
+    {
+      "url": "https://polyhaven.com/a/searsia_lucida",
+      "id": "searsia_lucida",
+      "authors": {
+        "James Ray Cock": "modeling",
+        "Jenelle van Heerden": "Photography"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Searsia Lucida"
+    },
+    {
+      "url": "https://polyhaven.com/a/forest_floor",
+      "id": "forest_floor",
+      "authors": {
+        "eye-candy.xyz": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Forest Floor"
+    },
+    {
+      "url": "https://polyhaven.com/a/mud_forest",
+      "id": "mud_forest",
+      "authors": {
+        "eye-candy.xyz": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Mud Forest"
+    },
+    {
+      "url": "https://polyhaven.com/a/mossy_rock",
+      "id": "mossy_rock",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Mossy Rock"
+    },
+    {
+      "url": "https://polyhaven.com/a/kloofendal_overcast",
+      "id": "kloofendal_overcast",
+      "authors": {
+        "Greg Zaal": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Kloofendal Overcast"
+    },
+    {
+      "url": "https://polyhaven.com/a/rocky_terrain",
+      "id": "rocky_terrain",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Rocky Terrain"
+    },
+    {
+      "url": "https://polyhaven.com/a/aerial_grass_rock",
+      "id": "aerial_grass_rock",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Aerial Grass Rock"
+    },
+    {
+      "url": "https://polyhaven.com/a/rock_face_03",
+      "id": "rock_face_03",
+      "authors": {
+        "Dario Barresi": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Rock Face 03"
+    },
+    {
+      "url": "https://polyhaven.com/a/rocky_trail_02",
+      "id": "rocky_trail_02",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Rocky Trail 02"
+    },
+    {
+      "url": "https://polyhaven.com/a/muddy_tracks",
+      "id": "muddy_tracks",
+      "authors": {
+        "Amal Kumar": "All"
+      },
+      "licensePolicy": "https://polyhaven.com/license",
+      "name": "Muddy Tracks"
+    }
+  ],
+  "sketchfab": [
+    {
+      "license": {
+        "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+        "label": "CC Attribution",
+        "fullName": "Creative Commons Attribution",
+        "requirements": "Author must be credited. Commercial use is allowed.",
+        "url": "http://creativecommons.org/licenses/by/4.0/",
+        "slug": "by"
+      },
+      "author": "Martin Trafas",
+      "id": "ac3c7013434e403e8faff87948caf422",
+      "url": "https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422",
+      "name": "[FREE] BMW M3 E30"
+    },
+    {
+      "license": {
+        "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+        "label": "CC Attribution",
+        "fullName": "Creative Commons Attribution",
+        "requirements": "Author must be credited. Commercial use is allowed.",
+        "url": "http://creativecommons.org/licenses/by/4.0/",
+        "slug": "by"
+      },
+      "author": "TonyWony",
+      "id": "402697365eaa41a68a543b71d0e0bfa8",
+      "url": "https://sketchfab.com/3d-models/audi-quattro-s1-402697365eaa41a68a543b71d0e0bfa8",
+      "name": "Audi Quattro S1"
+    },
+    {
+      "license": {
+        "uri": "https://api.sketchfab.com/v3/licenses/322a749bcfa841b29dff1e8a1bb74b0b",
+        "label": "CC Attribution",
+        "fullName": "Creative Commons Attribution",
+        "requirements": "Author must be credited. Commercial use is allowed.",
+        "url": "http://creativecommons.org/licenses/by/4.0/",
+        "slug": "by"
+      },
+      "author": "TARANTULA",
+      "id": "85614131e0dc4613a948472aaa935fc7",
+      "url": "https://sketchfab.com/3d-models/free-lancia-delta-hf-integrale-evo-2-85614131e0dc4613a948472aaa935fc7",
+      "name": "FREE Lancia Delta HF Integrale evo 2"
+    }
+  ],
+  "jrs": [
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/box.fbx",
+      "matches": true,
+      "localBlob": "14e2ff8dc2288579a6f86997f4fe4bfc2fd9c956",
+      "upstreamBlob": "14e2ff8dc2288579a6f86997f4fe4bfc2fd9c956"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/bridge.fbx",
+      "matches": true,
+      "localBlob": "3d01a4ab337a872a4bccda935729309ea99f79d9",
+      "upstreamBlob": "3d01a4ab337a872a4bccda935729309ea99f79d9"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/bumb.fbx",
+      "matches": true,
+      "localBlob": "a94ca3f2ef5ab21a975c11c8183445127072e019",
+      "upstreamBlob": "a94ca3f2ef5ab21a975c11c8183445127072e019"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/pillar_01.fbx",
+      "matches": true,
+      "localBlob": "8c13436d42fbeb8efa1293c7da31fa1a3d9c0d00",
+      "upstreamBlob": "8c13436d42fbeb8efa1293c7da31fa1a3d9c0d00"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/plane_area.fbx",
+      "matches": true,
+      "localBlob": "4fc41992f62000a95db2ef6e12526daeb9ae8733",
+      "upstreamBlob": "4fc41992f62000a95db2ef6e12526daeb9ae8733"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/platform_01.fbx",
+      "matches": true,
+      "localBlob": "84fee65401274ad9c772795bb845977431177bb5",
+      "upstreamBlob": "84fee65401274ad9c772795bb845977431177bb5"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/platform_02.fbx",
+      "matches": true,
+      "localBlob": "b82ed08c17ada90905e019231b175fdd27faff12",
+      "upstreamBlob": "b82ed08c17ada90905e019231b175fdd27faff12"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/platform_03.fbx",
+      "matches": true,
+      "localBlob": "8b99e31b4cdea298c02e63435bce14a1fceb60ae",
+      "upstreamBlob": "8b99e31b4cdea298c02e63435bce14a1fceb60ae"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/ramp_01.fbx",
+      "matches": true,
+      "localBlob": "afa15e564301a6535ef1ad3ed82630db4e6151c5",
+      "upstreamBlob": "afa15e564301a6535ef1ad3ed82630db4e6151c5"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/ramp_02.fbx",
+      "matches": true,
+      "localBlob": "282323be565021eb9d8df2ccec58e8badc20b87f",
+      "upstreamBlob": "282323be565021eb9d8df2ccec58e8badc20b87f"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/ramp_long.fbx",
+      "matches": true,
+      "localBlob": "b51f61adcae2284dcc22f75b3af1e80ed6782f57",
+      "upstreamBlob": "b51f61adcae2284dcc22f75b3af1e80ed6782f57"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/ramp_small.fbx",
+      "matches": true,
+      "localBlob": "76ff27ed60087c380d6f21634491f8d54438551f",
+      "upstreamBlob": "76ff27ed60087c380d6f21634491f8d54438551f"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/rough_terrain.fbx",
+      "matches": true,
+      "localBlob": "d950efa23d4a2fc63cde56943f7a7a5ce3bb9c04",
+      "upstreamBlob": "d950efa23d4a2fc63cde56943f7a7a5ce3bb9c04"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stairs.fbx",
+      "matches": true,
+      "localBlob": "19c9f31dbfd6ebd9ed972cbfea709c2fa17c40b7",
+      "upstreamBlob": "19c9f31dbfd6ebd9ed972cbfea709c2fa17c40b7"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stone_pf_01.fbx",
+      "matches": true,
+      "localBlob": "697b1287eb50afa7c1117994590b0416f9761f62",
+      "upstreamBlob": "697b1287eb50afa7c1117994590b0416f9761f62"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stone_pf_02.fbx",
+      "matches": true,
+      "localBlob": "fe28dae7838dbd2f8547c69d6037ff1069ba63e5",
+      "upstreamBlob": "fe28dae7838dbd2f8547c69d6037ff1069ba63e5"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stone_pf_03.fbx",
+      "matches": true,
+      "localBlob": "8b681d8d8cc5d74b4ac1d74e1b8977f3eab996af",
+      "upstreamBlob": "8b681d8d8cc5d74b4ac1d74e1b8977f3eab996af"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stone_pf_04.fbx",
+      "matches": true,
+      "localBlob": "3ad7a8fea4f65f799599f98ba538ed31d19022b3",
+      "upstreamBlob": "3ad7a8fea4f65f799599f98ba538ed31d19022b3"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/stone_pf_05.fbx",
+      "matches": true,
+      "localBlob": "cd9defa3158c004255bb0a8d024bd10f00a5411a",
+      "upstreamBlob": "cd9defa3158c004255bb0a8d024bd10f00a5411a"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Platform/wavy_01.fbx",
+      "matches": true,
+      "localBlob": "e2ae0ba104b264f7d9a409e9dffad07bfe81f2db",
+      "upstreamBlob": "e2ae0ba104b264f7d9a409e9dffad07bfe81f2db"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Vehicle/AMR Police Vechicle.fbx",
+      "matches": true,
+      "localBlob": "d801c2a00bee7ecd70681dd8dcd8a1d7d6898d42",
+      "upstreamBlob": "d801c2a00bee7ecd70681dd8dcd8a1d7d6898d42"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/3d Model AMR/Vehicle/AMR Wheel.fbx",
+      "matches": true,
+      "localBlob": "1511a53c573a6ac48334dae182f97e17775ef5b4",
+      "upstreamBlob": "1511a53c573a6ac48334dae182f97e17775ef5b4"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Audio/Police_siren5.wav",
+      "matches": true,
+      "localBlob": "0c47c9b15278e9020780651924b21c0f8ae26757",
+      "upstreamBlob": "0c47c9b15278e9020780651924b21c0f8ae26757"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Dust/dust_01.png",
+      "matches": true,
+      "localBlob": "9f2355896f1239b0d0001f6960663ab8204cdfbc",
+      "upstreamBlob": "9f2355896f1239b0d0001f6960663ab8204cdfbc"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Platform AMR/JSColorPallets.png",
+      "matches": true,
+      "localBlob": "882be7fa50ae15b49d7984f5e54ca6c7dd392c39",
+      "upstreamBlob": "882be7fa50ae15b49d7984f5e54ca6c7dd392c39"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Platform AMR/pltfrm_txture_02.png",
+      "matches": true,
+      "localBlob": "ac3898f4590fb188b3e1fbe868f6e3338a4cb8af",
+      "upstreamBlob": "ac3898f4590fb188b3e1fbe868f6e3338a4cb8af"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/glass_AlbedoTransparency.png",
+      "matches": true,
+      "localBlob": "19af723430fa8c8607f6109628f4d10cc947965f",
+      "upstreamBlob": "19af723430fa8c8607f6109628f4d10cc947965f"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/glass_Emission.png",
+      "matches": true,
+      "localBlob": "8d4661d13d0a407ea01c059b5f3c72e104af7cf1",
+      "upstreamBlob": "8d4661d13d0a407ea01c059b5f3c72e104af7cf1"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/glass_MetallicSmoothness.png",
+      "matches": true,
+      "localBlob": "5169bbd246de8664ef591b79af530bf7c735e24a",
+      "upstreamBlob": "5169bbd246de8664ef591b79af530bf7c735e24a"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/glass_Normal.png",
+      "matches": true,
+      "localBlob": "790c4929c0047263962998bf5b6439c872842f31",
+      "upstreamBlob": "790c4929c0047263962998bf5b6439c872842f31"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/wheel_2_AO.png",
+      "matches": true,
+      "localBlob": "dfb77a83813ace7eeb144fccfbd708bb28c42a3c",
+      "upstreamBlob": "dfb77a83813ace7eeb144fccfbd708bb28c42a3c"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/Materials AMR/Vehicle AMR/wheel_2_Normal.png",
+      "matches": true,
+      "localBlob": "73ea3e1334acb63fbd816ee6b8322b88e65c593e",
+      "upstreamBlob": "73ea3e1334acb63fbd816ee6b8322b88e65c593e"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/SkyBox AMR/Evening Sky1 .png",
+      "matches": true,
+      "localBlob": "2846ed9eb58c00d061ab98654a363e1f84c574f0",
+      "upstreamBlob": "2846ed9eb58c00d061ab98654a363e1f84c574f0"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/accelerate_button.png",
+      "matches": true,
+      "localBlob": "614c62b2ed8fefb175e5bbb5ea06904bf9ad2fd4",
+      "upstreamBlob": "614c62b2ed8fefb175e5bbb5ea06904bf9ad2fd4"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/brake_button.png",
+      "matches": true,
+      "localBlob": "f75b2e48d9ad2a9565872616c900054de051b231",
+      "upstreamBlob": "f75b2e48d9ad2a9565872616c900054de051b231"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/camera1_button.png",
+      "matches": true,
+      "localBlob": "686f4f80b53be4d31bb253ab3e8469110950bb2c",
+      "upstreamBlob": "686f4f80b53be4d31bb253ab3e8469110950bb2c"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/extralights_button.png",
+      "matches": true,
+      "localBlob": "0f4b3378455c441fd1d4ce587468bd83c5975012",
+      "upstreamBlob": "0f4b3378455c441fd1d4ce587468bd83c5975012"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/headlights_button.png",
+      "matches": true,
+      "localBlob": "4cd950c2fc3c88468ab3b17d7ef7dcaf37550126",
+      "upstreamBlob": "4cd950c2fc3c88468ab3b17d7ef7dcaf37550126"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/keyboard.png",
+      "matches": true,
+      "localBlob": "5e7fd166b04ef6ee481c7bc33e686ecf62e02852",
+      "upstreamBlob": "5e7fd166b04ef6ee481c7bc33e686ecf62e02852"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/left_button.png",
+      "matches": true,
+      "localBlob": "f7ee0ff328ef75ac2ebf07cec4c9e11b561545b3",
+      "upstreamBlob": "f7ee0ff328ef75ac2ebf07cec4c9e11b561545b3"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/reverse_button.png",
+      "matches": true,
+      "localBlob": "df2cc34b70af8bb7077e0022ab6991bd1aa30183",
+      "upstreamBlob": "df2cc34b70af8bb7077e0022ab6991bd1aa30183"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/right_button.png",
+      "matches": true,
+      "localBlob": "e3e38e2bc9b86d2c23ded502fdeabe46a0dfb8db",
+      "upstreamBlob": "e3e38e2bc9b86d2c23ded502fdeabe46a0dfb8db"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/signallights_button.png",
+      "matches": true,
+      "localBlob": "5c4fb1c690afe36d726fbcd6d5ba8f20fc089401",
+      "upstreamBlob": "5c4fb1c690afe36d726fbcd6d5ba8f20fc089401"
+    },
+    {
+      "path": "Assets/JS Vehicle Physics Controller/UI/siren_button.png",
+      "matches": true,
+      "localBlob": "8dee8d688ea4046cb8aa3542a5f317c4fb7ee94d",
+      "upstreamBlob": "8dee8d688ea4046cb8aa3542a5f317c4fb7ee94d"
+    }
+  ],
+  "jrsCommitTree": "c482bc547d3d599175fee2aaea84bc13db719652"
+}

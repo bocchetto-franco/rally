@@ -162,7 +162,8 @@ public enum RallyMenuScreen
     Selection,
     Results,
     Controls,
-    Options
+    Options,
+    Credits
 }
 
 [DisallowMultipleComponent]
@@ -247,7 +248,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
             (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame);
         if (back && screen != RallyMenuScreen.MainMenu)
         {
-            if (screen == RallyMenuScreen.Controls || screen == RallyMenuScreen.Options)
+            if (screen == RallyMenuScreen.Controls || screen == RallyMenuScreen.Options || screen == RallyMenuScreen.Credits)
                 OpenFrontendPage(RallyMenuScreen.MainMenu);
             else
                 SceneManager.LoadScene(screen == RallyMenuScreen.Selection ? RallyGameSession.MainMenuScene : RallyGameSession.SelectionScene);
@@ -333,6 +334,9 @@ public sealed partial class RallyMenuController : MonoBehaviour
             case RallyMenuScreen.Options:
                 BuildOptions(background);
                 break;
+            case RallyMenuScreen.Credits:
+                BuildCredits(background);
+                break;
         }
 
         if (screen == RallyMenuScreen.Selection && RallyGameSession.LocalPlayerCount == 2) return;
@@ -354,14 +358,15 @@ public sealed partial class RallyMenuController : MonoBehaviour
         Text(root, "Subtitle", "Tres clásicos. Tres pistas. Todo por recorrer.", 34f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-390f, -25f), new Vector2(900f, 60f), Muted);
         PanelRect(root, "Title Accent", Accent, new Vector2(-862f, 94f), new Vector2(12f, 250f));
 
-        RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 640f));
+        RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 760f));
         mainMenuCard = card.gameObject;
-        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 250f), new Vector2(460f, 36f), Accent);
-        Text(card, "Circuit", RallyGameSession.SelectedCircuit.Replace(' ', '_').ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 187f), new Vector2(460f, 60f), Color.white);
-        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicleDisplayName.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 105f), new Vector2(460f, 80f), Muted);
-        Button(card, "Play Button", "JUGAR", new Vector2(0f, -25f), new Vector2(470f, 86f), StartSelection, true);
-        Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -130f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
-        Button(card, "Options Button", "OPCIONES", new Vector2(0f, -225f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);
+        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 305f), new Vector2(460f, 36f), Accent);
+        Text(card, "Circuit", RallyGameSession.SelectedCircuit.Replace(' ', '_').ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 240f), new Vector2(460f, 60f), Color.white);
+        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicleDisplayName.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 156f), new Vector2(460f, 80f), Muted);
+        Button(card, "Play Button", "JUGAR", new Vector2(0f, 20f), new Vector2(470f, 86f), StartSelection, true);
+        Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -85f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
+        Button(card, "Options Button", "OPCIONES", new Vector2(0f, -180f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);
+        Button(card, "Credits Button", "CRÉDITOS", new Vector2(0f, -275f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Credits), false);
         mainMenuHint = Text(root, "Hint", "CRUZ / ENTER: seleccionar    D-PAD: navegar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-355f, -475f), new Vector2(970f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.85f)).gameObject;
         introCard = PanelRect(root, "Continue Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 280f)).gameObject;
         Text(introCard.transform, "Continue Label", "PRESIONÁ CUALQUIER BOTÓN\nPARA CONTINUAR", 32f, FontStyles.Bold, TextAlignmentOptions.Center, Vector2.zero, new Vector2(520f, 120f), Accent);
