@@ -26,6 +26,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     const float RepeatDelay = .35f, RepeatInterval = .12f;
     Gamepad previousPad;
     Button[] vehicleCycle;
+    bool spatialNavigation;
+    Button[][] navigationRows;
 
     public int SelectedIndex => selectedIndex;
     public int LocalPlayer => localPlayer;
@@ -58,6 +60,11 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     // Only selection panels opt in. Sliders and all other menus retain their controls.
     public void ConfigureVehicleCycle(Button[] cars) => vehicleCycle = cars;
+    public void ConfigureSpatialNavigation(params Button[][] rows)
+    {
+        spatialNavigation = true;
+        navigationRows = rows;
+    }
 
     public void FocusVehicle(Button car)
     {
@@ -226,17 +233,19 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         }
         bool decrease = direction == -2 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuLeft(localPlayer) : KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
         bool increase = direction == 2 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuRight(localPlayer) : KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
+        bool up = direction == -1 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuUp(localPlayer) : KeyPressed(Key.UpArrow, KeyCode.UpArrow)));
+        bool down = direction == 1 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuDown(localPlayer) : KeyPressed(Key.DownArrow, KeyCode.DownArrow)));
         Slider slider = Usable(selectedIndex) ? buttons[selectedIndex] as Slider : null;
-        bool previous = direction == -1 || (slider == null && decrease) ||
-            (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuUp(localPlayer) : KeyPressed(Key.UpArrow, KeyCode.UpArrow)));
-        bool next = direction == 1 || (slider == null && increase) ||
-            (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuDown(localPlayer) : KeyPressed(Key.DownArrow, KeyCode.DownArrow)));
+        bool previous = up || (slider == null && decrease);
+        bool next = down || (slider == null && increase);
         bool confirm = (!suppressSouthUntilRelease && (southPressed || south && !southHeld)) ||
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.Confirm(localPlayer) : KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
         southHeld = south;
         int carIndex = vehicleCycle == null || !Usable(selectedIndex) ? -1 : System.Array.IndexOf(vehicleCycle, buttons[selectedIndex]);
         if (carIndex >= 0 && (decrease || increase))
             FocusVehicle(vehicleCycle[(carIndex + (increase ? 1 : vehicleCycle.Length - 1)) % vehicleCycle.Length]);
+        else if (spatialNavigation && (up || down || decrease || increase))
+            MoveSpatial(up ? Vector2.up : down ? Vector2.down : decrease ? Vector2.left : Vector2.right);
         else if (previous) Move(-1);
         else if (next) Move(1);
         else if (slider != null && (decrease || increase))
@@ -254,6 +263,53 @@ public sealed class RallyMenuNavigation : MonoBehaviour
             int candidate = (selectedIndex + step * direction + buttons.Length) % buttons.Length;
             if (Usable(candidate)) { Select(candidate); return; }
         }
+    }
+
+    void MoveSpatial(Vector2 direction)
+    {
+        if (!Usable(selectedIndex)) return;
+        var current = (RectTransform)buttons[selectedIndex].transform;
+        Vector3 origin = current.TransformPoint(current.rect.center);
+        bool vertical = direction.y != 0;
+        if (vertical && navigationRows != null)
+            for (int row = 0; row < navigationRows.Length; row++)
+            {
+                if (System.Array.IndexOf(navigationRows[row], buttons[selectedIndex]) < 0) continue;
+                int step = direction.y > 0 ? -1 : 1;
+                for (int next = row + step; next >= 0 && next < navigationRows.Length; next += step)
+                {
+                    int closest = -1;
+                    float distance = float.PositiveInfinity;
+                    foreach (var button in navigationRows[next])
+                    {
+                        int index = System.Array.IndexOf(buttons, button);
+                        if (!Usable(index)) continue;
+                        float across = Mathf.Abs(button.transform.position.x - origin.x);
+                        if (across < distance) { closest = index; distance = across; }
+                    }
+                    if (closest >= 0) { Select(closest); return; }
+                }
+                return;
+            }
+        int best = -1;
+        float bestScore = float.PositiveInfinity;
+        // Only on a navigation event, never a per-frame hierarchy search.
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (i == selectedIndex || !Usable(i)) continue;
+            var rect = (RectTransform)buttons[i].transform;
+            Vector2 delta = rect.TransformPoint(rect.rect.center) - origin;
+            float forward = Vector2.Dot(delta, direction);
+            float across = Mathf.Abs(vertical ? delta.x : delta.y);
+            if (forward <= 1f) continue;
+            // Up/down must leave the row, not choose a distant side column.
+            // Left/right stays within the visual row; cars retain their carousel.
+            float rowTolerance = Mathf.Min(current.rect.height * current.lossyScale.y, rect.rect.height * rect.lossyScale.y) * .45f;
+            if (vertical ? across > forward * 3f || forward < rowTolerance : across > rowTolerance) continue;
+            float score = forward + across * 2f;
+            if (score < bestScore) { best = i; bestScore = score; }
+        }
+        if (best >= 0) Select(best);
     }
 
     void Select(int index)

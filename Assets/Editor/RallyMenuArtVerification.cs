@@ -92,7 +92,7 @@ public static class RallyMenuArtVerification
                     Require(button.GetComponentInChildren<TextMeshProUGUI>().text == RallyGameSession.VehicleDisplayName(i), "Separate correct name: " + RallyGameSession.VehicleDisplayName(i));
                     button.onClick.Invoke();
                     Require(GameObject.Find("Selected Vehicle").GetComponent<TextMeshProUGUI>().text == RallyGameSession.VehicleDisplayName(i), "Selected name updates");
-                    Require(GameObject.Find("Vehicle Counter").GetComponent<TextMeshProUGUI>().text == (i + 1) + "/3", "Index is independent of name");
+                    Require(GameObject.Find("Vehicle Counter") == null, "Obsolete vehicle counter remains removed");
                 }
                 Require(GameObject.Find("Selected Vehicle").GetComponent<TextMeshProUGUI>().font.name.Contains("Oswald"), "Non-default heading font");
                 RectTransform carCard = GameObject.Find("Vehicle Card").GetComponent<RectTransform>();
@@ -105,7 +105,8 @@ public static class RallyMenuArtVerification
             }
             else if (phase == 3)
             {
-                Require(RallyGameSession.SelectedVehicleIndex == 1, "D-Pad navigation updates displayed and saved car");
+                Require(RallyGameSession.SelectedVehicleIndex == 2, "Moving focus does not overwrite the confirmed car");
+                Require(GameObject.Find("Difficulty FÁCIL Button").GetComponent<Outline>().enabled, "Down leaves the car row vertically");
                 InputSystem.QueueStateEvent(pad, new GamepadState());
                 GameObject.Find("Circuit 1 Button").GetComponent<Button>().onClick.Invoke(); phase = 4; since = now;
             }

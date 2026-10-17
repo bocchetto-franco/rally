@@ -72,13 +72,13 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
             if (shown < 0 && choice == requested)
             {
                 title.text = RallyGameSession.VehicleDisplayName(choice);
-                details.text = "Vista no disponible · podés elegir este auto igualmente";
+                if (details != null) details.text = "Vista no disponible · podés elegir este auto igualmente";
                 yield return FadeTo(1);
                 break;
             }
             if (choice != requested) continue;
             title.text = RallyGameSession.VehicleDisplayName(choice);
-            details.text = "FÍSICA COMPARTIDA · 1.160 kg · MANEJO ARCADE";
+            if (details != null) details.text = "";
             yield return FadeTo(1);
         }
         transition = null;

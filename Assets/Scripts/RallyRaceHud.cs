@@ -19,8 +19,6 @@ public sealed class RallyRaceHud : MonoBehaviour
     int displayedRacerCount = -1;
     int displayedLap = -1;
     int displayedTotalLaps = -1;
-    int displayedCheckpoint = -1;
-    int displayedCheckpointCount = -1;
     int displayedTimerTick = -1;
     int displayedTimeMilliseconds = -1;
     bool displayedFinish;
@@ -172,7 +170,7 @@ public sealed class RallyRaceHud : MonoBehaviour
         panel.anchorMin = panel.anchorMax = Vector2.one;
         panel.pivot = Vector2.one;
         panel.anchoredPosition = new Vector2(-28f, -28f);
-        panel.sizeDelta = new Vector2(500f, 132f);
+        panel.sizeDelta = new Vector2(500f, 82f);
         timeText.fontSize = 44f;
         RectTransform time = timeText.rectTransform;
         time.anchorMin = time.anchorMax = time.pivot = new Vector2(.5f, 1f);
@@ -180,10 +178,8 @@ public sealed class RallyRaceHud : MonoBehaviour
         time.sizeDelta = new Vector2(470f, 58f);
         if (checkpointText != null)
         {
-            RectTransform checkpoint = checkpointText.rectTransform;
-            checkpoint.anchorMin = checkpoint.anchorMax = checkpoint.pivot = new Vector2(.5f, 1f);
-            checkpoint.anchoredPosition = new Vector2(0f, -74f);
-            checkpoint.sizeDelta = new Vector2(470f, 42f);
+            // Hide presentation only. Keep the reference and checkpoint gameplay intact.
+            checkpointText.gameObject.SetActive(false);
         }
     }
 
@@ -221,7 +217,6 @@ public sealed class RallyRaceHud : MonoBehaviour
     void ResetDisplayedValues()
     {
         displayedSpeed = displayedPosition = displayedRacerCount = displayedLap = displayedTotalLaps = -1;
-        displayedCheckpoint = displayedCheckpointCount = -1;
         displayedTimerTick = displayedTimeMilliseconds = -1;
     }
 
@@ -281,17 +276,6 @@ public sealed class RallyRaceHud : MonoBehaviour
                 displayedTimerTick = timerTick;
                 displayedTimeMilliseconds = milliseconds;
                 displayedFinish = finished;
-            }
-        }
-        if (checkpointText != null)
-        {
-            int completed = checkpointManager.CompletedRaceCheckpoints;
-            int count = checkpointManager.RaceCheckpointCount;
-            if (completed != displayedCheckpoint || count != displayedCheckpointCount)
-            {
-                checkpointText.SetText("Checkpoint {0}/{1}", (float)completed, (float)count);
-                displayedCheckpoint = completed;
-                displayedCheckpointCount = count;
             }
         }
     }
