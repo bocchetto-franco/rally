@@ -146,7 +146,7 @@ public sealed class RallyRaceLoading : MonoBehaviour
         }
         Stage("PREPARANDO AUTOS Y AUDIO", .25f);
         // Only the selectable models, not every historical Resources asset.
-        foreach (string path in new[] { "Vehicles/BmwE30", "Vehicles/AudiQuattro", "Audio/RallyAudioLibrary" })
+        foreach (string path in new[] { RallyPlayerVehicleSelection.LanciaResource, RallyPlayerVehicleSelection.PeugeotResource, RallyPlayerVehicleSelection.AudiResource, "Audio/RallyAudioLibrary" })
         {
             var request = Resources.LoadAsync<UnityEngine.Object>(path);
             while (!request.isDone) yield return null;

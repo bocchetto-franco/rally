@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// <summary>One on-demand mesh-only vehicle per panel, isolated from race/backdrop cameras.</summary>
 public sealed class RallyMenuVehiclePreview : MonoBehaviour
 {
-    static readonly string[] Paths = { "MenuVehicles/Porsche911", "MenuVehicles/BmwE30", "MenuVehicles/AudiQuattro" };
+    static readonly string[] Paths = { "MenuVehicles/LanciaS4", "MenuVehicles/Peugeot205T16", "MenuVehicles/AudiQuattro" };
     static readonly HashSet<RallyMenuVehiclePreview> views = new HashSet<RallyMenuVehiclePreview>();
     static AsyncOperation unusedCleanup;
     [SerializeField, Range(4f, 30f)] float rotationSpeed = 12f;

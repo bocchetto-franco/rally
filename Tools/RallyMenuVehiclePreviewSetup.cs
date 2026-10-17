@@ -24,8 +24,8 @@ public static class RallyMenuVehiclePreviewSetup
             floor.SetColor("_BaseColor", new Color(.095f, .105f, .12f));
             AssetDatabase.CreateAsset(floor, folder + "/StudioFloor.mat");
         }
-        string[] sources = { "Assets/Prefabs/Bot_Car.prefab", "Assets/Resources/Vehicles/BmwE30.prefab", "Assets/Resources/Vehicles/AudiQuattro.prefab" };
-        string[] names = { "Porsche911", "BmwE30", "AudiQuattro" };
+        string[] sources = { "Assets/Resources/Vehicles/LanciaS4.prefab", "Assets/Resources/Vehicles/Peugeot205T16.prefab" };
+        string[] names = { "LanciaS4", "Peugeot205T16" }; // Existing Audi preview remains byte-identical.
         Directory.CreateDirectory("Logs");
         File.WriteAllText("Logs/menu-vehicle-preview-setup.txt", "Mesh-only vehicle preview export\n");
         for (int i = 0; i < sources.Length; i++)

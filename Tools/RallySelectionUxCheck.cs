@@ -43,6 +43,20 @@ public static class RallySelectionUxCheck
     public static void Run() => Start(false);
     public static void RunMenusOnly() => Start(true);
     public static void RunSharedRow() => Start(true, true);
+    public static void RunGroupB()
+    {
+        Start(true);
+        Report = "Logs/group-b-play.txt";
+        File.WriteAllText(Report, "Group B: real Play, menus with virtual DualSense, 3 circuits x 1P/2P. Not a full driving lap or hardware test.\n");
+        steps = GroupBSteps();
+    }
+    public static void RunGroupBRaces()
+    {
+        Start(true);
+        Report = "Logs/group-b-races.txt";
+        File.WriteAllText(Report, "Group B: 3 circuits x 1P/2P, spawn/contact/short acceleration, virtual gamepads.\n");
+        steps = GroupBSteps(true);
+    }
     static void Start(bool onlyMenus, bool checkSharedRace = false)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer)
@@ -161,7 +175,7 @@ public static class RallySelectionUxCheck
             for (int step = 1; step <= 3; step++)
             {
                 Horizontal(input, true); yield return null; Neutral(first); KeysDown(); yield return null;
-                Check(Focus(nav) == (step < 3 ? cars[step] : B("Circuit 1 Button")), "right input " + input + ": Porsche -> BMW -> Audi -> terrain, step " + step);
+                Check(Focus(nav) == (step < 3 ? cars[step] : B("Circuit 1 Button")), "right input " + input + ": Lancia -> Peugeot -> Audi -> terrain, step " + step);
                 Check(RallyGameSession.SelectedVehicleIndex == 0, "browsing across panel boundary does not confirm a different car");
             }
             Horizontal(input, false); yield return null; Neutral(first); KeysDown(); yield return null;
@@ -182,9 +196,9 @@ public static class RallySelectionUxCheck
         Dpad(first, Vector2.left); yield return null; Neutral(first); yield return .15f;
         Check(Focus(nav) == cars[1] && RallyGameSession.SelectedVehicleIndex == 0, "left still browses every car without confirming"); Chosen(cars, 0);
         Cross(first); yield return null; Neutral(first); yield return .15f;
-        Check(RallyGameSession.SelectedVehicleIndex == 1, "DualSense Cross confirms focused BMW"); Chosen(cars, 1);
+        Check(RallyGameSession.SelectedVehicleIndex == 1, "DualSense Cross confirms focused Peugeot"); Chosen(cars, 1);
         Dpad(first, Vector2.left); yield return null; Neutral(first); yield return .15f;
-        Check(Focus(nav) == cars[0] && RallyGameSession.SelectedVehicleIndex == 1, "moving focus preserves confirmed BMW"); Chosen(cars, 1);
+        Check(Focus(nav) == cars[0] && RallyGameSession.SelectedVehicleIndex == 1, "moving focus preserves confirmed Peugeot"); Chosen(cars, 1);
         Check(cars[0].GetComponent<Outline>().enabled && !cars[1].GetComponent<Outline>().enabled, "focus outline remains separate from yellow selection");
         Dpad(first, Vector2.down); yield return null; Neutral(first); yield return null;
         Check(Focus(nav) == B("Difficulty FÁCIL Button"), "down from car row moves below, not to adjacent car");
@@ -213,7 +227,7 @@ public static class RallySelectionUxCheck
         Check(Focus(nav).name.StartsWith("Local Players"), "down from difficulty reaches player-count row");
         var preview = Field<RallyMenuVehiclePreview>(menu, "vehiclePreview");
         while (preview.IsTransitioning || preview.ShownIndex != 1 || preview.Opacity < .99f) yield return null;
-        Check(preview.VisibleModel != null && GameObject.Find("Selected Vehicle").GetComponent<TMP_Text>().text == "BMW M3 E30", "preview model and name remain visible after cleanup");
+        Check(preview.VisibleModel != null && GameObject.Find("Selected Vehicle").GetComponent<TMP_Text>().text == RallyGameSession.VehicleDisplayName(1), "preview model and name remain visible after cleanup");
         DisplayOutput();
         ScreenCapture.CaptureScreenshot("Logs/SelectionUX_1P.png"); yield return .3f;
         B("Local Players 2").onClick.Invoke(); yield return .4f;
@@ -261,7 +275,7 @@ public static class RallySelectionUxCheck
             Check(RallyGameSession.SelectedRaceScene == RallyGameSession.CircuitScenes[p] &&
                 shared.Count(b => b.colors.normalColor.r > .9f && b.colors.normalColor.g > .5f) == 1,
                 "J" + (p + 1) + " confirmation sets the single shared race circuit and highlight");
-            Check(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 2, "changing shared circuit preserves distinct BMW/Audi choices");
+            Check(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 2, "changing shared circuit preserves distinct Peugeot/Audi choices");
         }
         B("Player 1 Ready").onClick.Invoke(); B("Player 2 Ready").onClick.Invoke();
         Check(B("Race Button").interactable, "both independent Ready states unlock race");
@@ -289,8 +303,8 @@ public static class RallySelectionUxCheck
         yield return .3f; Cross(first); yield return null; Neutral(first); yield return null;
         B("Credits Button").onClick.Invoke(); yield return .3f;
         string creditText = string.Join("\n", Object.FindAnyObjectByType<RallyMenuController>().GetComponentsInChildren<TMP_Text>().Select(t => t.text));
-        Check(creditText.Contains("Martin Trafas") && creditText.Contains("TonyWony") && creditText.Contains("CC-BY 4.0"), "both car authors/licenses still appear on Credits page");
-        Check(File.ReadAllText("CREDITS.md").Contains("Martin Trafas") && File.ReadAllText("CREDITS.md").Contains("TonyWony"), "canonical CREDITS.md preserves car attribution");
+        Check(creditText.Contains("DisneyCars") && creditText.Contains("TonyWony") && creditText.Contains("CC-BY 4.0"), "current car authors/licenses appear on Credits page");
+        Check(File.ReadAllText("CREDITS.md").Contains("DisneyCars") && File.ReadAllText("CREDITS.md").Contains("TonyWony"), "canonical CREDITS.md preserves current car attribution");
         if (menusOnly) yield break;
         for (int scene = 0; scene < 3; scene++) for (int players = 1; players <= 2; players++)
         {
@@ -323,6 +337,83 @@ public static class RallySelectionUxCheck
             foreach (var hud in huds) Check(Field<RallyCheckpointManager>(hud, "checkpointManager").ElapsedTime > 0, "race clock advances without checkpoint text");
             ScreenCapture.CaptureScreenshot("Logs/SelectionUX_HUD_" + RallyGameSession.CircuitScenes[scene] + "_" + players + "P.png"); yield return .3f;
             SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; yield return null;
+        }
+    }
+    static IEnumerator GroupBSteps(bool racesOnly = false)
+    {
+        if (racesOnly)
+        {
+            while (Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+            yield return .4f;
+            disabled = InputSystem.devices.Where(d => (d is Gamepad || d is Keyboard) && d.enabled).ToArray();
+            foreach (var device in disabled) InputSystem.DisableDevice(device);
+            first = InputSystem.AddDevice<DualSenseGamepadHID>(); second = InputSystem.AddDevice<DualSenseGamepadHID>(); keyboard = InputSystem.AddDevice<Keyboard>();
+            Neutral(first); Neutral(second); yield return null;
+        }
+        else
+        {
+        var menus = Steps();
+        while (menus.MoveNext()) yield return menus.Current;
+        RallyGameSession.SelectLocalPlayers(1);
+        SceneManager.LoadScene(RallyGameSession.SelectionScene);
+        while (SceneManager.GetActiveScene().name != RallyGameSession.SelectionScene || Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+        yield return .4f;
+        for (int i = 0; i < 3; i++)
+        {
+            B("Vehicle " + i + " Button").onClick.Invoke();
+            var preview = Field<RallyMenuVehiclePreview>(Object.FindAnyObjectByType<RallyMenuController>(), "vehiclePreview");
+            while (preview.ShownIndex != i || preview.IsTransitioning || preview.Opacity < .99f) yield return null;
+            Check(preview.VisibleModel != null, "selected preview loaded: " + RallyPlayerVehicleSelection.Names[i]);
+            ScreenCapture.CaptureScreenshot("Logs/GroupB_Menu_" + i + ".png"); yield return .3f;
+        }
+        }
+        for (int scene = 0; scene < 3; scene++) for (int players = 1; players <= 2; players++)
+        {
+            RallyGameSession.SelectLocalPlayers(players);
+            RallyGameSession.SelectVehicleForPlayer(0, players == 2 ? 0 : scene);
+            RallyGameSession.SelectVehicleForPlayer(1, 1);
+            RallyGameSession.SelectCircuit(scene);
+            RallyRaceLoading.Load(RallyGameSession.CircuitScenes[scene]);
+            while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != RallyGameSession.CircuitScenes[scene]) yield return null;
+            yield return .5f;
+            string label = RallyGameSession.CircuitScenes[scene] + " " + players + "P";
+            var bots = Object.FindObjectsByType<RallyBotController>();
+            var cars = Object.FindObjectsByType<JrsVehicleController>().Where(c => c.isActiveAndEnabled && c.GetComponentInParent<RallyBotController>() == null).OrderBy(c => c.name).ToArray();
+            if (players == 2) cars = new[] { RallySplitScreen.Active.PlayerOne, RallySplitScreen.Active.PlayerTwo }.Select(g => g.GetComponent<JrsVehicleController>()).ToArray();
+            Check(cars.Length == players && bots.Length == (players == 1 ? 3 : 0), label + " correct player/bot counts");
+            for (int p = 0; p < cars.Length; p++)
+            {
+                var c = cars[p]; var visual = c.GetComponentInChildren<RallyVehicleVisual>();
+                Check(visual != null && visual.name == RallyGameSession.VehicleForPlayer(p) + " Visual", label + " selected model J" + (p + 1));
+                Check(c.GetComponentsInChildren<RallyVehicleVisual>().Length == 1, label + " no duplicate presentation");
+                var ws = new[] { c.frontLeftWheel, c.frontRightWheel, c.rearLeftWheel, c.rearRightWheel };
+                Check(ws.All(w => w != null) && ws.Distinct().Count() == 4, label + " four wheel colliders");
+                Check(Mathf.Abs(c.GetComponent<Rigidbody>().mass - 1160) < .1f, label + " player mass unchanged");
+                Check(c.frontLeftWheelTransform == visual.wheels[0] && c.rearRightWheelTransform == visual.wheels[3], label + " controller follows new wheels");
+                for (int w = 0; w < 4; w++) Check(Mathf.Abs(ws[w].radius - visual.radii[w]) < .0001f, label + " fitted wheel radius " + w);
+            }
+            foreach (var bot in bots)
+            {
+                var c = bot.GetComponentInChildren<JrsVehicleController>();
+                Check(c != null && c.GetComponentInChildren<RallyVehicleVisual>() != null, label + " bot has current model");
+                Check(RallyPlayerVehicleSelection.Names.Any(n => c.GetComponentInChildren<RallyVehicleVisual>().name == n + " Visual"), label + " bot picks from Group B roster");
+                Check(Mathf.Abs(c.GetComponent<Rigidbody>().mass - 1450) < .1f, label + " separate bot mass retained");
+            }
+            yield return 2f;
+            foreach (var c in cars)
+            {
+                var ws = new[] { c.frontLeftWheel, c.frontRightWheel, c.rearLeftWheel, c.rearRightWheel };
+                Check(ws.Count(w => w.isGrounded) >= 2, label + " wheels contact grid ground");
+                Check(Vector3.Dot(c.transform.up, Vector3.up) > .95f, label + " car stays upright");
+            }
+            var origins = cars.Select(c => c.transform.position).ToArray();
+            State(RallyLocalDevices.GamepadFor(0), rightTrigger: true);
+            if (players == 2) State(RallyLocalDevices.GamepadFor(1), rightTrigger: true);
+            yield return 1.5f;
+            Neutral(first); Neutral(second);
+            for (int p = 0; p < cars.Length; p++) Check(Vector3.Distance(cars[p].transform.position, origins[p]) > .2f, label + " J" + (p + 1) + " accelerates with assigned controller");
+            ScreenCapture.CaptureScreenshot("Logs/GroupB_Race_" + scene + "_" + players + ".png"); yield return .3f;
+            SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; yield return .3f;
         }
     }
     static void Finish(Exception error)

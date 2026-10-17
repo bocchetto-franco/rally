@@ -82,7 +82,7 @@ public static class RallyCreditsPlay
                     Check(scroll.content.rect.height > scroll.viewport.rect.height * 3f, "Long document is scrollable");
                     var texts = scroll.content.GetComponentsInChildren<TMP_Text>();
                     string all = string.Join("\n", texts.Select(text => text.text));
-                    foreach (string required in new[] { "Martin Trafas", "TonyWony", "REQUIERE ATRIBUCIÓN", "CC0", "NO CLARA", "Porsche", "Dmitry_mansurev64", "Quaternius", "Unity Companion License", "Electronic Highway Sign" })
+                    foreach (string required in new[] { "DisneyCars", "Lancia Delta S4", "Peugeot 205 T16", "TonyWony", "REQUIERE ATRIBUCIÓN", "CC0", "NO CLARA", "Dmitry_mansurev64", "Quaternius", "Unity Companion License", "Electronic Highway Sign" })
                         Check(all.Contains(required), "Displayed attribution: " + required);
                     foreach (var text in texts)
                         Check(text.rectTransform.rect.width <= scroll.viewport.rect.width, "Text contained horizontally");

@@ -9,11 +9,16 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class RallyPlayerVehicleSelection
 {
-    public const string BmwName = "BMW M3 E30";
-    public const string BmwResource = "Vehicles/BmwE30";
+    public const string LanciaName = "Lancia Delta S4";
+    public const string LanciaResource = "Vehicles/LanciaS4";
+    public const string PeugeotName = "Peugeot 205 T16";
+    public const string PeugeotResource = "Vehicles/Peugeot205T16";
+    // Historical editor tools use this symbol for selectable slot 1.
+    public const string BmwName = PeugeotName;
+    public const string BmwResource = PeugeotResource;
     public const string AudiName = "Audi Quattro S1";
     public const string AudiResource = "Vehicles/AudiQuattro";
-    public static readonly string[] Names = { RallyGameSession.VehicleName, BmwName, AudiName };
+    public static readonly string[] Names = { LanciaName, PeugeotName, AudiName };
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Install()
@@ -27,7 +32,7 @@ public static class RallyPlayerVehicleSelection
         if (Array.IndexOf(RallyGameSession.CircuitScenes, scene.name) < 0) return;
         RallyGameSession.RestoreSavedState();
         // Clone the pristine split-screen rig before applying independent visual selections.
-        if (RallyGameSession.LocalPlayerCount == 2 || RallyGameSession.SelectedVehicle == RallyGameSession.VehicleName) return;
+        if (RallyGameSession.LocalPlayerCount == 2) return;
         var player = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<JrsVehicleController>())
             .FirstOrDefault(c => c.name == RallyGameSession.VehicleName && c.GetComponentInParent<RallyBotController>() == null);
         if (player == null) { Debug.LogError("Selected vehicle: player root not found."); return; }
@@ -49,16 +54,15 @@ public static class RallyPlayerVehicleSelection
     {
         if (bot.GetComponentInParent<RallyBotController>(true) == null)
             throw new InvalidOperationException("Bot visuals require a bot vehicle.");
-        if (vehicleName == RallyGameSession.VehicleName)
-            return null; // The shared Bot_Car prefab already has the Porsche model.
         return ApplyVisualOnly(bot, vehicleName);
     }
 
     private static RallyVehicleVisual ApplyVisualOnly(JrsVehicleController player, string vehicleName)
     {
+        vehicleName = MigrateSavedName(vehicleName);
         var existing = player.GetComponentInChildren<RallyVehicleVisual>();
-        if (existing != null) return existing;
-        string resource = vehicleName == BmwName ? BmwResource : vehicleName == AudiName ? AudiResource : null;
+        if (existing != null && existing.name == vehicleName + " Visual") return existing;
+        string resource = vehicleName == LanciaName ? LanciaResource : vehicleName == PeugeotName ? PeugeotResource : vehicleName == AudiName ? AudiResource : null;
         if (resource == null) throw new ArgumentOutOfRangeException(nameof(vehicleName));
         var prefab = Resources.Load<RallyVehicleVisual>(resource);
         if (prefab == null || prefab.wheels.Length != 4 || prefab.radii.Length != 4)
@@ -116,6 +120,15 @@ public static class RallyPlayerVehicleSelection
         player.rearLeftWheelTransform = visual.wheels[2];
         player.rearRightWheelTransform = visual.wheels[3];
 
+        // Saved rigs carry the default Lancia presentation. Replace only that
+        // presentation when choosing a different car; physics objects stay alive.
+        if (existing != null)
+        {
+            existing.gameObject.SetActive(false);
+            if (Application.isPlaying) UnityEngine.Object.Destroy(existing.gameObject);
+            else UnityEngine.Object.DestroyImmediate(existing.gameObject);
+        }
+
         // Tuning, body collision, mass and inertia stay on the original rig.
         return visual;
     }
@@ -147,5 +160,7 @@ public static class RallyPlayerVehicleSelection
     }
 
     public static string MigrateSavedName(string name)
-        => name == "Mini Classic Rally" ? BmwName : name == "Lancia Delta HF Integrale" ? AudiName : name;
+        => name == "Porsche 911" || name == RallyGameSession.VehicleName ? LanciaName :
+           name == "BMW M3 E30" || name == "Mini Classic Rally" ? PeugeotName :
+           name == "Lancia Delta HF Integrale" ? AudiName : name;
 }

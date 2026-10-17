@@ -138,7 +138,7 @@ public static class RallyMenuVehiclePreviewCheck
                 case 16:
                     Release(); Check(RallyGameSession.VehicleIndexForPlayer(0) == 2 && RallyGameSession.VehicleIndexForPlayer(1) == 1, "Different cars confirmed independently");
                     var localResident = Resources.FindObjectsOfTypeAll<GameObject>().Where(g => EditorUtility.IsPersistent(g) && AssetDatabase.GetAssetPath(g).StartsWith("Assets/Resources/MenuVehicles/") && g.transform.parent == null).ToArray();
-                    Check(localResident.Length <= 2 && !localResident.Any(g => g.name == "Porsche911"), "2P has no discarded preview prefab resident");
+                    Check(localResident.Length <= 2 && !localResident.Any(g => g.name == "LanciaS4"), "2P has no discarded preview prefab resident");
                     InputSystem.DisableDevice(pad); InputSystem.DisableDevice(second);
                     InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.RightArrow)); phase = 20; break;
                 case 20:

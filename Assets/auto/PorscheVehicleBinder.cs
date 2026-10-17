@@ -26,6 +26,10 @@ public sealed class PorscheVehicleBinder : MonoBehaviour
         Transform vehicleRoot = transform.parent;
         if (vehicleRoot == null)
             return;
+        // The historical rig now has an authored Group B visual. Its wheel
+        // geometry is already fitted; never re-run the old Porsche setup on it.
+        if (vehicleRoot.GetComponentInChildren<RallyVehicleVisual>(true) != null)
+            return;
         // Local multiplayer clones an already fitted, tuned rig. Rebuilding from
         // world-space mesh bounds would inflate its collider and disable its input.
         if (Application.isPlaying && vehicleRoot.GetComponent<RallyLocalPlayerInput>() != null)

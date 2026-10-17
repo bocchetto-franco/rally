@@ -21,7 +21,7 @@ public static class RallyGameSession
     public const string RaceScene = "Circuit_01";
     public const string ResultsScene = "RaceResults";
     public const string VehicleName = "Porsche 911 SC Rally";
-    public static readonly string[] VehicleDisplayNames = { "Porsche 911", "BMW M3 E30", "Audi Quattro S1" };
+    public static readonly string[] VehicleDisplayNames = { "Lancia Delta S4", "Peugeot 205 T16", "Audi Quattro S1" };
     public const string CircuitName = "Circuit 01";
     public static readonly string[] CircuitNames = { "Circuit 01", "Circuit 02", "Circuit 03" };
     public static readonly string[] CircuitDisplayNames = { "Desierto", "Sierras", "Bosque" };
@@ -41,8 +41,8 @@ public static class RallyGameSession
         PlayerPrefs.Save();
     }
 
-    public static string SelectedVehicle { get; private set; } = VehicleName;
-    public static string SelectedVehicleTwo { get; private set; } = VehicleName;
+    public static string SelectedVehicle { get; private set; } = RallyPlayerVehicleSelection.LanciaName;
+    public static string SelectedVehicleTwo { get; private set; } = RallyPlayerVehicleSelection.LanciaName;
     public static string VehicleForPlayer(int player) => player == 0 ? SelectedVehicle : SelectedVehicleTwo;
     public static int VehicleIndexForPlayer(int player) => Mathf.Max(0, Array.IndexOf(RallyPlayerVehicleSelection.Names, VehicleForPlayer(player)));
     public static void SelectVehicleForPlayer(int player, int index)
@@ -106,10 +106,10 @@ public static class RallyGameSession
         LocalPlayerCount = Mathf.Clamp(PlayerPrefs.GetInt("Rally.LocalPlayers", 1), 1, 2);
         SelectedVehicle = RallyPlayerVehicleSelection.MigrateSavedName(PlayerPrefs.GetString(VehicleKey, VehicleName));
         if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicle) < 0)
-            SelectedVehicle = VehicleName;
+            SelectedVehicle = RallyPlayerVehicleSelection.LanciaName;
         SelectedVehicleTwo = RallyPlayerVehicleSelection.MigrateSavedName(PlayerPrefs.GetString(VehicleTwoKey, VehicleName));
         if (Array.IndexOf(RallyPlayerVehicleSelection.Names, SelectedVehicleTwo) < 0)
-            SelectedVehicleTwo = VehicleName;
+            SelectedVehicleTwo = RallyPlayerVehicleSelection.LanciaName;
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);
         if (Array.IndexOf(CircuitNames, SelectedCircuit) < 0)
             SelectedCircuit = CircuitName;
@@ -366,9 +366,9 @@ public sealed partial class RallyMenuController : MonoBehaviour
 
         RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 760f));
         mainMenuCard = card.gameObject;
-        Text(card, "Card Label", "PRÓXIMA ETAPA", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 305f), new Vector2(460f, 36f), Accent);
+        Text(card, "Card Label", "RALLY ARCADE", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 305f), new Vector2(460f, 36f), Accent);
         Text(card, "Circuit", RallyGameSession.SelectedCircuitDisplayName.ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 240f), new Vector2(460f, 60f), Color.white);
-        Text(card, "Details", "3 PISTAS DISPONIBLES\n" + RallyGameSession.SelectedVehicleDisplayName.ToUpperInvariant(), 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 156f), new Vector2(460f, 80f), Muted);
+        Text(card, "Details", "3 circuitos · 3 autos del Grupo B\nUna vuelta contrarreloj con bots", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 156f), new Vector2(460f, 80f), Muted);
         Button(card, "Play Button", "JUGAR", new Vector2(0f, 20f), new Vector2(470f, 86f), StartSelection, true);
         Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -85f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
         Button(card, "Options Button", "OPCIONES", new Vector2(0f, -180f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);

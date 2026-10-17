@@ -1,36 +1,36 @@
 # Rally — créditos y atribuciones
 
-Auditoría: 2026-10-10. Este archivo es la fuente de la pantalla Créditos y de la copia distribuida con el juego. Incluye recursos activos y recursos históricos todavía presentes en Assets/Resources; estar descargado, ser gratuito o aparecer en un ejemplo no demuestra permiso de uso.
+Auditoría general: 2026-10-10; sustitución de autos Grupo B: 2026-10-17. Este archivo es la fuente de la pantalla Créditos y de la copia distribuida con el juego. Incluye recursos activos y recursos históricos todavía presentes en Assets/Resources; estar descargado, ser gratuito o aparecer en un ejemplo no demuestra permiso de uso.
 
 ## Estado de licencias
 
 CC0 1.0 Universal: atribución no obligatoria; listado por transparencia. CC-BY: REQUIERE ATRIBUCIÓN, conservar nombre, autor, enlace a obra/licencia y cambios. MIT, Apache y OFL: conservar también sus avisos/licencias completos. Los samples de Unity NO son CC0; tienen condiciones para proyectos dependientes de Unity.
 
-PENDIENTE CRÍTICO: no se encontró autor, URL original ni licencia del Porsche importado por el usuario. No darlo por autorizado para distribución/comercialización. La fuente Electronic Highway Sign de los ejemplos TMP tampoco tiene términos verificables locales. No se identificaron licencias NC/ND expresas en los demás recursos auditados; esto no acredita derechos de marcas, logotipos, liveries o imagen de terceros.
+PENDIENTE: la fuente Electronic Highway Sign de los ejemplos TMP no tiene términos verificables locales. No se identificaron licencias NC/ND expresas en los demás recursos auditados; esto no acredita derechos de marcas, logotipos, liveries o imagen de terceros. El Porsche de licencia no verificada y el BMW retirados se conservan únicamente en el respaldo local fuera de Assets, no en los recursos distribuidos del juego actual.
 
 La revisión contrasta SOURCE/SOURCES, manifiestos y licencias locales con Poly Haven API, Sketchfab API, páginas de Freesound/OpenGameArt, Kenney y licencias de los paquetes instalados. Las páginas web de BMW/Audi devolvieron 403; su API pública confirmó CC-BY 4.0. No se adivinó la procedencia del Porsche por su nombre. Inventario por archivo: Docs/AssetLicenseInventory.csv; evidencia de APIs: Docs/CreditsEvidence.json; 63 paquetes y licencias/ausencias locales: Docs/PackageLicenseInventory.csv. Avisos distribuidos: StreamingAssets/Licenses/.
 
 ## Autos y vehículo de referencia
 
-### Porsche 911 SC Rally — licencia no clara
-- Autor: DESCONOCIDO; aportado/importado por el usuario.
-- Fuente: DESCONOCIDA; no hay URL original verificable en el proyecto.
-- Licencia: NO CLARA — pendiente de comprobación, no asumir permiso comercial/distribución.
-- Rutas: `Assets/auto/porsche-911-sc-rally`.
-- Estado: modelo principal activo; FBX 911sc.fbx y nueve texturas originales. La licencia debe cubrir modelo, mapas y livery; pedir el enlace/archivo de licencia al proveedor original. El binder y las conversiones locales no otorgan derechos sobre el modelo.
-
-### [FREE] BMW M3 E30
-- Autor: Martin Trafas (TinoD2).
-- Fuente: https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422
+### Lancia Delta S4 — 1965–2002 Rally Cars
+- Autor: DisneyCars (supercarmodels), según la publicación original.
+- Fuente: https://sketchfab.com/3d-models/1965-2002-rally-cars-2146acc1e3de409baf46d03a070d0526
 - Licencia: CC-BY 4.0 International — REQUIERE ATRIBUCIÓN. https://creativecommons.org/licenses/by/4.0/
-- Rutas: `Assets/Art/Vehicles/BmwE30`; `Assets/Resources/Vehicles/BmwE30.prefab`.
-- Cambios: estudio eliminado, ruedas delanteras enderezadas y cuatro conjuntos de rueda preparados, conversión FBX/URP, escala uniforme 4.30 m y compresión de texturas. Fuente/hash preservados en SOURCE.md. Sin respaldo ni patrocinio del autor o fabricante.
+- Rutas: `Assets/Art/Vehicles/LanciaS4`; `Assets/Resources/Vehicles/LanciaS4.prefab`; `Assets/Resources/MenuVehicles/LanciaS4.prefab`; `Assets/Art/MenuVehicles/LanciaS4_0.asset`.
+- Cambios: orientación FBX, nombres/pivotes de las cuatro ruedas originales, material URP, textura comprimida y preview derivado. Escala uniforme original conservada. Fuente/hash en SOURCE.md. Licencia declarada por el publicador; sin respaldo ni patrocinio del autor o fabricante.
+
+### Peugeot 205 T16 Evo 2 — 1965–2002 Rally Cars
+- Autor: DisneyCars (supercarmodels), según la publicación original.
+- Fuente: https://sketchfab.com/3d-models/1965-2002-rally-cars-2146acc1e3de409baf46d03a070d0526
+- Licencia: CC-BY 4.0 International — REQUIERE ATRIBUCIÓN. https://creativecommons.org/licenses/by/4.0/
+- Rutas: `Assets/Art/Vehicles/Peugeot205T16`; `Assets/Resources/Vehicles/Peugeot205T16.prefab`; `Assets/Resources/MenuVehicles/Peugeot205T16.prefab`; `Assets/Art/MenuVehicles/Peugeot205T16_0.asset`.
+- Cambios: orientación FBX, escala uniforme 0.9721383795, nombres/pivotes de las cuatro ruedas originales, material URP, textura comprimida y preview derivado. Fuente/hash en SOURCE.md. Licencia declarada por el publicador; sin respaldo ni patrocinio del autor o fabricante.
 
 ### Audi Quattro S1
 - Autor: TonyWony.
 - Fuente: https://sketchfab.com/3d-models/audi-quattro-s1-402697365eaa41a68a543b71d0e0bfa8
 - Licencia: CC-BY 4.0 International — REQUIERE ATRIBUCIÓN. https://creativecommons.org/licenses/by/4.0/
-- Rutas: `Assets/Art/Vehicles/AudiQuattro`; `Assets/Resources/Vehicles/AudiQuattro.prefab`.
+- Rutas: `Assets/Art/Vehicles/AudiQuattro`; `Assets/Resources/Vehicles/AudiQuattro.prefab`; `Assets/Resources/MenuVehicles/AudiQuattro.prefab`; `Assets/Art/MenuVehicles/AudiQuattro_0.asset`.
 - Cambios: Collada/DAE a FBX, separación de ruedas originales, pivotes nombrados, escala uniforme 4.25 m, materiales URP y empaquetado PBR. Fuente/hash en SOURCE.md. Sin respaldo ni patrocinio del autor o fabricante.
 
 ### FREE Lancia Delta HF Integrale evo 2 — histórico
@@ -319,7 +319,7 @@ Todos los sets siguientes usan CC0 1.0 Universal: https://creativecommons.org/pu
 - Autor: proyecto Rally (trabajo local del proyecto asistido por herramientas).
 - Fuente: repositorio del proyecto; no proveedor externo. https://github.com/bocchetto-franco/rally
 - Licencia: no se declara una licencia general nueva del proyecto en esta auditoría. Los derivados conservan las licencias de sus fuentes CC0, CC-BY, MIT, OFL/Apache o Unity; no relabelar todos como CC0.
-- Rutas: `Assets/Art/Environment/PackedTextures`; `Assets/Art/Environment/Materials`; `Assets/Art/Environment/Prefabs`; `Assets/Art/Environment/Terrain`; `Assets/Art/Environment/Circuit02`; `Assets/Art/Environment/Circuit01Dressing`; `Assets/Art/Forest/Materials`; `Assets/Art/Forest/Prefabs`; `Assets/Art/Forest/Terrain`; `Assets/Art/Forest/Circuit03`; `Assets/Art/Sierras/Circuit02`; `Assets/Art/PerformanceLOD`; `Assets/Art/PuddleDressing`; `Assets/Art/RallyFinish`; `Assets/Art/RoadTerrainBlend`; `Assets/Resources/MenuPreviews`; `Assets/Resources/MenuBackdrops`; `Assets/Resources/Audio/RallyAudioLibrary.asset`; `Assets/Prefabs`; `Assets/Scenes`.
+- Rutas: `Assets/Art/Environment/PackedTextures`; `Assets/Art/Environment/Materials`; `Assets/Art/Environment/Prefabs`; `Assets/Art/Environment/Terrain`; `Assets/Art/Environment/Circuit02`; `Assets/Art/Environment/Circuit01Dressing`; `Assets/Art/Forest/Materials`; `Assets/Art/Forest/Prefabs`; `Assets/Art/Forest/Terrain`; `Assets/Art/Forest/Circuit03`; `Assets/Art/Sierras/Circuit02`; `Assets/Art/PerformanceLOD`; `Assets/Art/PuddleDressing`; `Assets/Art/RallyFinish`; `Assets/Art/RallyTurbo`; `Assets/Art/RoadTerrainBlend`; `Assets/Resources/MenuVehicles/StudioFloor.mat`; `Assets/Resources/MenuPreviews`; `Assets/Resources/MenuBackdrops`; `Assets/Resources/Audio/RallyAudioLibrary.asset`; `Assets/Prefabs`; `Assets/Scenes`.
 - Alcance: trazados ProBuilder, mapas de alturas y depresiones, puente/río, arcos de meta a cuadros, antiguos fardos de heno (geometría propia; retirados), máscaras PBR/alpha, prefabs/LOD/multitudes combinadas, materiales agua/bordes, capturas y copias visuales de menú. No hay modelo de fardo descargado. Agua deriva de Unity; vegetación/terreno/público/decoración de los autores anteriores. El material Sierra daylight sky y las copias de cielo/agua heredan el origen ya listado.
 
 ## Notas de distribución

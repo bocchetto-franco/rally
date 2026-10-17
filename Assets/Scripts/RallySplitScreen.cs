@@ -80,10 +80,8 @@ public sealed class RallySplitScreen : MonoBehaviour
         dynamicsTwo = secondDynamics.GetComponent<RallyVehicleDynamics>();
         dynamicsTwo.BindVehicle(PlayerTwo);
         // Presentation only: retain the same rigidbody, wheels and tuning for both cars.
-        if (RallyGameSession.VehicleForPlayer(0) != RallyGameSession.VehicleName)
-            RallyPlayerVehicleSelection.ApplyVisual(PlayerOne, RallyGameSession.VehicleForPlayer(0));
-        if (RallyGameSession.VehicleForPlayer(1) != RallyGameSession.VehicleName)
-            RallyPlayerVehicleSelection.ApplyVisual(PlayerTwo, RallyGameSession.VehicleForPlayer(1));
+        RallyPlayerVehicleSelection.ApplyVisual(PlayerOne, RallyGameSession.VehicleForPlayer(0));
+        RallyPlayerVehicleSelection.ApplyVisual(PlayerTwo, RallyGameSession.VehicleForPlayer(1));
         secondCar.transform.SetParent(null, true);
         secondDynamics.transform.SetParent(null, true);
 

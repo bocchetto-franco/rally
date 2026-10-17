@@ -1,10 +1,11 @@
 Vehicle artwork attribution
 
-BMW M3 E30 by Martin Trafas (TinoD2), Creative Commons Attribution 4.0.
-https://sketchfab.com/3d-models/free-bmw-m3-e30-ac3c7013434e403e8faff87948caf422
+Lancia Delta S4 and Peugeot 205 T16 Evo 2 from 1965-2002 Rally Cars,
+published by DisneyCars (supercarmodels), Creative Commons Attribution 4.0.
+https://sketchfab.com/3d-models/1965-2002-rally-cars-2146acc1e3de409baf46d03a070d0526
 https://creativecommons.org/licenses/by/4.0/
-Modified: studio removed, front wheels straightened, wheel assemblies prepared,
-uniform scale set to 4.30 m, FBX export and Unity URP material conversion.
+Modified: wheel names/pivots, FBX orientation, Unity URP materials and menu previews.
+Peugeot uniformly scaled by 0.9721383795; Lancia retained original uniform scale.
 
 Audi Quattro S1 by TonyWony, Creative Commons Attribution 4.0.
 https://sketchfab.com/3d-models/audi-quattro-s1-402697365eaa41a68a543b71d0e0bfa8
