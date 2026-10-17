@@ -18,9 +18,9 @@ Exportación explícita con Unity idle: `unity command run_script --file Tools/R
 
 ## Controles
 
-Arriba/abajo navega entre autos, pistas y acciones. Mientras el foco está en los autos, izquierda/derecha recorre únicamente los tres modelos y vuelve al primero después del último. Mouse conserva selección directa. En modo local, cada mando controla exclusivamente su panel; navegar previsualiza y Cruz/Enter/Espacio confirma según los controles de cada piloto, conservando el sistema Listo existente.
+Arriba/abajo navega entre filas. En selección individual, Derecha recorre Porsche → BMW → Audi y solo desde Audi pasa a terreno; Izquierda desde terreno vuelve, recordando el foco. Stick, D-Pad y flechas comparten esa regla; L2/R2 no cambian panel. En 2P izquierda/derecha recorre la fila de autos de cada piloto. Mouse conserva selección directa. Navegar solo previsualiza y Cruz/Enter/Espacio confirma según los controles de cada piloto, conservando el sistema Listo existente. El verificador específico de paneles es `Tools/RallySelectionUxCheck.cs`, entrada `RunMenusOnly`.
 
-El nombre y peso 1.160 kg son presentación; reflejan el perfil compartido del jugador y no aplican ningún valor a la física.
+Solo se muestra el nombre: la ficha de peso/física se retiró por pedido explícito del 2026-10-17. El preview no aplica ningún valor a la física.
 
 ## Verificación
 

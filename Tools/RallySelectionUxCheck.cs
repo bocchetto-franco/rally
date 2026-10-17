@@ -19,7 +19,8 @@ using Object = UnityEngine.Object;
 // External Play verification. No scene/physics/asset writes, restores the user's session.
 public static class RallySelectionUxCheck
 {
-    const string Report = "Logs/selection-ux-check.txt";
+    static string Report;
+    static bool menusOnly;
     static readonly string[] Keys = { "Rally.LocalPlayers", "Rally.SelectedVehicle", "Rally.SelectedVehicleTwo", "Rally.SelectedCircuit", "Rally.BotDifficulty" };
     static bool[] had;
     static string[] strings;
@@ -38,12 +39,15 @@ public static class RallySelectionUxCheck
     static int lastFrame;
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
 
-    public static void Run()
+    public static void Run() => Start(false);
+    public static void RunMenusOnly() => Start(true);
+    static void Start(bool onlyMenus)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer)
             throw new Exception("Unity must be idle.");
         if (!EditorSettings.enterPlayModeOptionsEnabled || (EditorSettings.enterPlayModeOptions & EnterPlayModeOptions.DisableDomainReload) == 0)
             throw new Exception("External check requires the project's Disable Domain Reload setting.");
+        menusOnly = onlyMenus; Report = onlyMenus ? "Logs/selection-panel-check.txt" : "Logs/selection-ux-check.txt";
         scenes = EditorSceneManager.GetSceneManagerSetup(); start = EditorSceneManager.playModeStartScene;
         background = Application.runInBackground; paused = EditorApplication.isPaused; timeScale = Time.timeScale;
         had = Keys.Select(PlayerPrefs.HasKey).ToArray(); strings = Keys.Select(k => PlayerPrefs.GetString(k)).ToArray(); ints = Keys.Select(k => PlayerPrefs.GetInt(k)).ToArray();
@@ -53,7 +57,8 @@ public static class RallySelectionUxCheck
         testInput.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         testInput.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus; InputSystem.settings = testInput;
         RallyGameSession.SelectLocalPlayers(1); RallyGameSession.SelectVehicleForPlayer(0, 0); RallyGameSession.SelectVehicleForPlayer(1, 0);
-        File.WriteAllText(Report, "Selection UX: real Play, virtual DualSense/keyboard, 1P/2P, HUD in all circuits\n");
+        RallyGameSession.SelectCircuit(0);
+        File.WriteAllText(Report, onlyMenus ? "Selection panel boundary: real Play, virtual DualSense/keyboard, 1P/2P menus only\n" : "Selection UX: real Play, virtual DualSense/keyboard, 1P/2P, HUD in all circuits\n");
         stopping = exited = false; runtimeError = null; next = 0; lastFrame = -1; deadline = EditorApplication.timeSinceStartup + 1500;
         steps = Steps(); EditorApplication.update += Tick; EditorApplication.playModeStateChanged += Mode; Application.logMessageReceived += Log;
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/MainMenu.unity");
@@ -91,17 +96,31 @@ public static class RallySelectionUxCheck
     {
         State(pad);
     }
-    static void State(Gamepad pad, byte dpad = 8, bool cross = false, Vector2 stick = default)
+    static void State(Gamepad pad, byte dpad = 8, bool cross = false, Vector2 stick = default, bool leftTrigger = false, bool rightTrigger = false)
     {
         InputSystem.QueueStateEvent(pad, new DualSenseHIDInputReport {
             leftStickX = (byte)Mathf.RoundToInt((stick.x + 1) * 127.5f), leftStickY = (byte)Mathf.RoundToInt((1 - stick.y) * 127.5f),
-            rightStickX = 128, rightStickY = 128, buttons0 = (byte)(dpad | (cross ? 1 << 5 : 0)) });
+            rightStickX = 128, rightStickY = 128, buttons0 = (byte)(dpad | (cross ? 1 << 5 : 0)),
+            leftTrigger = leftTrigger ? (byte)255 : (byte)0, rightTrigger = rightTrigger ? (byte)255 : (byte)0 });
     }
     static void Cross(Gamepad pad) => State(pad, cross: true);
     static void Dpad(Gamepad pad, Vector2 direction) => State(pad, direction.y > 0 ? (byte)0 : direction.y < 0 ? (byte)4 : direction.x > 0 ? (byte)2 : direction.x < 0 ? (byte)6 : (byte)8);
     static void Stick(Gamepad pad, Vector2 direction) => State(pad, stick: direction);
     static void KeysDown(params Key[] keys) => InputSystem.QueueStateEvent(keyboard, new KeyboardState(keys));
+    static void Horizontal(int input, bool right)
+    {
+        if (input == 0) Dpad(first, right ? Vector2.right : Vector2.left);
+        else if (input == 1) KeysDown(right ? Key.RightArrow : Key.LeftArrow);
+        else Stick(first, right ? Vector2.right : Vector2.left);
+    }
     static bool Yellow(Color c) => c.r > .9f && c.g > .75f && c.b < .25f;
+    static void DisplayOutput()
+    {
+        var output = Object.FindObjectsByType<Camera>().Single(c => c.name == "Menu Display 1 - clear only");
+        Check(output.isActiveAndEnabled && output.targetTexture == null && output.targetDisplay == 0, "real camera renders to Display 1, not only RenderTextures");
+        Check(output.cullingMask == 0 && output.clearFlags == CameraClearFlags.SolidColor, "display output does not render the landscape a second time");
+        Check(Object.FindObjectsByType<AudioListener>().Count(l => l.enabled) == 1, "menu retains a single active AudioListener");
+    }
     static void Chosen(Button[] cars, int expected)
     {
         Check(cars.Count(b => Yellow(b.colors.normalColor)) == 1 && Yellow(cars[expected].colors.normalColor), "exactly one confirmed yellow car per panel");
@@ -133,8 +152,32 @@ public static class RallySelectionUxCheck
         CleanSelection();
         var nav = Nav(); var menu = Object.FindAnyObjectByType<RallyMenuController>(); var cars = Field<Button[]>(menu, "vehicleButtons");
         nav.FocusVehicle(cars[0]); yield return .15f; Chosen(cars, 0);
-        Dpad(first, Vector2.right); yield return null; Neutral(first); yield return .15f;
-        Check(Focus(nav) == cars[1] && RallyGameSession.SelectedVehicleIndex == 0, "D-Pad browses BMW without confirming it"); Chosen(cars, 0);
+        for (int input = 0; input < 3; input++)
+        {
+            nav.FocusVehicle(cars[0]);
+            for (int step = 1; step <= 3; step++)
+            {
+                Horizontal(input, true); yield return null; Neutral(first); KeysDown(); yield return null;
+                Check(Focus(nav) == (step < 3 ? cars[step] : B("Circuit 1 Button")), "right input " + input + ": Porsche -> BMW -> Audi -> terrain, step " + step);
+                Check(RallyGameSession.SelectedVehicleIndex == 0, "browsing across panel boundary does not confirm a different car");
+            }
+            Horizontal(input, false); yield return null; Neutral(first); KeysDown(); yield return null;
+            Check(Focus(nav) == cars[2], "left input " + input + " returns from terrain to Audi");
+        }
+        nav.FocusVehicle(B("Circuit 1 Button"));
+        Dpad(first, Vector2.down); yield return null; Neutral(first); yield return null; Cross(first); yield return null; Neutral(first); yield return .15f;
+        Check(RallyGameSession.SelectedRaceScene == "Circuit_02" && B("Circuit 2 Button").colors.normalColor.g > .5f && B("Circuit 2 Button").colors.normalColor.b < .2f, "track confirmation retains orange highlight");
+        Dpad(first, Vector2.left); yield return null; Neutral(first); yield return null;
+        Check(Focus(nav) == cars[2], "return from track list remembers Audi focus");
+        State(first, rightTrigger: true); yield return .5f; Neutral(first); yield return null;
+        Check(Focus(nav) == cars[2], "R2 no longer moves from Audi to terrain");
+        nav.FocusVehicle(B("Circuit 2 Button"));
+        State(first, leftTrigger: true); yield return .5f;
+        Check(Focus(nav) == B("Circuit 2 Button") && RallyGameSession.SelectedVehicleIndex == 0, "L2 no longer moves from terrain to cars");
+        Neutral(first); yield return null;
+        nav.FocusVehicle(cars[2]);
+        Dpad(first, Vector2.left); yield return null; Neutral(first); yield return .15f;
+        Check(Focus(nav) == cars[1] && RallyGameSession.SelectedVehicleIndex == 0, "left still browses every car without confirming"); Chosen(cars, 0);
         Cross(first); yield return null; Neutral(first); yield return .15f;
         Check(RallyGameSession.SelectedVehicleIndex == 1, "DualSense Cross confirms focused BMW"); Chosen(cars, 1);
         Dpad(first, Vector2.left); yield return null; Neutral(first); yield return .15f;
@@ -168,6 +211,7 @@ public static class RallySelectionUxCheck
         var preview = Field<RallyMenuVehiclePreview>(menu, "vehiclePreview");
         while (preview.IsTransitioning || preview.ShownIndex != 1 || preview.Opacity < .99f) yield return null;
         Check(preview.VisibleModel != null && GameObject.Find("Selected Vehicle").GetComponent<TMP_Text>().text == "BMW M3 E30", "preview model and name remain visible after cleanup");
+        DisplayOutput();
         ScreenCapture.CaptureScreenshot("Logs/SelectionUX_1P.png"); yield return .3f;
         B("Local Players 2").onClick.Invoke(); yield return .4f;
         CleanSelection();
@@ -196,6 +240,7 @@ public static class RallySelectionUxCheck
         var previews = Field<RallyMenuVehiclePreview[]>(menu, "localVehiclePreviews");
         while (previews.Any(p => p.IsTransitioning || p.ShownIndex != 1 || p.Opacity < .99f)) yield return null;
         Check(previews.All(p => p.VisibleModel != null), "both local preview models remain visible");
+        DisplayOutput();
         ScreenCapture.CaptureScreenshot("Logs/SelectionUX_2P.png"); yield return .3f;
         B("Back Button").onClick.Invoke();
         while (SceneManager.GetActiveScene().name != "MainMenu") yield return null;
@@ -204,12 +249,23 @@ public static class RallySelectionUxCheck
         string creditText = string.Join("\n", Object.FindAnyObjectByType<RallyMenuController>().GetComponentsInChildren<TMP_Text>().Select(t => t.text));
         Check(creditText.Contains("Martin Trafas") && creditText.Contains("TonyWony") && creditText.Contains("CC-BY 4.0"), "both car authors/licenses still appear on Credits page");
         Check(File.ReadAllText("CREDITS.md").Contains("Martin Trafas") && File.ReadAllText("CREDITS.md").Contains("TonyWony"), "canonical CREDITS.md preserves car attribution");
+        if (menusOnly) yield break;
         for (int scene = 0; scene < 3; scene++) for (int players = 1; players <= 2; players++)
         {
             RallyGameSession.SelectLocalPlayers(players); RallyRaceLoading.Load(RallyGameSession.CircuitScenes[scene]);
             while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != RallyGameSession.CircuitScenes[scene]) yield return null;
             yield return .15f;
             var huds = Object.FindObjectsByType<RallyRaceHud>(); Check(huds.Length == players, "correct HUD count " + RallyGameSession.CircuitScenes[scene] + " " + players + "P");
+            Check(!Object.FindObjectsByType<Camera>().Any(c => c.name == "Menu Display 1 - clear only"), "menu display camera is destroyed on entering race");
+            foreach (var zone in Object.FindObjectsByType<RallyTurboZone>())
+            {
+                var mesh = zone.GetComponentInChildren<MeshFilter>().sharedMesh;
+                var mat = zone.GetComponentInChildren<MeshRenderer>().sharedMaterials[1];
+                Check(mesh.GetIndexCount(0) == 0 && mesh.GetIndexCount(1) == 48 && mesh.vertexCount == 32, "turbo has only four chevrons, zero dark backing geometry");
+                Check(Mathf.Abs(mesh.bounds.size.x - 2.4f) < .1f && Mathf.Abs(mesh.bounds.size.z - 8.3f) < .1f, "turbo arrows use larger visual bounds");
+                Check(Mathf.Abs(mat.GetColor("_BaseColor").a - .55f) < .001f && mat.GetFloat("_Surface") == 1 && mat.GetFloat("_ZWrite") == 0 && mat.IsKeywordEnabled("_SURFACE_TYPE_TRANSPARENT"), "turbo material uses real alpha transparency at 55 percent");
+                Check(zone.ActivationHalfWidth == .7f && zone.GetComponent<BoxCollider>().size == new Vector3(2.2f, 3, 8), "narrow centre activation collider is unchanged");
+            }
             foreach (var bot in Object.FindObjectsByType<RallyBotController>()) bot.enabled = false;
             foreach (var dynamics in Object.FindObjectsByType<RallyVehicleDynamics>()) dynamics.enabled = false;
             foreach (var car in Object.FindObjectsByType<JrsVehicleController>()) { car.enabled = false; var body = car.GetComponent<Rigidbody>(); body.linearVelocity = body.angularVelocity = Vector3.zero; body.isKinematic = true; }

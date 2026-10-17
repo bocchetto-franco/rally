@@ -5,7 +5,7 @@ Implementación adicional al controlador existente, compartida por jugadores y b
 ## Parámetros
 
 - Tres zonas por circuito bajo `Rally Turbo Zones`, con hijos `Turbo_01/02/03 - centre lane 1.4m`.
-- Señal visual de 2.2 × 8 m: cuatro flechas amarillas sobre franja oscura, malla adaptada a la altura real del camino, materiales URP Unlit compartidos, sin sombras ni colisión sólida.
+- Señal visual actual (2026-10-17): solo cuatro chevrones amarillos, sin franja de fondo. Ocupan 2.4 × 8.3 m, frente a flechas anteriores de 1.28 × 7.2 m. Material URP Unlit transparente, RGBA `(1, 0.88, 0.30, 0.55)`, mezcla alpha y ZWrite desactivado. Malla adaptada por raycast al camino, sin sombras ni colisión sólida. El mayor tamaño es únicamente visual: no ensancha la activación.
 - La raíz del Rigidbody debe entrar en un carril central de 1.4 m, dentro del volumen y avanzando en el sentido de las flechas. Rozar con la carrocería/ruedas no alcanza. Velocidad mínima: 12 km/h; alineación mínima del movimiento: coseno 0.5.
 - Impulso: 4.5 m/s² durante 2.25 s mediante `ForceMode.Acceleration`, igual para cualquier masa. Solo empuja con al menos dos ruedas apoyadas y el auto enderezado; sin fuerza vertical añadida. El impulso deja de aportar aceleración a 180 km/h y nunca reduce una velocidad superior existente.
 - No se acumula mientras ya está activo. Cada zona tiene un rearme de 8 s por vehículo; el cooldown no es compartido entre corredores y usa tiempo de juego, por lo que la pausa lo congela.
@@ -33,3 +33,13 @@ Prueba real de Play: `Logs/turbo-play-check.txt`, **COMPLETE: PASS** y **RESTORE
 | Circuit_03 | 278 / 830 / 1306 m | +1.2 / -1.2 / +1.2 m |
 
 Las distancias se miden sobre los waypoints actuales, incluido el puente; no se regeneraron trazados. Materiales/mallas originales de señalización en `Assets/Art/RallyTurbo/`, sin descargas nuevas. No son oclusores: los bakes existentes se conservan.
+
+## Actualización visual sin cambios de gameplay
+
+`Tools/RallyTurboVisualUpgrade.cs`, entrada `Run`, actualiza los nueve Mesh assets manteniendo GUID/referencias y el material `Turbo yellow.mat`. La submalla 0 queda vacía (cero triángulos), por compatibilidad con el slot histórico; no hay geometría de fondo oscuro. La submalla 1 contiene 32 vértices/16 triángulos en cuatro chevrones. El material oscuro histórico se conserva como recurso, pero no dibuja un fondo.
+
+Validación: `Logs/turbo-visual-upgrade.txt` **COMPLETE: PASS**, los tres archivos de escena byte-idénticos; no cambiaron Transform, BoxCollider 2.2×3×8 m, activación central de 1.4 m ni scripts de impulso. Respaldo de mallas/material: `Logs/SceneBackups/TurboVisual_20261017_113732/`. El instalador histórico `RallyTurboSetup` conserva el aspecto nuevo si se usa para una instalación futura; no ejecutarlo sobre las pistas existentes.
+
+`RallySelectionUxCheck` comprueba material transparente real, tamaño y ausencia de fondo en las tres pistas 1P/2P. Para probar cruces físicos nuevamente usar `RallyTurboRuntimeCheck`; exigir el informe final actual, no solo el histórico. Las capturas `Logs/Turbo_Circuit_0X_0.png` muestran las flechas sobre el piso real.
+
+Rerun final del 2026-10-17 después del cambio visual: ambos informes **COMPLETE: PASS / RESTORED**. Los nueve cruces centrales activaron y los nueve cruces de borde no; se conservaron duración/no acumulación y efecto independiente por vehículo, incluidos bots y J1/J2. Se revisaron las capturas nuevas de las tres pistas. Unity quedó fuera de Play y con InputSettings válido; no se regeneró el ejecutable Windows.

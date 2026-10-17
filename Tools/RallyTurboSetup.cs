@@ -97,7 +97,10 @@ public static class RallyTurboSetup
         Directory.CreateDirectory(backup);
         Directory.CreateDirectory(Folder); AssetDatabase.Refresh();
         Material dark = Material("Turbo charcoal", new Color(.045f, .055f, .075f));
-        Material yellow = Material("Turbo yellow", new Color(1f, .78f, .03f));
+        Material yellow = Material("Turbo yellow", new Color(1f, .88f, .3f, .55f));
+        yellow.SetColor("_BaseColor", new Color(1f, .88f, .3f, .55f));
+        yellow.SetFloat("_Surface", 1); yellow.SetFloat("_Blend", 0);
+        BaseShaderGUI.SetupMaterialBlendMode(yellow);
         File.WriteAllText("Logs/turbo-build.txt", "Backup: " + backup + "\n");
         try
         {
@@ -161,12 +164,11 @@ public static class RallyTurboSetup
             }
             for (int i = 1; i < points.Length - 1; i++) triangles.AddRange(new[] { first, first + i + 1, first + i });
         };
-        // Small cells follow the road's slope instead of leaving a floating rectangle.
-        for (int z = -4; z < 4; z++) polygon(new[] { new Vector2(-1.1f, z), new Vector2(1.1f, z), new Vector2(1.1f, z + 1), new Vector2(-1.1f, z + 1) }, baseTriangles, .022f);
-        for (int z = -3; z <= 3; z += 2)
+        // Empty slot 0 preserves existing material references, with NO backing geometry.
+        foreach (float z in new[] { -3.3f, -1.1f, 1.1f, 3.3f })
         {
-            polygon(new[] { new Vector2(-.64f, z - .65f), new Vector2(0, z - .05f), new Vector2(0, z + .55f), new Vector2(-.64f, z - .05f) }, arrows, .03f);
-            polygon(new[] { new Vector2(0, z - .05f), new Vector2(.64f, z - .65f), new Vector2(.64f, z - .05f), new Vector2(0, z + .55f) }, arrows, .03f);
+            polygon(new[] { new Vector2(-1.2f, z - .85f), new Vector2(0, z + .2f), new Vector2(0, z + .85f), new Vector2(-1.2f, z - .2f) }, arrows, .035f);
+            polygon(new[] { new Vector2(0, z + .2f), new Vector2(1.2f, z - .85f), new Vector2(1.2f, z - .2f), new Vector2(0, z + .85f) }, arrows, .035f);
         }
         var mesh = new Mesh { name = zone.gameObject.scene.name + " " + zone.name + " road arrows" };
         mesh.SetVertices(vertices); mesh.subMeshCount = 2; mesh.SetTriangles(baseTriangles, 0); mesh.SetTriangles(arrows, 1); mesh.RecalculateNormals(); mesh.RecalculateBounds(); return mesh;

@@ -351,6 +351,8 @@ public sealed partial class RallyMenuController : MonoBehaviour
         if (vehicleButtons != null)
         {
             menuNavigation.ConfigureVehicleCycle(vehicleButtons);
+            menuNavigation.ConfigureSelectionPanels(vehicleButtons, circuitButtons, RallyGameSession.SelectedVehicleIndex,
+                Mathf.Max(0, Array.IndexOf(RallyGameSession.CircuitNames, RallyGameSession.SelectedCircuit)));
             menuNavigation.ConfigureSpatialNavigation();
             menuNavigation.FocusVehicle(vehicleButtons[RallyGameSession.SelectedVehicleIndex]);
         }
@@ -402,7 +404,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
                 new Vector2(-198f + 198f * i, -147f), new Vector2(184f, 46f), () => { RallyGameSession.SelectVehicle(choice); RefreshVehicleSelection(); }, false);
             vehicleButtons[i].GetComponentInChildren<TextMeshProUGUI>().fontSize = 21;
         }
-        Text(carCard, "Handling Note", "IZQ / DER: CAMBIAR AUTO · ENTER / CRUZ: ELEGIR", 17f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -190f), new Vector2(580f, 30f), Muted);
+        Text(carCard, "Handling Note", "IZQ/DER: AUTOS · AUDI + DER: TERRENO · CRUZ: ELEGIR", 17f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -190f), new Vector2(580f, 30f), Muted);
         RefreshVehicleSelection();
 
         RectTransform circuitCard = PanelRect(root, "Circuit Card", Panel, new Vector2(365f, 25f), new Vector2(670f, 500f));

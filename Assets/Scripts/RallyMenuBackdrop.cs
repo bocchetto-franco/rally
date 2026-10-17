@@ -10,6 +10,7 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
 {
     RallyMenuBackdropScene environment;
     Camera cameraView;
+    Camera displayCamera;
     string requestedTrack;
     int revision;
     float angle;
@@ -18,6 +19,26 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
     RenderTexture backgroundTarget;
     RawImage backgroundImage;
     int screenWidth, screenHeight;
+
+    void Awake()
+    {
+        // The scenery and car studios render into bounded textures. Unity's Game
+        // View still needs a real Display 1 output, even with overlay Canvases.
+        // This camera only clears: it does not render the scenery a second time.
+        var go = new GameObject("Menu Display 1 - clear only");
+        go.transform.SetParent(transform, false);
+        displayCamera = go.AddComponent<Camera>();
+        displayCamera.targetDisplay = 0; displayCamera.targetTexture = null;
+        displayCamera.cullingMask = 0; displayCamera.depth = -100;
+        displayCamera.clearFlags = CameraClearFlags.SolidColor;
+        displayCamera.backgroundColor = new Color(.035f, .025f, .019f);
+        displayCamera.nearClipPlane = .1f; displayCamera.farClipPlane = 1;
+        displayCamera.allowHDR = false; displayCamera.allowMSAA = false;
+        var data = displayCamera.GetUniversalAdditionalCameraData();
+        data.renderPostProcessing = false; data.renderShadows = false; data.volumeLayerMask = 0;
+        data.requiresDepthTexture = false; data.requiresColorTexture = false;
+        data.antialiasing = AntialiasingMode.None;
+    }
 
     public void Show(string track)
     {
@@ -61,6 +82,7 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
         }
         cameraView = Camera.main;
         if (cameraView == null || environment == null) yield break;
+        cameraView.enabled = true; cameraView.targetDisplay = 0;
         cameraView.cullingMask = 1 << 31;
         cameraView.clearFlags = CameraClearFlags.Skybox;
         cameraView.nearClipPlane = .3f;
@@ -143,6 +165,7 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
 
     void OnDestroy()
     {
+        if (displayCamera != null) Destroy(displayCamera.gameObject);
         revision++;
         foreach (var pending in instantiations)
             if (!pending.isDone) pending.Cancel();

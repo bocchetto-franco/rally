@@ -139,6 +139,7 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
         cameraObject.transform.SetParent(studio.transform, false);
         studioCamera = cameraObject.AddComponent<Camera>();
         studioCamera.enabled = false;
+        studioCamera.targetDisplay = 0;
         studioCamera.clearFlags = CameraClearFlags.SolidColor;
         studioCamera.backgroundColor = new Color(.045f, .052f, .062f);
         studioCamera.cullingMask = 1 << layer;

@@ -28,6 +28,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     Button[] vehicleCycle;
     bool spatialNavigation;
     Button[][] navigationRows;
+    Button[] panelCars, panelTracks;
+    Button lastCarFocus, lastTrackFocus;
 
     public int SelectedIndex => selectedIndex;
     public int LocalPlayer => localPlayer;
@@ -60,6 +62,14 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     // Only selection panels opt in. Sliders and all other menus retain their controls.
     public void ConfigureVehicleCycle(Button[] cars) => vehicleCycle = cars;
+    // The single-player selection has two side-by-side panels. Other menus keep
+    // their existing carousel/slider/L2 behaviour, including independent 2P rows.
+    public void ConfigureSelectionPanels(Button[] cars, Button[] tracks, int car, int track)
+    {
+        panelCars = cars; panelTracks = tracks;
+        lastCarFocus = cars[Mathf.Clamp(car, 0, cars.Length - 1)];
+        lastTrackFocus = tracks[Mathf.Clamp(track, 0, tracks.Length - 1)];
+    }
     public void ConfigureSpatialNavigation(params Button[][] rows)
     {
         spatialNavigation = true;
@@ -126,6 +136,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         _ = pad.dpad.left.wasPressedThisFrame;
         _ = pad.dpad.right.wasPressedThisFrame;
         _ = pad.leftTrigger.wasPressedThisFrame;
+        _ = pad.rightTrigger.wasPressedThisFrame;
     }
 
     void AttachEventSystem()
@@ -165,7 +176,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     // One dominant stick axis prevents diagonal double steps. Separate press/
     // release thresholds prevent drift near the deadzone from moving the focus.
-    static int ReadDirection(Gamepad pad, int previous)
+    int ReadDirection(Gamepad pad, int previous)
     {
         if (pad == null) return 0;
         if (pad.dpad.up.isPressed) return -1;
@@ -176,7 +187,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         float threshold = previous == 0 ? .55f : .35f;
         if (Mathf.Max(Mathf.Abs(stick.x), Mathf.Abs(stick.y)) >= threshold)
             return Mathf.Abs(stick.y) >= Mathf.Abs(stick.x) ? (stick.y > 0 ? -1 : 1) : (stick.x > 0 ? 2 : -2);
-        if (pad.leftTrigger.ReadValue() >= (previous == 1 ? .35f : .55f)) return 1;
+        if (panelCars == null && pad.leftTrigger.ReadValue() >= (previous == 1 ? .35f : .55f)) return 1;
         return 0;
     }
 
@@ -187,9 +198,10 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         if (direction == 0 && pad != null)
         {
             if (pad.dpad.up.wasPressedThisFrame) direction = -1;
-            else if (pad.dpad.down.wasPressedThisFrame || pad.leftTrigger.wasPressedThisFrame) direction = 1;
+            else if (pad.dpad.down.wasPressedThisFrame) direction = 1;
             else if (pad.dpad.left.wasPressedThisFrame) direction = -2;
             else if (pad.dpad.right.wasPressedThisFrame) direction = 2;
+            else if (panelCars == null && pad.leftTrigger.wasPressedThisFrame) direction = 1;
         }
         bool move = direction != 0 && (direction != heldDirection || Time.unscaledTime >= nextMoveTime);
         if (move) nextMoveTime = Time.unscaledTime + (direction == heldDirection ? RepeatInterval : RepeatDelay);
@@ -242,7 +254,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.Confirm(localPlayer) : KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
         southHeld = south;
         int carIndex = vehicleCycle == null || !Usable(selectedIndex) ? -1 : System.Array.IndexOf(vehicleCycle, buttons[selectedIndex]);
-        if (carIndex >= 0 && (decrease || increase))
+        if (SwitchSelectionPanel(increase, decrease)) { }
+        else if (carIndex >= 0 && (decrease || increase))
             FocusVehicle(vehicleCycle[(carIndex + (increase ? 1 : vehicleCycle.Length - 1)) % vehicleCycle.Length]);
         else if (spatialNavigation && (up || down || decrease || increase))
             MoveSpatial(up ? Vector2.up : down ? Vector2.down : decrease ? Vector2.left : Vector2.right);
@@ -255,6 +268,18 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     bool Usable(int index) => index >= 0 && index < buttons.Length && buttons[index] != null &&
         buttons[index].gameObject.activeInHierarchy && buttons[index].IsInteractable();
+
+    bool SwitchSelectionPanel(bool right, bool left)
+    {
+        if (panelCars == null || !Usable(selectedIndex)) return false;
+        Selectable focused = buttons[selectedIndex];
+        // Traverse Porsche -> BMW -> Audi normally; only the right-hand edge
+        // leaves the row for terrain. Keyboard, D-Pad and stick share this path.
+        Button target = right && focused == panelCars[panelCars.Length - 1] ? lastTrackFocus :
+            left && System.Array.IndexOf(panelTracks, focused) >= 0 ? lastCarFocus : null;
+        if (target == null) return false;
+        FocusVehicle(target); return true;
+    }
 
     void Move(int direction)
     {
@@ -315,6 +340,11 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     void Select(int index)
     {
         selectedIndex = index;
+        if (panelCars != null && buttons[index] is Button focused)
+        {
+            if (System.Array.IndexOf(panelCars, focused) >= 0) lastCarFocus = focused;
+            if (System.Array.IndexOf(panelTracks, focused) >= 0) lastTrackFocus = focused;
+        }
         for (int i = 0; i < outlines.Length; i++)
         {
             if (outlines[i] != null) outlines[i].enabled = i == selectedIndex;

@@ -84,15 +84,19 @@ public static class RallyMenuVehiclePreviewCheck
                     Capture("Logs/Menu_Car_Porsche.png"); phase++; next += 1; break;
                 case 1:
                     Check(Quaternion.Angle(rotation, View().VisibleModel.transform.parent.rotation) > 5, "Slow continuous vertical rotation");
-                    observeFade = true; Pad(pad, GamepadButton.DpadRight); phase++; break;
+                    observeFade = true;
+                    Object.FindAnyObjectByType<RallyMenuNavigation>().FocusVehicle(GameObject.Find("Vehicle 1 Button").GetComponent<Button>());
+                    Pad(pad, GamepadButton.South); phase++; break;
                 case 2:
-                    Release(); Check(View().RequestedIndex == 1, "D-Pad right selects BMW");
+                    Release(); Check(View().RequestedIndex == 1, "Cross confirms the focused BMW preview");
                     phase++; break;
                 case 3:
                     if (!Ready(0, 1)) return;
                     Check(sawFade, "Intermediate fade opacity observed during model transition"); observeFade = false;
                     Validate(View()); Capture("Logs/Menu_Car_Bmw.png"); phase = 30; break;
-                case 30: Pad(pad, GamepadButton.DpadRight); phase = 4; break;
+                case 30:
+                    Object.FindAnyObjectByType<RallyMenuNavigation>().FocusVehicle(GameObject.Find("Vehicle 2 Button").GetComponent<Button>());
+                    Pad(pad, GamepadButton.South); phase = 4; break;
                 case 4: Release(); phase++; break;
                 case 5:
                     if (!Ready(0, 2)) return;
