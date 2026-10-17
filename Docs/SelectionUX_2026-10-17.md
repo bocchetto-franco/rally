@@ -24,3 +24,13 @@ La causa de «Display 1 / No cameras rendering» era que todas las cámaras acti
 El rerun de `selection-ux-check.txt` terminó **COMPLETE: PASS / RESTORED** para los controles anteriores, resaltados, salida a Display 1 y limpieza de cámaras al entrar a carrera. Para la corrección final del borde Audi y la retirada de L2/R2, usar `RallySelectionUxCheck.RunMenusOnly`: informe separado `Logs/selection-panel-check.txt`, con teclado/D-Pad/stick, gatillos sin efecto y regresión de selección local 2P. No implica prueba con mandos físicos. La navegación local 2P no salta al panel del otro jugador.
 
 Corrección final verificada: `selection-panel-check.txt` **COMPLETE: PASS / RESTORED**. Teclado, D-Pad y stick recorren Porsche → BMW → Audi → Terreno; Izquierda vuelve a Audi, y ambos gatillos permanecen sin efecto sobre el foco 1P. Se conservaron colores, confirmación explícita y selección local 2P. Esta pasada se limita a menús; no repite los seis casos de HUD ni las pruebas físicas de turbo, que no cambiaron.
+
+## Una fila de circuitos compartida en 2P
+
+`BuildLocalSelection` creaba dos filas deliberadamente, `circuitButtons` y `secondCircuitButtons`. La segunda se eliminó: solo se crean tres botones, y los dos navegadores referencian exactamente esas mismas instancias. La selección sigue en `RallyGameSession.SelectedCircuit`; confirmar desde cualquier mando actualiza la pista común y reinicia ambos Listo, sin modificar los autos.
+
+`ConfigureSharedControls` crea bordes independientes `Local Focus 1/2` como hijos de los botones compartidos. No altera su escala ni usa un Outline común: ambos jugadores pueden enfocar un botón sin que el otro borre su indicador. Los bordes no interceptan raycasts, se activan al navegar y se limpian con el navegador. Esta opción solo se configura en la fila compartida 2P; los autos y la selección individual no cambian.
+
+Prueba acotada `RallySelectionUxCheck.RunSharedRow`, informe `Logs/shared-circuit-row-check.txt`: regresión de menú 1P, conteo de solo tres botones sin duplicados/proxies, referencias compartidas, focos simultáneos independientes, confirmación por ambos mandos, autos distintos conservados, invalidación de Listo y entrada real de ambos jugadores a Circuit_02 con BMW/Audi. Usa layouts DualSense virtuales, no hardware; no es una vuelta conducida. Captura final `Logs/SelectionUX_2P.png`. Exigir `COMPLETE: PASS` y `RESTORED`.
+
+Validación final: **COMPLETE: PASS / RESTORED**; captura revisada con una sola fila y focos ámbar/celeste independientes. Carrera compartida C02 cargada con BMW para J1 y Audi para J2, sin bots. Editor fuera de Play, compilación terminada e InputSettings válido. No se guardaron escenas ni se modificaron físicas; el ejecutable anterior no se regeneró.

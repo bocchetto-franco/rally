@@ -21,6 +21,7 @@ public static class RallySelectionUxCheck
 {
     static string Report;
     static bool menusOnly;
+    static bool sharedRaceCheck;
     static readonly string[] Keys = { "Rally.LocalPlayers", "Rally.SelectedVehicle", "Rally.SelectedVehicleTwo", "Rally.SelectedCircuit", "Rally.BotDifficulty" };
     static bool[] had;
     static string[] strings;
@@ -41,13 +42,15 @@ public static class RallySelectionUxCheck
 
     public static void Run() => Start(false);
     public static void RunMenusOnly() => Start(true);
-    static void Start(bool onlyMenus)
+    public static void RunSharedRow() => Start(true, true);
+    static void Start(bool onlyMenus, bool checkSharedRace = false)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || BuildPipeline.isBuildingPlayer)
             throw new Exception("Unity must be idle.");
         if (!EditorSettings.enterPlayModeOptionsEnabled || (EditorSettings.enterPlayModeOptions & EnterPlayModeOptions.DisableDomainReload) == 0)
             throw new Exception("External check requires the project's Disable Domain Reload setting.");
-        menusOnly = onlyMenus; Report = onlyMenus ? "Logs/selection-panel-check.txt" : "Logs/selection-ux-check.txt";
+        menusOnly = onlyMenus; sharedRaceCheck = checkSharedRace;
+        Report = checkSharedRace ? "Logs/shared-circuit-row-check.txt" : onlyMenus ? "Logs/selection-panel-check.txt" : "Logs/selection-ux-check.txt";
         scenes = EditorSceneManager.GetSceneManagerSetup(); start = EditorSceneManager.playModeStartScene;
         background = Application.runInBackground; paused = EditorApplication.isPaused; timeScale = Time.timeScale;
         had = Keys.Select(PlayerPrefs.HasKey).ToArray(); strings = Keys.Select(k => PlayerPrefs.GetString(k)).ToArray(); ints = Keys.Select(k => PlayerPrefs.GetInt(k)).ToArray();
@@ -218,6 +221,11 @@ public static class RallySelectionUxCheck
         var local = Object.FindObjectsByType<RallyMenuNavigation>().OrderBy(n => n.LocalPlayer).ToArray();
         Check(local.Length == 2, "two independent local navigation owners");
         menu = Object.FindAnyObjectByType<RallyMenuController>(); var localCars = Field<Button[][]>(menu, "localVehicleButtons");
+        var shared = Field<Button[]>(menu, "circuitButtons");
+        Check(GameObject.Find("Shared Circuit Card").GetComponentsInChildren<Button>(true).Length == 3 &&
+            !menu.GetComponentsInChildren<Button>(true).Any(b => b.name.StartsWith("Player 2 Circuit")), "only one real track row exists, with three buttons and no duplicate/proxy row");
+        foreach (var navigation in local)
+            Check(shared.All(b => Field<Selectable[]>(navigation, "buttons").Contains(b)), "both navigators use the same physical circuit buttons");
         Gamepad padOne = RallyLocalDevices.GamepadFor(0), padTwo = RallyLocalDevices.GamepadFor(1);
         for (int p = 0; p < 2; p++)
         {
@@ -225,24 +233,58 @@ public static class RallySelectionUxCheck
             int confirmed = RallyGameSession.VehicleIndexForPlayer(p), other = RallyGameSession.VehicleIndexForPlayer(1 - p);
             local[p].FocusVehicle(localCars[p][0]); Dpad(pad, Vector2.right); yield return null; Neutral(pad); yield return .15f;
             Check(Focus(local[p]) == localCars[p][1] && RallyGameSession.VehicleIndexForPlayer(p) == confirmed, "local browsing does not implicitly confirm J" + (p + 1));
+            if (p == 1) { Dpad(pad, Vector2.right); yield return null; Neutral(pad); yield return null; }
             Cross(pad); yield return null; Neutral(pad); yield return .15f;
-            Check(RallyGameSession.VehicleIndexForPlayer(p) == 1 && RallyGameSession.VehicleIndexForPlayer(1 - p) == other, "Cross confirms only its own player's car"); Chosen(localCars[p], 1);
+            Check(RallyGameSession.VehicleIndexForPlayer(p) == p + 1 && RallyGameSession.VehicleIndexForPlayer(1 - p) == other, "Cross confirms only its own player's car"); Chosen(localCars[p], p + 1);
             Dpad(pad, Vector2.down); yield return null; Neutral(pad); yield return null;
             Check(Focus(local[p]) == B("Player " + (p + 1) + " Ready"), "down from local car row goes to Ready, not a side car");
             Stick(pad, Vector2.up); yield return null; Neutral(pad); yield return null; Check(Focus(local[p]) == localCars[p][1], "up from Ready returns to central car");
-            local[p].FocusVehicle(p == 0 ? B("Circuit 1 Button") : B("Player 2 Circuit 1"));
+            local[p].FocusVehicle(shared[0]);
             Dpad(pad, Vector2.right); yield return null; Neutral(pad); yield return null;
-            Check(Focus(local[p]) == (p == 0 ? B("Circuit 2 Button") : B("Player 2 Circuit 2")), "left/right traverses only its own track row");
+            Check(Focus(local[p]) == shared[1], "either player's left/right traverses the single shared track row");
             Dpad(pad, Vector2.up); yield return null; Neutral(pad); yield return null;
             Check(Focus(local[p]) == B("Player " + (p + 1) + " Ready"), "up from any local track returns to Ready row");
-            Chosen(localCars[p], 1);
+            Chosen(localCars[p], p + 1);
         }
+        local[0].FocusVehicle(shared[0]); local[1].FocusVehicle(shared[2]);
+        Check(shared[0].transform.Find("Local Focus 1").gameObject.activeInHierarchy && shared[2].transform.Find("Local Focus 2").gameObject.activeInHierarchy, "two independent focus frames coexist on one row");
+        Dpad(padTwo, Vector2.left); yield return null; Neutral(padTwo); yield return null;
+        Check(Focus(local[0]) == shared[0] && Focus(local[1]) == shared[1] && shared[0].transform.Find("Local Focus 1").gameObject.activeInHierarchy,
+            "moving J2 focus does not erase J1 shared-row focus");
+        local[0].FocusVehicle(shared[1]);
+        Check(shared[1].transform.Find("Local Focus 1").gameObject.activeInHierarchy && shared[1].transform.Find("Local Focus 2").gameObject.activeInHierarchy && shared[1].transform.localScale == Vector3.one,
+            "both players can focus the same button without fighting over its outline or scale");
+        for (int p = 0; p < 2; p++)
+        {
+            var pad = p == 0 ? padOne : padTwo;
+            local[p].FocusVehicle(shared[p]); Cross(pad); yield return null; Neutral(pad); yield return .15f;
+            Check(RallyGameSession.SelectedRaceScene == RallyGameSession.CircuitScenes[p] &&
+                shared.Count(b => b.colors.normalColor.r > .9f && b.colors.normalColor.g > .5f) == 1,
+                "J" + (p + 1) + " confirmation sets the single shared race circuit and highlight");
+            Check(RallyGameSession.VehicleIndexForPlayer(0) == 1 && RallyGameSession.VehicleIndexForPlayer(1) == 2, "changing shared circuit preserves distinct BMW/Audi choices");
+        }
+        B("Player 1 Ready").onClick.Invoke(); B("Player 2 Ready").onClick.Invoke();
+        Check(B("Race Button").interactable, "both independent Ready states unlock race");
+        Cross(padTwo); yield return null; Neutral(padTwo); yield return null;
+        Check(!B("Race Button").interactable && Field<bool[]>(menu, "localReady").All(r => !r), "shared track confirmation invalidates both Ready states");
         var previews = Field<RallyMenuVehiclePreview[]>(menu, "localVehiclePreviews");
-        while (previews.Any(p => p.IsTransitioning || p.ShownIndex != 1 || p.Opacity < .99f)) yield return null;
+        while (previews.Where((p, i) => p.IsTransitioning || p.ShownIndex != i + 1 || p.Opacity < .99f).Any()) yield return null;
         Check(previews.All(p => p.VisibleModel != null), "both local preview models remain visible");
         DisplayOutput();
         ScreenCapture.CaptureScreenshot("Logs/SelectionUX_2P.png"); yield return .3f;
-        B("Back Button").onClick.Invoke();
+        if (sharedRaceCheck)
+        {
+            B("Player 1 Ready").onClick.Invoke(); B("Player 2 Ready").onClick.Invoke();
+            local[0].FocusVehicle(B("Race Button")); Cross(padOne); yield return null; Neutral(padOne);
+            while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != "Circuit_02") yield return null;
+            var split = RallySplitScreen.Active;
+            Check(split != null && split.Ready && RallyGameSession.LocalPlayerCount == 2, "shared row launches Circuit_02 for both local players");
+            Check(split.PlayerOne.GetComponentInChildren<RallyVehicleVisual>(true).name == RallyGameSession.VehicleForPlayer(0) + " Visual" &&
+                split.PlayerTwo.GetComponentInChildren<RallyVehicleVisual>(true).name == RallyGameSession.VehicleForPlayer(1) + " Visual", "each player's selected car reaches its own race rig");
+            Check(Object.FindObjectsByType<RallyBotController>().Length == 0, "two-player race still has no bots");
+            SceneManager.LoadScene("MainMenu");
+        }
+        else B("Back Button").onClick.Invoke();
         while (SceneManager.GetActiveScene().name != "MainMenu") yield return null;
         yield return .3f; Cross(first); yield return null; Neutral(first); yield return null;
         B("Credits Button").onClick.Invoke(); yield return .3f;

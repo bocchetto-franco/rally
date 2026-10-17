@@ -30,6 +30,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     Button[][] navigationRows;
     Button[] panelCars, panelTracks;
     Button lastCarFocus, lastTrackFocus;
+    Button[] sharedControls;
+    GameObject[] sharedFocusFrames;
 
     public int SelectedIndex => selectedIndex;
     public int LocalPlayer => localPlayer;
@@ -48,6 +50,9 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     {
         if (outlines == null) return;
         foreach (Outline outline in outlines) if (outline != null) outline.effectColor = color;
+        if (sharedFocusFrames != null)
+            foreach (var frame in sharedFocusFrames) if (frame != null)
+                foreach (var edge in frame.GetComponentsInChildren<Image>(true)) edge.color = color;
     }
 
     public void ResetSelection()
@@ -62,6 +67,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     // Only selection panels opt in. Sliders and all other menus retain their controls.
     public void ConfigureVehicleCycle(Button[] cars) => vehicleCycle = cars;
+    public void ConfigureSharedControls(Button[] controls) => sharedControls = controls;
     // The single-player selection has two side-by-side panels. Other menus keep
     // their existing carousel/slider/L2 behaviour, including independent 2P rows.
     public void ConfigureSelectionPanels(Button[] cars, Button[] tracks, int car, int track)
@@ -86,16 +92,23 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     public void ConfigureControls(params Selectable[] orderedControls)
     {
         AttachEventSystem();
+        ReleaseSharedFrames();
         buttons = orderedControls;
         outlines = new Outline[buttons.Length];
+        sharedFocusFrames = new GameObject[buttons.Length];
         originalScales = new Vector3[buttons.Length];
         for (int i = 0; i < buttons.Length; i++)
         {
+            originalScales[i] = buttons[i].transform.localScale;
+            if (sharedControls != null && System.Array.IndexOf(sharedControls, buttons[i]) >= 0)
+            {
+                sharedFocusFrames[i] = SharedFrame((RectTransform)buttons[i].transform);
+                continue;
+            }
             Outline outline = buttons[i].GetComponent<Outline>() ?? buttons[i].gameObject.AddComponent<Outline>();
             outline.effectColor = new Color(.15f, .9f, 1f, 1f);
             outline.effectDistance = new Vector2(7f, -7f);
             outlines[i] = outline;
-            originalScales[i] = buttons[i].transform.localScale;
         }
         ResetSelection();
     }
@@ -118,6 +131,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         InputSystem.onDeviceChange += DeviceChanged;
         SeedHeld();
         AttachEventSystem();
+        if (sharedFocusFrames != null)
+            for (int i = 0; i < sharedFocusFrames.Length; i++) if (sharedFocusFrames[i] != null) sharedFocusFrames[i].SetActive(i == selectedIndex);
     }
 
     static void DeviceChanged(InputDevice device, InputDeviceChange change)
@@ -158,8 +173,40 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     void OnDisable()
     {
+        if (sharedFocusFrames != null) foreach (var frame in sharedFocusFrames) if (frame != null) frame.SetActive(false);
         InputSystem.onDeviceChange -= DeviceChanged;
         ReleaseEventSystem();
+    }
+
+    void OnDestroy() => ReleaseSharedFrames();
+
+    void ReleaseSharedFrames()
+    {
+        if (sharedFocusFrames == null) return;
+        foreach (var frame in sharedFocusFrames) if (frame != null) { frame.SetActive(false); Destroy(frame); }
+        sharedFocusFrames = null;
+    }
+
+    GameObject SharedFrame(RectTransform parent)
+    {
+        // One physical Button, but two independent borders. Never share its Outline
+        // or scale: another pilot moving focus must not clear this pilot's border.
+        var frame = new GameObject("Local Focus " + (localPlayer + 1), typeof(RectTransform));
+        var rect = (RectTransform)frame.transform; rect.SetParent(parent, false);
+        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+        float margin = localPlayer == 0 ? 8f : 2f;
+        rect.offsetMin = -Vector2.one * margin; rect.offsetMax = Vector2.one * margin;
+        for (int side = 0; side < 4; side++)
+        {
+            var edge = new GameObject("Focus Edge " + side, typeof(RectTransform), typeof(Image));
+            var e = (RectTransform)edge.transform; e.SetParent(rect, false);
+            bool horizontal = side < 2;
+            e.anchorMin = horizontal ? new Vector2(0, side) : new Vector2(side - 2, 0);
+            e.anchorMax = horizontal ? new Vector2(1, side) : new Vector2(side - 2, 1);
+            e.sizeDelta = horizontal ? new Vector2(0, 4) : new Vector2(4, 0);
+            var image = edge.GetComponent<Image>(); image.color = new Color(.15f, .9f, 1); image.raycastTarget = false;
+        }
+        frame.SetActive(false); return frame;
     }
 
     void ReleaseEventSystem()
@@ -348,7 +395,8 @@ public sealed class RallyMenuNavigation : MonoBehaviour
         for (int i = 0; i < outlines.Length; i++)
         {
             if (outlines[i] != null) outlines[i].enabled = i == selectedIndex;
-            if (buttons[i] != null) buttons[i].transform.localScale = originalScales[i] * (i == selectedIndex ? 1.04f : 1f);
+            if (sharedFocusFrames[i] != null) sharedFocusFrames[i].SetActive(i == selectedIndex);
+            else if (buttons[i] != null) buttons[i].transform.localScale = originalScales[i] * (i == selectedIndex ? 1.04f : 1f);
         }
         // Local panels keep independent outlines; one global selected object cannot represent both.
         if (localPlayer < 0 && eventSystem != null && buttons.Length > selectedIndex && buttons[selectedIndex] != null)

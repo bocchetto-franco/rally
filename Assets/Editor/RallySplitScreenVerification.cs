@@ -433,7 +433,7 @@ public static class RallySplitScreenVerification
             else if (phase == 50)
             {
                 Require(RallyLocalDevices.UsesKeyboard(0) && RallyLocalDevices.UsesKeyboard(1), "Both players can use shared keyboard without controllers");
-                ButtonNamed("Player 2 Circuit 2").onClick.Invoke();
+                ButtonNamed("Circuit 2 Button").onClick.Invoke();
                 Require(RallyGameSession.SelectedRaceScene == "Circuit_02", "J2 can select the shared track");
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.S, Key.DownArrow)); Next(57);
             }
