@@ -262,7 +262,9 @@ public static class Circuit03RiverBridge
         if (stone.shader == null) throw new InvalidOperationException("Stone shader missing.");
         stone.name = "Bridge abutment stone"; AssetDatabase.CreateAsset(stone, Folder + "/Bridge abutment stone.mat");
         for (int i = 0; i < 80; i++) Box(i % 5 == 0 ? alternate : boards, new Vector3(0,-.14f,-19.75f + i*.5f), new Vector3(10.4f,.3f,.492f), Quaternion.identity);
-        Collision("Continuous smooth deck collider", new Vector3(0,-.16f,0), new Vector3(10.4f,.35f,40.2f));
+        var deckCollider = Collision("Continuous smooth deck collider", new Vector3(0,-.16f,0), new Vector3(10.4f,.35f,40.2f));
+        // Match the approach height: avoid the former 1.5 cm vertical collision lip.
+        deckCollider.center = new Vector3(0, -.015f, 0);
         foreach (float side in new[]{-1f,1f})
         {
             Box(beams, new Vector3(side*3.7f,-.65f,0), new Vector3(.48f,.9f,40.6f), Quaternion.identity);

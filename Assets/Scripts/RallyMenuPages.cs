@@ -12,9 +12,8 @@ public sealed partial class RallyMenuController
         screen = page;
         mainMenuRevealed = true;
         BuildInterface();
-        // Consume the opening/returning press, not the first action on the new page.
-        menuNavigation.enabled = false;
-        StartCoroutine(EnableMenuNavigationNextFrame());
+        // The new navigation seeds the opening press in OnEnable. It can accept
+        // the next press immediately without a disabled frame between pages.
     }
 
     void PageTitle(Transform root, string title, string subtitle)
@@ -33,8 +32,8 @@ public sealed partial class RallyMenuController
             new[] { "W / flecha arriba", "S / flecha abajo", "A / D · flechas", "Espacio", "T (también M)", "R", "Escape", "Flechas / Enter", "Escape" });
         ControlColumn(root, "Gamepad Controls", "DUALSENSE / GAMEPAD", 375f,
             new[] { "Acelerar", "Frenar", "Dirección", "Freno de mano", "Enderezar auto volcado", "Volver al checkpoint", "Pausa", "Navegar / confirmar", "Volver atrás" },
-            new[] { "R2 / RT (analógico)", "L2 / LT (analógico)", "Stick izquierdo", "Cruz / A", "Cuadrado / X", "Triángulo / Y", "Options / Start", "D-Pad / Cruz (A)", "Círculo / B" });
-        Text(root, "Controls Note", "Enderezar conserva tu progreso. Volver al checkpoint reposiciona el auto.\n2P: J1 WASD / Espacio / R / T / Escape · J2 flechas / Enter / Backspace / Shift derecho / P.\nMenús 2P: J1 WASD + Espacio; J2 flechas + Enter. Un mando por jugador también disponible.",
+            new[] { "R2 / RT (analógico)", "L2 / LT (analógico)", "Stick izquierdo", "Cruz / A", "Cuadrado / X", "Triángulo / Y", "Options / Start", "D-Pad / stick · Cruz / A", "Círculo / B" });
+        Text(root, "Controls Note", "Enderezar conserva tu progreso. Volver al checkpoint reposiciona el auto.\n2P: J1 WASD / Espacio / R / T / Escape · J2 flechas / Enter / Backspace / Shift derecho / P.\nMenús: D-Pad o stick para navegar; L2 / LT para la opción siguiente. 2P: J1 WASD + Espacio; J2 flechas + Enter.",
             18f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -329f), new Vector2(1440f, 94f), Muted);
         Button(root, "Back Button", "VOLVER", new Vector2(0f, -441f), new Vector2(380f, 74f), () => OpenFrontendPage(RallyMenuScreen.MainMenu), false);
     }
@@ -102,7 +101,7 @@ public sealed partial class RallyMenuController
         refresh();
         Text(graphics, "Quality Note", "Alta conserva el aspecto actual; Media y Baja reducen detalle y carga gráfica.", 20f,
             FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -49f), new Vector2(1300f, 36f), Muted);
-        Text(root, "Options Hint", "ARRIBA/ABAJO: elegir · IZQUIERDA/DERECHA: volumen · CRUZ/ENTER: confirmar · CÍRCULO/ESC: volver", 19f,
+        Text(root, "Options Hint", "D-PAD / STICK: navegar y ajustar · L2: siguiente · CRUZ/ENTER: confirmar · CÍRCULO/ESC: volver", 19f,
             FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -345f), new Vector2(1490f, 40f), Muted);
         optionControls[6] = Button(root, "Back Button", "VOLVER", new Vector2(0f, -441f), new Vector2(380f, 74f), () => OpenFrontendPage(RallyMenuScreen.MainMenu), false);
     }

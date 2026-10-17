@@ -219,6 +219,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         // object must not cause a global lookup on every physics tick.
         GameObject inputObject = GameObject.Find("Circuit Keyboard Input");
         inputController = inputObject != null ? inputObject.GetComponent<JrsInputController>() : null;
+        if (controller != null && botInput == null && !controller.TryGetComponent<RallyBotController>(out _))
+        {
+            var offTrack = controller.GetComponent<RallyOffTrackSpeedPenalty>() ?? controller.gameObject.AddComponent<RallyOffTrackSpeedPenalty>();
+            offTrack.Configure(controller, this);
+        }
     }
 
     private void FixedUpdate()

@@ -67,7 +67,7 @@ public sealed partial class RallyMenuController
         panel.gameObject.AddComponent<RallyCreditsScroll>().Configure(scroll);
         Canvas.ForceUpdateCanvases();
         scroll.verticalNormalizedPosition = 1f;
-        Text(root, "Credits Hint", "RUEDA DEL MOUSE / ARRASTRAR / FLECHAS / D-PAD: leer · ENTER / CRUZ / CÍRCULO / ESC: volver",
+        Text(root, "Credits Hint", "MOUSE / FLECHAS / D-PAD / STICK / L2: leer · ENTER / CRUZ / CÍRCULO / ESC: volver",
             18f, FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, -392f), new Vector2(1490f, 34f), Muted);
         Button(root, "Back Button", "VOLVER", new Vector2(0f, -455f), new Vector2(380f, 74f),
             () => OpenFrontendPage(RallyMenuScreen.MainMenu), false);

@@ -56,6 +56,7 @@ public static class Circuit03BridgeDriveTest
                 loadedAt=EditorApplication.timeSinceStartup; return;
             }
             if(EditorApplication.timeSinceStartup-loadedAt<2)return;
+            if(RallyRaceLoading.IsPreparing)return;
             if(!prepared)
             {
                 prepared=true;

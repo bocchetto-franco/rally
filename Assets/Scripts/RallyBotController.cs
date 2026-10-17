@@ -39,6 +39,8 @@ public sealed class RallyBotController : MonoBehaviour
     public float CrossTrackDistance { get; private set; }
     public float RaceMaxSpeedKph => raceMaxSpeedKph;
     public float RaceCornerBrakingAggressiveness => raceCornerBrakingAggressiveness;
+    // Non-serialized, cleared by the boost receiver. Base difficulty/tuning never changes.
+    public float TurboSpeedBonusKph { get; set; }
 
     public void Configure(JrsVehicleController controller, Rigidbody body, Transform route = null)
     {
@@ -209,6 +211,7 @@ public sealed class RallyBotController : MonoBehaviour
         float outsideCorridor = Mathf.Max(0f, CrossTrackDistance - safeCorridorHalfWidth);
         float recoverySpeed = Mathf.Lerp(raceMaxSpeedKph, 45f, Mathf.Clamp01(outsideCorridor / 4f));
         targetSpeed = Mathf.Min(targetSpeed, recoverySpeed);
+        targetSpeed += TurboSpeedBonusKph;
 
         // Proportional braking avoids full-brake oscillation around the target.
         VerticalInput = speedKph > targetSpeed + 2f

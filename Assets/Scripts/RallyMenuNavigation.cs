@@ -18,7 +18,12 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     int localPlayer = -1;
     bool keyboardOverride;
     EventSystem eventSystem;
-    bool upHeld, downHeld, leftHeld, rightHeld, southHeld;
+    bool southHeld;
+    bool suppressSouthUntilRelease;
+    int heldDirection;
+    int activatedFrame;
+    float nextMoveTime;
+    const float RepeatDelay = .35f, RepeatInterval = .12f;
     Gamepad previousPad;
     Button[] vehicleCycle;
 
@@ -63,6 +68,7 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     public void ConfigureControls(params Selectable[] orderedControls)
     {
+        AttachEventSystem();
         buttons = orderedControls;
         outlines = new Outline[buttons.Length];
         originalScales = new Vector3[buttons.Length];
@@ -79,17 +85,46 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     void SeedHeld()
     {
+        activatedFrame = Time.frameCount;
         previousPad = Pad;
-        upHeld = previousPad != null && previousPad.dpad.up.isPressed;
-        downHeld = previousPad != null && previousPad.dpad.down.isPressed;
-        leftHeld = previousPad != null && previousPad.dpad.left.isPressed;
-        rightHeld = previousPad != null && previousPad.dpad.right.isPressed;
-        southHeld = previousPad != null && previousPad.buttonSouth.isPressed;
+        // Suppress only the press that opened this page, including a quick tap
+        // released within the same input update. The next new press is valid.
+        southHeld = previousPad != null && (previousPad.buttonSouth.isPressed || previousPad.buttonSouth.wasPressedThisFrame);
+        suppressSouthUntilRelease = southHeld;
+        heldDirection = ReadDirection(previousPad, 0);
+        nextMoveTime = Time.unscaledTime + RepeatDelay;
     }
 
     void OnEnable()
     {
+        foreach (Gamepad pad in Gamepad.all) TrackPresses(pad);
+        InputSystem.onDeviceChange += DeviceChanged;
         SeedHeld();
+        AttachEventSystem();
+    }
+
+    static void DeviceChanged(InputDevice device, InputDeviceChange change)
+    {
+        if (device is Gamepad pad && (change == InputDeviceChange.Added || change == InputDeviceChange.Reconnected))
+            TrackPresses(pad);
+    }
+
+    static void TrackPresses(Gamepad pad)
+    {
+        // ButtonControl starts tracking short press/release transitions on its
+        // first query. Prime every connected pad before its first menu event.
+        _ = pad.buttonSouth.wasPressedThisFrame;
+        _ = pad.dpad.up.wasPressedThisFrame;
+        _ = pad.dpad.down.wasPressedThisFrame;
+        _ = pad.dpad.left.wasPressedThisFrame;
+        _ = pad.dpad.right.wasPressedThisFrame;
+        _ = pad.leftTrigger.wasPressedThisFrame;
+    }
+
+    void AttachEventSystem()
+    {
+        if (!isActiveAndEnabled || eventSystem == EventSystem.current && eventSystem != null) return;
+        ReleaseEventSystem();
         eventSystem = EventSystem.current;
         if (eventSystem == null) return;
         if (!navigationUsers.ContainsKey(eventSystem))
@@ -105,13 +140,54 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     void OnDisable()
     {
-        if (eventSystem == null || !navigationUsers.ContainsKey(eventSystem)) return;
+        InputSystem.onDeviceChange -= DeviceChanged;
+        ReleaseEventSystem();
+    }
+
+    void ReleaseEventSystem()
+    {
+        if (eventSystem == null || !navigationUsers.ContainsKey(eventSystem)) { eventSystem = null; return; }
         if (--navigationUsers[eventSystem] == 0)
         {
             eventSystem.sendNavigationEvents = previousNavigationEvents[eventSystem];
             navigationUsers.Remove(eventSystem);
             previousNavigationEvents.Remove(eventSystem);
         }
+        eventSystem = null;
+    }
+
+    // One dominant stick axis prevents diagonal double steps. Separate press/
+    // release thresholds prevent drift near the deadzone from moving the focus.
+    static int ReadDirection(Gamepad pad, int previous)
+    {
+        if (pad == null) return 0;
+        if (pad.dpad.up.isPressed) return -1;
+        if (pad.dpad.down.isPressed) return 1;
+        if (pad.dpad.left.isPressed) return -2;
+        if (pad.dpad.right.isPressed) return 2;
+        Vector2 stick = pad.leftStick.ReadValue();
+        float threshold = previous == 0 ? .55f : .35f;
+        if (Mathf.Max(Mathf.Abs(stick.x), Mathf.Abs(stick.y)) >= threshold)
+            return Mathf.Abs(stick.y) >= Mathf.Abs(stick.x) ? (stick.y > 0 ? -1 : 1) : (stick.x > 0 ? 2 : -2);
+        if (pad.leftTrigger.ReadValue() >= (previous == 1 ? .35f : .55f)) return 1;
+        return 0;
+    }
+
+    int DirectionPressed(Gamepad pad)
+    {
+        int direction = ReadDirection(pad, heldDirection);
+        // Digital taps can begin and end before Update; isPressed alone loses them.
+        if (direction == 0 && pad != null)
+        {
+            if (pad.dpad.up.wasPressedThisFrame) direction = -1;
+            else if (pad.dpad.down.wasPressedThisFrame || pad.leftTrigger.wasPressedThisFrame) direction = 1;
+            else if (pad.dpad.left.wasPressedThisFrame) direction = -2;
+            else if (pad.dpad.right.wasPressedThisFrame) direction = 2;
+        }
+        bool move = direction != 0 && (direction != heldDirection || Time.unscaledTime >= nextMoveTime);
+        if (move) nextMoveTime = Time.unscaledTime + (direction == heldDirection ? RepeatInterval : RepeatDelay);
+        heldDirection = direction;
+        return move ? direction : 0;
     }
 
     static bool KeyPressed(Key key, KeyCode legacy) => Input.GetKeyDown(legacy) ||
@@ -121,27 +197,43 @@ public sealed class RallyMenuNavigation : MonoBehaviour
     {
         if (RallyRaceLoading.IsInputBlocked) return;
         if (buttons == null || buttons.Length == 0) return;
+        AttachEventSystem();
+        // A newly opened page must not also consume its opening keyboard/gamepad event.
+        if (Time.frameCount == activatedFrame) return;
         Gamepad pad = Pad;
-        if (pad != previousPad) SeedHeld(); // Reconnect without submitting a held button.
-        bool up = pad != null && pad.dpad.up.isPressed;
-        bool down = pad != null && pad.dpad.down.isPressed;
-        bool left = pad != null && pad.dpad.left.isPressed;
-        bool right = pad != null && pad.dpad.right.isPressed;
+        if (pad != previousPad)
+        {
+            previousPad = pad;
+            // Gamepad.current can change on this very press: do not swallow it.
+            // A reconnected controller with an already-held button stays blocked.
+            southHeld = pad != null && pad.buttonSouth.isPressed && !pad.buttonSouth.wasPressedThisFrame;
+            suppressSouthUntilRelease = southHeld;
+            heldDirection = 0;
+        }
+        int direction = DirectionPressed(pad);
         bool south = pad != null && pad.buttonSouth.isPressed;
+        bool southPressed = pad != null && pad.buttonSouth.wasPressedThisFrame;
+        if (pad == null || !south || pad.buttonSouth.wasReleasedThisFrame) suppressSouthUntilRelease = false;
+        if (!Usable(selectedIndex)) ResetSelection();
         if (localPlayer < 0 && eventSystem != null)
+        {
+            bool ownsFocus = false;
             for (int i = 0; i < buttons.Length; i++)
-                if (Usable(i) && i != selectedIndex && eventSystem.currentSelectedGameObject == buttons[i].gameObject)
-                { Select(i); break; }
-        bool decrease = (left && !leftHeld) || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuLeft(localPlayer) : KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
-        bool increase = (right && !rightHeld) || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuRight(localPlayer) : KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
+                if (Usable(i) && eventSystem.currentSelectedGameObject == buttons[i].gameObject)
+                { ownsFocus = true; if (i != selectedIndex) Select(i); break; }
+            if (!ownsFocus && Usable(selectedIndex))
+                eventSystem.SetSelectedGameObject(buttons[selectedIndex].gameObject);
+        }
+        bool decrease = direction == -2 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuLeft(localPlayer) : KeyPressed(Key.LeftArrow, KeyCode.LeftArrow)));
+        bool increase = direction == 2 || (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuRight(localPlayer) : KeyPressed(Key.RightArrow, KeyCode.RightArrow)));
         Slider slider = Usable(selectedIndex) ? buttons[selectedIndex] as Slider : null;
-        bool previous = (up && !upHeld) || (slider == null && decrease) ||
+        bool previous = direction == -1 || (slider == null && decrease) ||
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuUp(localPlayer) : KeyPressed(Key.UpArrow, KeyCode.UpArrow)));
-        bool next = (down && !downHeld) || (slider == null && increase) ||
+        bool next = direction == 1 || (slider == null && increase) ||
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.MenuDown(localPlayer) : KeyPressed(Key.DownArrow, KeyCode.DownArrow)));
-        bool confirm = (south && !southHeld) ||
+        bool confirm = (!suppressSouthUntilRelease && (southPressed || south && !southHeld)) ||
             (KeyboardAllowed && (localPlayer >= 0 ? RallyLocalKeyboard.Confirm(localPlayer) : KeyPressed(Key.Enter, KeyCode.Return) || KeyPressed(Key.NumpadEnter, KeyCode.KeypadEnter)));
-        upHeld = up; downHeld = down; leftHeld = left; rightHeld = right; southHeld = south;
+        southHeld = south;
         int carIndex = vehicleCycle == null || !Usable(selectedIndex) ? -1 : System.Array.IndexOf(vehicleCycle, buttons[selectedIndex]);
         if (carIndex >= 0 && (decrease || increase))
             FocusVehicle(vehicleCycle[(carIndex + (increase ? 1 : vehicleCycle.Length - 1)) % vehicleCycle.Length]);

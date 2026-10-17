@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -273,12 +272,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
         introCard.SetActive(false);
         mainMenuCard.SetActive(true);
         mainMenuHint.SetActive(true);
-        StartCoroutine(EnableMenuNavigationNextFrame());
-    }
-
-    IEnumerator EnableMenuNavigationNextFrame()
-    {
-        yield return null; // The button that dismissed the prompt must not also press JUGAR.
         menuNavigation.enabled = true;
         menuNavigation.ResetSelection();
     }
@@ -377,7 +370,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
         Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -85f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
         Button(card, "Options Button", "OPCIONES", new Vector2(0f, -180f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);
         Button(card, "Credits Button", "CRÉDITOS", new Vector2(0f, -275f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Credits), false);
-        mainMenuHint = Text(root, "Hint", "CRUZ / ENTER: seleccionar    D-PAD: navegar    ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-355f, -475f), new Vector2(970f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.85f)).gameObject;
+        mainMenuHint = Text(root, "Hint", "CRUZ / ENTER: elegir · D-PAD / STICK: navegar · L2: siguiente · ESC: volver", 18f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(-355f, -475f), new Vector2(970f, 32f), new Color(Muted.r, Muted.g, Muted.b, 0.85f)).gameObject;
         introCard = PanelRect(root, "Continue Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 280f)).gameObject;
         Text(introCard.transform, "Continue Label", "PRESIONÁ CUALQUIER BOTÓN\nPARA CONTINUAR", 32f, FontStyles.Bold, TextAlignmentOptions.Center, Vector2.zero, new Vector2(520f, 120f), Accent);
         introPrompt = introCard.GetComponentInChildren<TextMeshProUGUI>();

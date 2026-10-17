@@ -193,6 +193,9 @@ public sealed class RallyRaceHud : MonoBehaviour
         // before this one-off bind. Never poll for optional components per frame.
         yield return null;
         CacheVehicleReferences();
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
+        var miniMap = GetComponent<RallyMiniMap>() ?? gameObject.AddComponent<RallyMiniMap>();
+        miniMap.Configure(vehicleBody, speedText != null ? speedText.font : null);
     }
 
     void CacheVehicleReferences()
