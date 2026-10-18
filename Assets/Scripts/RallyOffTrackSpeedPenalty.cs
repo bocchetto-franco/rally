@@ -20,6 +20,7 @@ public sealed class RallyOffTrackSpeedPenalty : MonoBehaviour
     public bool IsOffTrack { get; private set; }
     public int AppliedCount { get; private set; }
     public float RetainedSpeed => retainedSpeed;
+    internal bool IsDrivingSurface(Collider surface) => surface != null && roadSurfaces.Contains(surface);
 
     public void Configure(JrsVehicleController vehicle, RallyVehicleDynamics owner)
     {

@@ -9,6 +9,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     public float SteeringResponse => steeringResponse;
     public float AutomaticBrakeAmount => automaticBrakeAmount;
     RallyLocalPlayerInput localInput;
+    RallyVehicleDust drivingDust;
     public void SetLocalInput(RallyLocalPlayerInput input) => localInput = input;
 
     // Used when cloning the existing player's tuned component. Do not reset tuning.
@@ -215,6 +216,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     private void Start()
     {
+        drivingDust = controller != null ? controller.GetComponent<RallyVehicleDust>() : null;
         // Optional legacy input is resolved once after scene setup. A missing
         // object must not cause a global lookup on every physics tick.
         GameObject inputObject = GameObject.Find("Circuit Keyboard Input");
@@ -319,7 +321,10 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         bool hasGroundContact = wheel.GetGroundHit(out WheelHit hit);
         float lateralSlip = hasGroundContact ? Mathf.Abs(hit.sidewaysSlip) : 0f;
         float threshold = smokeActive ? smokeStopSlip : smokeStartSlip;
-        bool shouldEmit = hasGroundContact && speedKph >= smokeMinimumSpeedKph && lateralSlip >= threshold;
+        bool shouldEmit = hasGroundContact && speedKph >= smokeMinimumSpeedKph && lateralSlip >= threshold &&
+            Time.timeScale > 0f && controller != null && controller.isActiveAndEnabled && !vehicleBody.isKinematic &&
+            Vector3.Dot(vehicleBody.rotation * Vector3.up, Vector3.up) > .5f &&
+            (drivingDust == null || drivingDust.CanEmitAt(hit.collider));
 
         if (hasGroundContact)
         {
