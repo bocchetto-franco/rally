@@ -1,5 +1,7 @@
 # Rally — instrucciones para agentes
 
+- Build Windows vigente (2026-10-18): `Build/Windows_2026-10-18/Rally1.exe`, Release x64, versión 0.1.0, MainMenu primero y seis escenas incluidas, input Both. Contiene los tres Grupo B y la estela nueva. Build **Succeeded**, cero errores/tres avisos de Unity, más dos avisos de referencias duplicadas de ILPP resueltas automáticamente. Informe `Logs/windows-build-2026-10-18.txt`; detalles y SHA-256 en `Docs/WindowsBuild_2026-10-18.md`. Conservar carpeta Data/DLL junto al EXE; los builds anteriores siguen disponibles. Verificación del artefacto/compilación, no benchmark ni vuelta completa del ejecutable nuevo.
+
 ## Flota Grupo B vigente (2026-10-17)
 
 - Esta sección reemplaza las referencias históricas a Porsche/BMW como modelos disponibles: **Lancia Delta S4**, **Peugeot 205 T16 (Evo 2)** y **Audi Quattro S1** son las tres opciones actuales de jugador, previsualización y bots. Se conserva el identificador interno `Porsche 911 SC Rally` de los rigs, `Porsche Rally Dynamics` y `PorscheVehicleBinder` por compatibilidad de escenas; no son nombres mostrados ni modelos Porsche todavía cargados.
