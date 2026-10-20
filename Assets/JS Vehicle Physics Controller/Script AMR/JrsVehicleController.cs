@@ -63,6 +63,10 @@ public class JrsVehicleController : MonoBehaviour
 
     public void SetBotInput(RallyBotController input) => botInput = input;
 
+    // Presentation reads the same owner-specific input/gear; it never changes vehicle forces.
+    public float PresentationThrottle => Mathf.Clamp01(ReadVertical());
+    public int PresentationGear => currentGear;
+
     public AudioSource engineAudioSource; // Assign this in the Inspector
     public AudioSource engineStartAudioSource; // Assign this in the Inspector
 
@@ -72,6 +76,9 @@ public class JrsVehicleController : MonoBehaviour
         prevRotation = frontLeftWheelTransform.rotation;
 
         mobileInputController = FindAnyObjectByType<JrsInputController>();
+
+        if (GetComponent<RallyVehicleExhaust>() == null)
+            gameObject.AddComponent<RallyVehicleExhaust>();
 
         // Audio is shared by the three player visual variants; bots stay silent.
         if (botInput == null)

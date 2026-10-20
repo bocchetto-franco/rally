@@ -61,6 +61,101 @@ public static class RallySelectionUxCheck
     public static void RunDustBaseline() => StartDust(false);
     public static void RunDustSteering() => StartDust(true);
     public static void RunDustAndWater() => StartDust(true, true);
+    public static void RunAtmosphere()
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+            if (SceneManager.GetSceneAt(i).isDirty) throw new Exception("Save scene before Play verification");
+        Start(true); Report = "Logs/graphics-atmosphere-play.txt";
+        File.WriteAllText(Report, "Graphics profiles: real Play, all variants/bots, 1P/2P, toggles and negative control C02. Not a full driving lap or FPS benchmark.\n");
+        steps = AtmosphereSteps();
+    }
+    static IEnumerator AtmosphereSteps()
+    {
+        while (Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+        disabled = InputSystem.devices.Where(d => (d is Gamepad || d is Keyboard) && d.enabled).ToArray();
+        foreach (var device in disabled) InputSystem.DisableDevice(device);
+        first = InputSystem.AddDevice<DualSenseGamepadHID>(); second = InputSystem.AddDevice<DualSenseGamepadHID>(); keyboard = InputSystem.AddDevice<Keyboard>();
+        Neutral(first); Neutral(second); yield return null;
+        foreach (var test in new[] { (0, 1, 0), (1, 1, 1), (2, 1, 2), (2, 2, 0), (0, 2, 2) })
+        {
+            int circuit = test.Item1, players = test.Item2;
+            RallyGameSession.SelectLocalPlayers(players); RallyGameSession.SelectVehicleForPlayer(0, test.Item3); RallyGameSession.SelectVehicleForPlayer(1, 1);
+            RallyGameSession.SelectCircuit(circuit); string scene = RallyGameSession.CircuitScenes[circuit];
+            RallyRaceLoading.Load(scene);
+            while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != scene) yield return null;
+            yield return .5f;
+            string label = scene + " " + players + "P";
+            var cars = Object.FindObjectsByType<JrsVehicleController>().Where(c => c.isActiveAndEnabled).ToArray();
+            Check(cars.Length == (players == 2 ? 2 : 4), label + " roster intact");
+            foreach (var car in cars)
+            {
+                var exhaust = car.GetComponent<RallyVehicleExhaust>();
+                Check(exhaust != null && exhaust.Smoke != null && exhaust.Backfire != null, label + " exhaust preloaded for " + car.name);
+                Check(exhaust.Smoke.main.maxParticles == 40 && exhaust.Backfire.main.maxParticles == 6, label + " bounded exhaust budget");
+                var visual = car.GetComponentInChildren<RallyVehicleVisual>();
+                var nozzle = visual.transform.InverseTransformPoint(exhaust.Smoke.transform.position);
+                Check(Mathf.Abs(nozzle.z - visual.bodyBounds.min.z) < .1f, label + " nozzle follows selected model rear bounds");
+                var bot = car.GetComponentInParent<RallyBotController>();
+                if (bot != null) Check(Mathf.Abs(car.PresentationThrottle - Mathf.Clamp01(bot.VerticalInput)) < .001f, label + " bot owns exhaust throttle");
+            }
+            var atmosphere = Object.FindAnyObjectByType<RallyCircuitAtmosphere>();
+            if (circuit == 1)
+            {
+                Check(atmosphere == null && Object.FindObjectsByType<RallyCameraRain>().Length == 0, label + " no new atmosphere/rain in Sierras");
+                Check(RenderSettings.fogMode != FogMode.Linear, label + " scene lighting did not leak from previous circuit");
+            }
+            else
+            {
+                Check(atmosphere != null && atmosphere.IsApplied, label + " correct profile applied");
+                Check(RenderSettings.fogMode == FogMode.Linear && Mathf.Approximately(RenderSettings.fogStartDistance, atmosphere.profile.fogStart), label + " profile fog active");
+                Check(Quaternion.Angle(RenderSettings.sun.transform.rotation, Quaternion.Euler(atmosphere.profile.sunEuler)) < .01f, label + " profile sun active");
+                Check(atmosphere.RainViews.Count == (circuit == 2 ? players : 0), label + " one rain emitter per view only in forest");
+                foreach (var rain in atmosphere.RainViews)
+                {
+                    Check(rain.View != null && rain.Particles.particleCount > 0 && rain.Particles.particleCount <= rain.Particles.main.maxParticles, label + " rain live/capped");
+                    Check(rain.Particles.main.maxParticles == (players == 2 ? 300 : 480), label + " reduced split-screen rain budget");
+                }
+                if (circuit == 2)
+                    Check(Object.FindObjectsByType<MeshRenderer>().Any(r => r.sharedMaterials.Contains(atmosphere.profile.wetRoadMaterial)), label + " wet road actually assigned");
+                ScreenCapture.CaptureScreenshot("Logs/Atmosphere_" + scene + "_" + players + "P.png"); yield return .2f;
+                atmosphere.enabled = false; yield return null;
+                Check(!atmosphere.IsApplied && RenderSettings.fogMode != FogMode.Linear, label + " disabled profile restores original fog");
+                Check(atmosphere.RainViews.All(r => !r.gameObject.activeInHierarchy), label + " disabled profile stops rain");
+                if (circuit == 2) Check(!Object.FindObjectsByType<MeshRenderer>().Any(r => r.sharedMaterials.Contains(atmosphere.profile.wetRoadMaterial)), label + " disabled profile restores road");
+                atmosphere.enabled = true; yield return .3f;
+                Check(atmosphere.IsApplied && atmosphere.RainViews.All(r => r.gameObject.activeInHierarchy), label + " profile can be enabled again");
+            }
+            var player = players == 2 ? RallySplitScreen.Active.PlayerOne : cars.Single(c => c.GetComponentInParent<RallyBotController>() == null);
+            var body = player.GetComponent<Rigidbody>(); var effect = player.GetComponent<RallyVehicleExhaust>();
+            var pad = RallyLocalDevices.GamepadFor(0);
+            State(pad, rightTrigger: true);
+            float until = Time.time + .4f;
+            while (Time.time < until) { State(pad, rightTrigger: true); body.linearVelocity = player.transform.forward * 22; body.angularVelocity = Vector3.zero; yield return null; }
+            File.AppendAllText(Report, $"EXHAUST {label}: throttle={player.PresentationThrottle}, emission={effect.CurrentEmission}, speed={body.linearVelocity.magnitude*3.6f}, visible={Field<bool>(effect, "visible")}, enabled={player.enabled}, kinematic={body.isKinematic}, up={Vector3.Dot(player.transform.up, Vector3.up)}, timeScale={Time.timeScale}\n");
+            Check(Field<float>(effect, "currentThrottle") > .9f && effect.CurrentEmission > 0, label + " real owner throttle produces smoke");
+            int shifts = effect.ShiftEvents;
+            var gear = typeof(JrsVehicleController).GetField("currentGear", Private);
+            gear.SetValue(player, player.PresentationGear == player.gearRatios.Length ? 1 : player.gearRatios.Length);
+            typeof(RallyVehicleExhaust).GetField("nextPuff", Private).SetValue(effect, 0f);
+            body.linearVelocity = player.transform.forward * 22;
+            State(pad, rightTrigger: true); yield return null;
+            Check(effect.ShiftEvents > shifts, label + " actual gear change triggers puff");
+            yield return .4f;
+            int lifts = effect.LiftEvents;
+            body.linearVelocity = player.transform.forward * 22; Neutral(pad); yield return null; yield return null;
+            Check(effect.LiftEvents > lifts && effect.CurrentEmission >= 25, label + " throttle lift increases smoke");
+            Check(effect.Backfire.particleCount > 0, label + " high-speed lift creates bounded orange backfire");
+            if (players == 2)
+                Check(RallySplitScreen.Active.PlayerTwo.GetComponent<RallyVehicleExhaust>().CurrentEmission == 0, label + " J1 throttle does not emit J2 smoke");
+            body.linearVelocity = Vector3.zero; yield return null;
+            Check(effect.CurrentEmission == 0, label + " stationary stops exhaust");
+            body.rotation = Quaternion.AngleAxis(180, player.transform.forward) * body.rotation;
+            body.linearVelocity = Vector3.forward * 20; State(pad, rightTrigger: true); yield return null; yield return null;
+            Check(effect.CurrentEmission == 0, label + " overturned stops exhaust");
+            Neutral(first); Neutral(second);
+            SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; yield return .3f;
+        }
+    }
     static void StartDust(bool verify, bool wet = false)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)
