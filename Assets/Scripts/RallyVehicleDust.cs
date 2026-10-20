@@ -10,10 +10,17 @@ public sealed class RallyVehicleDust : MonoBehaviour
     [SerializeField, Min(0f)] float minimumSpeedKph = 4f;
     [SerializeField, Min(5f)] float fullIntensitySpeedKph = 110f;
     [SerializeField, Min(0f)] float minimumEmission = .25f;
-    [SerializeField, Min(0f)] float maximumEmission = 16f;
-    [SerializeField, Range(1f, 4f)] float fullTurnEmissionMultiplier = 2.6f;
-    [SerializeField, Range(1f, 2f)] float fullTurnSizeMultiplier = 1.45f;
+    [SerializeField, Min(0f)] float maximumEmission = 24f;
+    [SerializeField, Min(0f)] float fullTurnEmissionBonus = 48f;
+    [SerializeField, Min(1f)] float maximumEmissionPerWheel = 70f;
+    [SerializeField, Range(1f, 2f)] float fullTurnSizeMultiplier = 1.65f;
     [SerializeField, Min(10f)] float maximumEffectDistance = 90f;
+
+    [Header("Runtime readings (updated after the vehicle controller)")]
+    [SerializeField] float currentSpeedKph;
+    [SerializeField] float currentSteerAngle;
+    [SerializeField, Range(0f, 1f)] float currentSteering;
+    [SerializeField] float currentRearEmission;
 
     JrsVehicleController controller;
     Rigidbody body;
@@ -84,25 +91,33 @@ public sealed class RallyVehicleDust : MonoBehaviour
     void LateUpdate()
     {
         float speedKph = Vector3.ProjectOnPlane(body.linearVelocity, Vector3.up).magnitude * 3.6f;
+        currentSpeedKph = speedKph;
         // A checkpoint reset must not leave a cloud at the previous location.
         if ((transform.position - lastPosition).sqrMagnitude > 225f) ClearTrail();
         lastPosition = transform.position;
         bool moving = speedKph > minimumSpeedKph && EmissionAllowed();
         float blend = Mathf.InverseLerp(minimumSpeedKph, Mathf.Max(minimumSpeedKph + 1f, fullIntensitySpeedKph), speedKph);
         blend = Mathf.SmoothStep(0f, 1f, blend);
-        float steerAngle = (controller.frontLeftWheel.steerAngle + controller.frontRightWheel.steerAngle) * .5f;
-        float steering = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.08f, .85f,
-            Mathf.Abs(steerAngle) / Mathf.Max(1f, controller.maxSteerAngle)));
-        float rate = moving ? Mathf.Lerp(minimumEmission, maximumEmission, blend) *
-            Mathf.Lerp(1f, fullTurnEmissionMultiplier, steering) : 0f;
-        float particleSize = Mathf.Lerp(.18f, .68f, blend) * Mathf.Lerp(1f, fullTurnSizeMultiplier, steering);
-        UpdateEmitter(controller.rearLeftWheel, leftDust, rate, particleSize, blend);
-        UpdateEmitter(controller.rearRightWheel, rightDust, rate, particleSize, blend);
+        // Read this car's live WheelColliders after Update/FixedUpdate. A shared
+        // keyboard/gamepad value would mix the two local players' effects.
+        currentSteerAngle = (controller.frontLeftWheel.steerAngle + controller.frontRightWheel.steerAngle) * .5f;
+        float steering = Mathf.Clamp01(Mathf.Abs(currentSteerAngle) / Mathf.Max(1f, controller.maxSteerAngle));
+        currentSteering = steering;
+        // Automatic braking reduces speed in a tight turn. A purely multiplied
+        // speed rate became weaker than a fast straight despite stronger steering.
+        float turnSpeed = Mathf.InverseLerp(8f, 35f, speedKph);
+        float rate = moving ? Mathf.Min(maximumEmissionPerWheel,
+            Mathf.Lerp(minimumEmission, maximumEmission, blend) + fullTurnEmissionBonus * steering * turnSpeed) : 0f;
+        currentRearEmission = rate;
+        float particleSize = Mathf.Lerp(.22f, .85f, blend);
+        float growth = Mathf.Lerp(1f, fullTurnSizeMultiplier, steering);
+        UpdateEmitter(controller.rearLeftWheel, leftDust, rate, particleSize, blend, growth);
+        UpdateEmitter(controller.rearRightWheel, rightDust, rate, particleSize, blend, growth);
 
         // Reuse the two existing corner emitters, keeping the main trail behind.
         float cornerRate = moving && speedKph > 8f ? Mathf.Min(10f, rate * .25f * steering) : 0f;
-        UpdateEmitter(controller.frontLeftWheel, leftCornerDust, cornerRate, particleSize * .7f, blend);
-        UpdateEmitter(controller.frontRightWheel, rightCornerDust, cornerRate, particleSize * .7f, blend);
+        UpdateEmitter(controller.frontLeftWheel, leftCornerDust, cornerRate, particleSize * .7f, blend, growth);
+        UpdateEmitter(controller.frontRightWheel, rightCornerDust, cornerRate, particleSize * .7f, blend, growth);
         GateLegacyFrontSmoke(controller.frontLeftWheel, controller.frontLeftDustParticleSystem, moving);
         GateLegacyFrontSmoke(controller.frontRightWheel, controller.frontRightDustParticleSystem, moving);
     }
@@ -114,9 +129,14 @@ public sealed class RallyVehicleDust : MonoBehaviour
             smoke.Stop(false, ParticleSystemStopBehavior.StopEmitting);
     }
 
-    void UpdateEmitter(WheelCollider wheel, ParticleSystem dust, float rate, float particleSize, float speedBlend)
+    void UpdateEmitter(WheelCollider wheel, ParticleSystem dust, float rate, float particleSize, float speedBlend, float growth)
     {
         if (dust == null) return;
+        // Keep existing particles responsive even if this wheel briefly loses
+        // contact at a road edge; contact still gates all new emission below.
+        var size = dust.sizeOverLifetime;
+        size.enabled = true;
+        size.sizeMultiplier = growth;
         if (rate <= 0f)
         {
             var stoppedEmission = dust.emission;
@@ -141,7 +161,8 @@ public sealed class RallyVehicleDust : MonoBehaviour
             velocity.x = drift.x; velocity.z = drift.z;
         }
         var emission = dust.emission;
-        emission.rateOverTime = grounded ? rate : 0f;
+        emission.enabled = true;
+        emission.rateOverTime = new ParticleSystem.MinMaxCurve(grounded ? rate : 0f);
         if (grounded && rate > 0f)
         {
             if (!dust.isEmitting) dust.Play(false);
@@ -171,13 +192,13 @@ public sealed class RallyVehicleDust : MonoBehaviour
         main.playOnAwake = false;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.useUnscaledTime = false;
-        main.maxParticles = emitterName.StartsWith("Rear") ? 64 : 20;
+        main.maxParticles = emitterName.StartsWith("Rear") ? 96 : 24;
         main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
         main.startLifetime = new ParticleSystem.MinMaxCurve(.85f, 1.5f);
         main.startSpeed = new ParticleSystem.MinMaxCurve(.2f, .55f);
         main.startSize = new ParticleSystem.MinMaxCurve(.18f, .4f);
         main.startColor = new ParticleSystem.MinMaxGradient(
-            new Color(.48f, .36f, .19f, .14f), new Color(.69f, .55f, .32f, .23f));
+            new Color(.48f, .36f, .19f, .24f), new Color(.69f, .55f, .32f, .38f));
         var emission = dust.emission;
         emission.enabled = true;
         emission.rateOverTime = 0f;

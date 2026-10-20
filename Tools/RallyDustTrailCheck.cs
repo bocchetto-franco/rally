@@ -74,8 +74,8 @@ public static class RallyDustTrailCheck
             tick(80, 0); float straightRate = Rate(left), straightSize = left.main.startSize.constantMax;
             Check(straightRate > slowRate && straightSize > slowSize, "speed increases emission and size");
             tick(80, car.maxSteerAngle); float cornerRate = Rate(left);
-            Check(cornerRate > straightRate * 2 && left.main.startSize.constantMax > straightSize * 1.35f && Rate(front) > 0, "steering noticeably increases rear trail plus existing front dust");
-            report.Add($"MEASURED rear particles/s slow={slowRate:F3}, straight80={straightRate:F3}, corner80={cornerRate:F3}; size {slowSize:F3}/{straightSize:F3}/{left.main.startSize.constantMax:F3}");
+            Check(cornerRate > straightRate * 2 && left.main.startSize.constantMax * left.sizeOverLifetime.sizeMultiplier > straightSize * 1.35f && Rate(front) > 0, "steering noticeably increases rear trail plus existing front dust");
+            report.Add($"MEASURED rear particles/s slow={slowRate:F3}, straight80={straightRate:F3}, corner80={cornerRate:F3}; size {slowSize:F3}/{straightSize:F3}/{left.main.startSize.constantMax * left.sizeOverLifetime.sizeMultiplier:F3}");
             Check(left.main.simulationSpace == ParticleSystemSimulationSpace.World && left.main.startLifetime.constantMax == 1.5f, "world-space cloud lingers for up to 1.5 seconds");
             Check(left.GetComponent<ParticleSystemRenderer>().sharedMaterial.shader == car.rearLeftDustParticleSystem.GetComponent<ParticleSystemRenderer>().sharedMaterial.shader, "existing drift shader reused");
             left.Simulate(.35f, false, false); right.Simulate(.35f, false, false);
@@ -87,6 +87,7 @@ public static class RallyDustTrailCheck
             Check(alive > 0 && Mathf.Abs(particles[0].position.z - oldZ) < .1f, "existing particles stay behind when the car moves");
             tick(0, 0); Check(Rate(left) == 0 && Rate(right) == 0 && Rate(front) == 0 && !left.isEmitting, "stationary car stops emitting");
             left.Simulate(1.6f, false, false); Check(left.particleCount == 0, "old cloud expires without accumulating");
+            CheckWater(source, scene, car, body);
             Time.timeScale = 0; tick(80, 30); Check(Rate(left) == 0, "pause blocks emission"); Time.timeScale = 1;
             body.rotation = Quaternion.Euler(0, 0, 90); tick(80, 30); Check(Rate(left) == 0, "overturned car blocks emission");
             body.rotation = Quaternion.identity; body.position = new Vector3(0, 6, 0); physics.Simulate(.02f);
@@ -104,7 +105,7 @@ public static class RallyDustTrailCheck
             secondCamera.transform.LookAt(new Vector3(0, .5f, 2));
             tick(80, 30); Check(Rate(left) > 0, "either local-player camera keeps visible trail active");
             for (int i = 0; i < 100; i++) tick(80, 30);
-            Check(root.GetComponentsInChildren<ParticleSystem>(true).Length == count && left.main.maxParticles == 64 && front.main.maxParticles == 20, "no emitter duplication; fixed particle budgets");
+            Check(root.GetComponentsInChildren<ParticleSystem>(true).Length == count && left.main.maxParticles == 96 && front.main.maxParticles == 24, "no emitter duplication; fixed particle budgets");
             car.enabled = false; tick(80, 30); Check(Rate(left) == 0, "finished/disabled control blocks trail");
             report.Add("COMPLETE: PASS");
         }
@@ -116,5 +117,59 @@ public static class RallyDustTrailCheck
             if (source.IsValid()) EditorSceneManager.ClosePreviewScene(source);
             File.WriteAllLines("Logs/dust-trail-check.txt", report);
         }
+    }
+
+    static void CheckWater(Scene source, Scene scene, JrsVehicleController car, Rigidbody body)
+    {
+        var zoneObject = new GameObject("wet particle isolated check");
+        SceneManager.MoveGameObjectToScene(zoneObject, scene);
+        zoneObject.AddComponent<BoxCollider>().isTrigger = true;
+        var zone = zoneObject.AddComponent<RallyPuddleSlowZone>();
+        var oldZone = source.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<RallyPuddleSlowZone>(true)).First();
+        EditorUtility.CopySerialized(oldZone, zone);
+        Call(zone, "Awake");
+        var water = Field<ParticleSystem>(zone, "splashParticles");
+        Check(Field<float>(zone, "splashMinimumSpeedKph") == 20f, "serialized stock splash threshold migrates to 20 km/h");
+        var entry = typeof(RallyPuddleSlowZone).GetMethod("EmitEntrySplash", Private);
+        body.linearVelocity = Vector3.forward * (10f / 3.6f);
+        entry.Invoke(zone, new object[] { body });
+        Check(water.particleCount == 0, "slow stationary-range entry does not spray water");
+        body.linearVelocity = Vector3.forward * (25f / 3.6f);
+        entry.Invoke(zone, new object[] { body });
+        int low = water.particleCount;
+        Check(low >= 26 && water.transform.position.y >= .07f && water.main.startSize.constantMax >= .3f,
+            "visible water burst at 25 km/h spawns above surface, not below lowered COM");
+        water.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        body.linearVelocity = Vector3.forward * (90f / 3.6f);
+        entry.Invoke(zone, new object[] { body });
+        int high = water.particleCount;
+        Check(high > low && high >= 40 && water.main.maxParticles == 192, "higher speed increases water burst with bounded pool");
+        Check(Mathf.Approximately((float)typeof(RallyPuddleSlowZone).GetMethod("CalculateWaterResistance", Private).Invoke(zone, new object[] { 110f }), 7.5f),
+            "water braking and aquaplaning tuning unchanged");
+        water.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        var continuous = typeof(RallyPuddleSlowZone).GetMethod("EmitContinuousSplash", Private);
+        for (int i = 0; i < 25; i++) continuous.Invoke(zone, new object[] { body, 90f });
+        Check(water.particleCount >= 30, "continuous water spray increases while crossing, reuses same system");
+
+        var mud = zoneObject.AddComponent<RallyPuddleMudVisual>();
+        mud.halfSize = new Vector2(30, 200);
+        mud.sprayMaterial = source.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<RallyPuddleMudVisual>(true)).First().sprayMaterial;
+        ((System.Collections.IEnumerator)typeof(RallyPuddleMudVisual).GetMethod("Start", Private).Invoke(mud, null)).MoveNext();
+        typeof(RallyPuddleMudVisual).GetField("vehicles", Private).SetValue(mud, new[] { new RallyVehiclePresentationCache.Vehicle(car) });
+        var droplets = Field<ParticleSystem>(mud, "spray");
+        for (int i = 0; i < 25; i++) Call(mud, "FixedUpdate");
+        Check(droplets.particleCount >= 30 && droplets.main.maxParticles == 160, "four grounded tires produce denser mud spray using existing pool");
+        var values = new ParticleSystem.Particle[160];
+        int alive = droplets.GetParticles(values);
+        Check(values.Take(alive).All(p => p.startSize <= .18f && p.velocity.y > 0), "larger muddy droplets have upward ballistic launch");
+        droplets.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        body.rotation = Quaternion.Euler(0, 0, 90);
+        body.transform.rotation = body.rotation;
+        for (int i = 0; i < 25; i++) Call(mud, "FixedUpdate");
+        Check(droplets.particleCount == 0, "overturned vehicle cannot generate new mud droplets");
+        body.rotation = Quaternion.identity;
+        body.transform.rotation = body.rotation;
+        report.Add($"MEASURED water burst25={low}; burst90={high}; continuous90={water.particleCount}; mud90={alive}");
+        Object.DestroyImmediate(zoneObject);
     }
 }

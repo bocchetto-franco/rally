@@ -15,9 +15,10 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
     [SerializeField, Min(0f)] float maximumLateralAcceleration = 2.2f;
 
     [Header("Low-cost splash")]
-    [SerializeField, Min(0f)] float splashMinimumSpeedKph = 35f;
+    [SerializeField, Min(0f)] float splashMinimumSpeedKph = 20f;
     [SerializeField, Min(0)] int entrySplashParticles = 22;
     [SerializeField, Min(0f)] float maximumContinuousParticlesPerSecond = 36f;
+    [SerializeField, Range(1f, 4f)] float splashDensityMultiplier = 2.2f;
     [SerializeField] ParticleSystem splashParticles;
 
     struct VehicleOverlap { public int count; public JrsVehicleController vehicle; }
@@ -26,9 +27,14 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
     readonly List<Rigidbody> staleBodies = new List<Rigidbody>(8);
     Material runtimeSplashMaterial;
     float splashEmissionAccumulator;
+    float waterSurfaceY;
 
     void Awake()
     {
+        // Upgrade the previous stock visual threshold, preserving custom values.
+        if (Mathf.Approximately(splashMinimumSpeedKph, 35f)) splashMinimumSpeedKph = 20f;
+        var waterRenderer = GetComponent<Renderer>();
+        waterSurfaceY = waterRenderer != null ? waterRenderer.bounds.center.y : transform.position.y;
         // Migrate only the exact original value serialized in Circuit_01.
         // Later manual tuning remains untouched.
         if (Mathf.Approximately(brakingAcceleration, 3.5f))
@@ -170,7 +176,7 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
         float intensity = Mathf.InverseLerp(splashMinimumSpeedKph, aquaplaningFullSpeedKph, speedKph);
         if (!splashParticles.isPlaying)
             splashParticles.Play(false);
-        splashParticles.Emit(Mathf.Max(1, Mathf.RoundToInt(entrySplashParticles * Mathf.Lerp(0.55f, 1f, intensity))));
+        splashParticles.Emit(Mathf.Max(1, Mathf.RoundToInt(entrySplashParticles * splashDensityMultiplier * Mathf.Lerp(0.55f, 1f, intensity))));
     }
 
     void EmitContinuousSplash(Rigidbody body, float speedKph)
@@ -180,7 +186,7 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
 
         PositionSplash(body);
         float intensity = Mathf.InverseLerp(splashMinimumSpeedKph, aquaplaningFullSpeedKph, speedKph);
-        splashEmissionAccumulator += Mathf.Lerp(8f, maximumContinuousParticlesPerSecond, intensity) * Time.fixedDeltaTime;
+        splashEmissionAccumulator += Mathf.Lerp(8f, maximumContinuousParticlesPerSecond, intensity) * splashDensityMultiplier * Time.fixedDeltaTime;
         int count = Mathf.FloorToInt(splashEmissionAccumulator);
         if (count <= 0)
             return;
@@ -193,8 +199,12 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
 
     void PositionSplash(Rigidbody body)
     {
+        // The lowered arcade center of mass could put the old emitter under
+        // the road. Emit above the visible water, not relative to that COM.
+        Vector3 position = body.worldCenterOfMass;
+        position.y = waterSurfaceY + .08f;
         splashParticles.transform.SetPositionAndRotation(
-            body.worldCenterOfMass - body.transform.up * 0.42f,
+            position,
             Quaternion.LookRotation(Vector3.up, body.transform.forward));
     }
 
@@ -208,14 +218,14 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
         main.loop = false;
         main.playOnAwake = false;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.startLifetime = new ParticleSystem.MinMaxCurve(0.28f, 0.58f);
-        main.startSpeed = new ParticleSystem.MinMaxCurve(2.8f, 6.2f);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.23f);
+        main.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 0.8f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(3.4f, 7.4f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.11f, 0.31f);
         main.startColor = new ParticleSystem.MinMaxGradient(
             new Color(0.72f, 0.88f, 0.94f, 0.46f),
             new Color(0.9f, 0.97f, 1f, 0.72f));
         main.gravityModifier = 0.7f;
-        main.maxParticles = 80;
+        main.maxParticles = 192;
 
         ParticleSystem.EmissionModule emission = particles.emission;
         emission.enabled = false;

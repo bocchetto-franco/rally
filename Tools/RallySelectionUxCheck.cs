@@ -22,6 +22,7 @@ public static class RallySelectionUxCheck
     static string Report;
     static bool menusOnly;
     static bool sharedRaceCheck;
+    static bool wetEffectsCheck;
     static readonly string[] Keys = { "Rally.LocalPlayers", "Rally.SelectedVehicle", "Rally.SelectedVehicleTwo", "Rally.SelectedCircuit", "Rally.BotDifficulty" };
     static bool[] had;
     static string[] strings;
@@ -56,6 +57,19 @@ public static class RallySelectionUxCheck
         Report = "Logs/group-b-races.txt";
         File.WriteAllText(Report, "Group B: 3 circuits x 1P/2P, spawn/contact/short acceleration, virtual gamepads.\n");
         steps = GroupBSteps(true);
+    }
+    public static void RunDustBaseline() => StartDust(false);
+    public static void RunDustSteering() => StartDust(true);
+    public static void RunDustAndWater() => StartDust(true, true);
+    static void StartDust(bool verify, bool wet = false)
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+            if (SceneManager.GetSceneAt(i).isDirty) throw new Exception("Save open scene before Play verification: " + SceneManager.GetSceneAt(i).path);
+        Start(true);
+        wetEffectsCheck = wet;
+        Report = wet ? "Logs/dust-water-play.txt" : verify ? "Logs/dust-steering-play.txt" : "Logs/dust-steering-baseline.txt";
+        File.WriteAllText(Report, "Dust steering: real Play, virtual DualSense, actual wheel angle, runtime particle modules, 1P/2P. Controlled velocities; not a full driving lap.\n");
+        steps = DustSteeringSteps(verify);
     }
     static void Start(bool onlyMenus, bool checkSharedRace = false)
     {
@@ -414,6 +428,128 @@ public static class RallySelectionUxCheck
             for (int p = 0; p < cars.Length; p++) Check(Vector3.Distance(cars[p].transform.position, origins[p]) > .2f, label + " J" + (p + 1) + " accelerates with assigned controller");
             ScreenCapture.CaptureScreenshot("Logs/GroupB_Race_" + scene + "_" + players + ".png"); yield return .3f;
             SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; yield return .3f;
+        }
+    }
+    static IEnumerator DustSteeringSteps(bool verify)
+    {
+        while (Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+        disabled = InputSystem.devices.Where(d => (d is Gamepad || d is Keyboard) && d.enabled).ToArray();
+        foreach (var device in disabled) InputSystem.DisableDevice(device);
+        first = InputSystem.AddDevice<DualSenseGamepadHID>(); second = InputSystem.AddDevice<DualSenseGamepadHID>(); keyboard = InputSystem.AddDevice<Keyboard>();
+        Neutral(first); Neutral(second); yield return null;
+        for (int players = 1; players <= 2; players++)
+        {
+            RallyGameSession.SelectLocalPlayers(players); RallyGameSession.SelectVehicleForPlayer(0, players == 1 ? 2 : 0); RallyGameSession.SelectVehicleForPlayer(1, 1);
+            RallyRaceLoading.Load("Circuit_01");
+            while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != "Circuit_01") yield return null;
+            yield return .4f;
+            var cars = players == 2 ? new[] { RallySplitScreen.Active.PlayerOne, RallySplitScreen.Active.PlayerTwo } :
+                new[] { Object.FindObjectsByType<JrsVehicleController>().Single(c => c.name == RallyGameSession.VehicleName) };
+            foreach (var bot in Object.FindObjectsByType<RallyBotController>())
+            { bot.enabled = false; var c = bot.GetComponentInChildren<JrsVehicleController>(); c.enabled = false; c.GetComponent<Rigidbody>().isKinematic = true; }
+            var bodies = cars.Select(c => c.GetComponent<Rigidbody>()).ToArray();
+            foreach (var body in bodies) body.constraints |= RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezeRotationY;
+            var effects = cars.Select(c => c.GetComponent<RallyVehicleDust>()).ToArray();
+            var emitters = effects.Select(e => Field<ParticleSystem>(e, "leftDust")).ToArray();
+            Check(effects.All(e => e != null) && emitters.All(e => e != null), players + "P has independent dust components");
+            var pads = Enumerable.Range(0, players).Select(RallyLocalDevices.GamepadFor).ToArray();
+            for (int frame = 0; frame < 12; frame++)
+            { for (int p = 0; p < players; p++) { State(pads[p], rightTrigger: true); bodies[p].linearVelocity = cars[p].transform.forward * (80f / 3.6f); } yield return null; }
+            float straight = emitters[0].emission.rateOverTime.constant;
+            DustSample(players, "straight80", cars, emitters);
+            for (int frame = 0; frame < 4; frame++)
+            {
+                State(pads[0], stick: new Vector2(-.35f, 0), rightTrigger: true);
+                if (players == 2) State(pads[1], rightTrigger: true);
+                for (int p = 0; p < players; p++) bodies[p].linearVelocity = cars[p].transform.forward * (35f / 3.6f);
+                yield return null;
+            }
+            float partial = emitters[0].emission.rateOverTime.constant;
+            float partialGrowth = emitters[0].sizeOverLifetime.sizeMultiplier;
+            DustSample(players, "J1 partial turn35", cars, emitters);
+            for (int frame = 0; frame < (verify ? 35 : 8); frame++)
+            {
+                State(pads[0], stick: new Vector2(-.9f, 0), rightTrigger: true);
+                if (players == 2) State(pads[1], rightTrigger: true);
+                for (int p = 0; p < players; p++) bodies[p].linearVelocity = cars[p].transform.forward * (35f / 3.6f);
+                yield return null;
+            }
+            DustSample(players, "J1 turn35; J2 straight35", cars, emitters);
+            Check(Mathf.Abs(cars[0].frontLeftWheel.steerAngle) > 20f, players + "P steering input reaches actual WheelCollider in real time");
+            if (verify)
+            {
+                Check(emitters[0].emission.enabled && emitters[0].emission.rateOverTime.constant > straight * 1.4f, players + "P slow turn remains visibly stronger than faster straight");
+                Check(emitters[0].emission.rateOverTime.constant > partial * 1.4f && emitters[0].sizeOverLifetime.sizeMultiplier > partialGrowth + .2f,
+                    players + "P partial/full live steering proportionally changes emission and size");
+                Check(emitters[0].sizeOverLifetime.enabled && emitters[0].sizeOverLifetime.sizeMultiplier > 1.3f, players + "P runtime growth also changes already living particles");
+                if (players == 2)
+                    Check(Mathf.Abs(cars[1].frontLeftWheel.steerAngle) < 1f && emitters[1].emission.rateOverTime.constant < emitters[0].emission.rateOverTime.constant * .5f,
+                        "J1 steering does not increase J2 dust");
+            }
+            ScreenCapture.CaptureScreenshot("Logs/Dust_Steering_" + players + "P_" + (verify ? "After" : "Before") + ".png"); yield return .2f;
+            if (players == 2)
+            {
+                for (int frame = 0; frame < (verify ? 35 : 8); frame++)
+                {
+                    State(pads[0], rightTrigger: true); State(pads[1], stick: new Vector2(.9f, 0), rightTrigger: true);
+                    for (int p = 0; p < players; p++) bodies[p].linearVelocity = cars[p].transform.forward * (35f / 3.6f);
+                    yield return null;
+                }
+                DustSample(players, "J1 straight35; J2 turn35", cars, emitters);
+                if (verify) Check(Mathf.Abs(cars[1].frontLeftWheel.steerAngle) > 20f && emitters[1].emission.rateOverTime.constant > emitters[0].emission.rateOverTime.constant * 2f &&
+                    emitters[0].sizeOverLifetime.sizeMultiplier < 1.05f && emitters[1].sizeOverLifetime.sizeMultiplier > 1.3f, "J2 alone increases emission/growth and J1 resets immediately");
+                if (verify) { ScreenCapture.CaptureScreenshot("Logs/Dust_Steering_2P_J2_After.png"); yield return .2f; }
+            }
+            if (wetEffectsCheck)
+            {
+                var waterZone = Object.FindAnyObjectByType<RallyPuddleSlowZone>();
+                var mudZone = Object.FindAnyObjectByType<RallyPuddleMudVisual>();
+                var water = Field<ParticleSystem>(waterZone, "splashParticles");
+                var mud = Field<ParticleSystem>(mudZone, "spray");
+                for (int p = 0; p < players; p++)
+                {
+                    Neutral(first); Neutral(second);
+                    water.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    mud.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    for (int other = 0; other < players; other++) if (other != p) bodies[other].isKinematic = true;
+                    bodies[p].isKinematic = false; bodies[p].constraints = RigidbodyConstraints.FreezeRotation;
+                    float clearance = cars[p].frontLeftWheel.GetGroundHit(out WheelHit hit) ? bodies[p].position.y - hit.point.y : .65f;
+                    Vector3 direction = Vector3.ProjectOnPlane(waterZone.transform.forward, Vector3.up).normalized;
+                    Vector3 target = mudZone.transform.TransformPoint(mudZone.localCenter) - direction;
+                    var classifier = cars[p].GetComponent<RallyOffTrackSpeedPenalty>();
+                    var ground = Physics.RaycastAll(target + Vector3.up * 4, Vector3.down, 10, ~0, QueryTriggerInteraction.Ignore)
+                        .Where(h => (bool)typeof(RallyOffTrackSpeedPenalty).GetMethod("IsDrivingSurface", Private | BindingFlags.Public).Invoke(classifier, new object[] { h.collider }))
+                        .OrderBy(h => h.distance).First();
+                    target.y = ground.point.y + clearance + .02f;
+                    bodies[p].position = target; bodies[p].rotation = Quaternion.LookRotation(direction);
+                    bodies[p].angularVelocity = Vector3.zero; Physics.SyncTransforms();
+                    int peakWater = 0, peakMud = 0;
+                    for (int frame = 0; frame < 22; frame++)
+                    {
+                        State(pads[p], rightTrigger: true);
+                        bodies[p].linearVelocity = direction * (40f / 3.6f);
+                        peakWater = Mathf.Max(peakWater, water.particleCount); peakMud = Mathf.Max(peakMud, mud.particleCount);
+                        yield return null;
+                    }
+                    Check(peakWater >= 20 && peakMud > 0, players + "P J" + (p + 1) + " actual puddle overlap/contact emits water and mud");
+                    File.AppendAllText(Report, $"WATER {players}P J{p+1}: peak={peakWater}; mud={peakMud}; budgets={water.main.maxParticles}/{mud.main.maxParticles}\n");
+                    ScreenCapture.CaptureScreenshot("Logs/Wet_Effects_" + players + "P_J" + (p+1) + ".png"); yield return .2f;
+                }
+            }
+            Neutral(first); Neutral(second);
+            SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; yield return .2f;
+        }
+    }
+    static void DustSample(int players, string stage, JrsVehicleController[] cars, ParticleSystem[] effects)
+    {
+        for (int p = 0; p < cars.Length; p++)
+        {
+            File.AppendAllText(Report, $"SAMPLE {players}P {stage} J{p + 1}: speed={cars[p].GetComponent<Rigidbody>().linearVelocity.magnitude * 3.6f:F2}; steer={cars[p].frontLeftWheel.steerAngle:F2}; rate={effects[p].emission.rateOverTime.constant:F2}; startSize={effects[p].main.startSize.constantMax:F3}; growth={effects[p].sizeOverLifetime.sizeMultiplier:F3}; alive={effects[p].particleCount}\n");
+            if (stage == "straight80")
+            {
+                var renderer = effects[p].GetComponent<ParticleSystemRenderer>(); var m = renderer.sharedMaterial;
+                File.AppendAllText(Report, "MATERIAL " + m.shader.name + " renderer=" + renderer.enabled + " tint=" + m.GetColor("_BaseColor") + " softFade=" + m.GetVector("_SoftParticleFadeParams") + "\n");
+            }
         }
     }
     static void Finish(Exception error)

@@ -38,8 +38,10 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [Header("Arcade handling")]
     [SerializeField] private float vehicleMass = 1160f;
     [SerializeField] private float vehicleAngularDamping = 2.6f;
-    [SerializeField] private float maximumSteerAngle = 40f;
-    [SerializeField] private float steeringResponse = 22f;
+    [Tooltip("Maximum front wheel steering angle in degrees, shared by all player car visuals.")]
+    [SerializeField, Range(1f, 60f)] private float maximumSteerAngle = 44f;
+    [Tooltip("Keyboard steering input travel per second. Analog stick input remains direct.")]
+    [SerializeField, Min(0.1f)] private float steeringResponse = 60f;
     [SerializeField] private float motorForce = 480f;
     [SerializeField] private float firstGearRatio = 6.0f;
     [SerializeField] private float secondGearRatio = 3.75f;
@@ -173,8 +175,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         frontSideStiffness = rearSideStiffness = 1.25f;
         lateralVelocityCorrection = 5f;
         maximumLateralCorrectionAcceleration = 12f;
-        maximumSteerAngle = 40f;
-        steeringResponse = isBot ? 6f : 22f;
+        maximumSteerAngle = isBot ? 40f : 44f;
+        steeringResponse = isBot ? 6f : 60f;
         spinAssistYawRateThreshold = 1.25f;
         spinAssistCorrectionStrength = 7f;
         handbrakeRecoveryTorqueMultiplier = 0.55f;

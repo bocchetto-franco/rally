@@ -473661,8 +473661,8 @@ MonoBehaviour:
   botGripProfile: {fileID: 0}
   vehicleMass: 1160
   vehicleAngularDamping: 2.6
-  maximumSteerAngle: 40
-  steeringResponse: 22
+  maximumSteerAngle: 44
+  steeringResponse: 60
   motorForce: 480
   firstGearRatio: 6
   secondGearRatio: 3.75
@@ -616967,7 +616967,7 @@ MonoBehaviour:
   sirenButton: {fileID: 1420738667}
   signalLightsButton: {fileID: 1420429414}
   extraLightsButton: {fileID: 39046554}
-  steerSpeed: 22
+  steerSpeed: 60
   cameras:
   - {fileID: 901743558}
 --- !u!4 &1701726375

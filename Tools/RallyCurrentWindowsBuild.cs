@@ -11,8 +11,8 @@ using UnityEngine.SceneManagement;
 // External build utility. Never included in the game or used to regenerate scenes.
 public static class RallyCurrentWindowsBuild
 {
-    const string Output = "Build/Windows_2026-10-18/Rally1.exe";
-    const string Report = "Logs/windows-build-2026-10-18.txt";
+    const string Output = "Build/Windows_2026-10-19_Effects/Rally1.exe";
+    const string Report = "Logs/windows-build-2026-10-19-effects.txt";
     static readonly string[] SceneNames = { "MainMenu", "VehicleCircuitSelection", "Circuit_01", "Circuit_02", "Circuit_03", "RaceResults" };
     static readonly string[] Generated = {
         "Assets/Resources/MenuFonts/Oswald.asset", "Assets/Resources/MenuFonts/Roboto.asset", "Assets/Settings/RallyHUD_Font.asset",
@@ -71,7 +71,7 @@ public static class RallyCurrentWindowsBuild
     }
     static void Build()
     {
-        string backup = "Logs/SceneBackups/WindowsBuild_20261018_" + DateTime.UtcNow.ToString("HHmmss");
+        string backup = "Logs/SceneBackups/WindowsBuild_20261019_" + DateTime.UtcNow.ToString("HHmmss");
         var preloaded = PlayerSettings.GetPreloadedAssets();
         var bytes = Generated.Where(File.Exists).ToDictionary(p => p, File.ReadAllBytes);
         var scenes = EditorSceneManager.GetSceneManagerSetup();
@@ -100,7 +100,7 @@ public static class RallyCurrentWindowsBuild
             File.Copy(Report, Path.GetDirectoryName(Output) + "/BuildReport.txt", true);
             File.WriteAllText(Path.GetDirectoryName(Output) + "/BuildInfo.txt", "Rally1 Windows x64 release\nBuilt UTC: " + DateTime.UtcNow.ToString("O") +
                 "\nUnity: " + Application.unityVersion + "\nVersion: " + PlayerSettings.bundleVersion +
-                "\nCars: Lancia Delta S4 / Peugeot 205 T16 / Audi Quattro S1\nIncludes speed/steering dust trail (2026-10-18).\nEntry scene: MainMenu\nInput: Both\nKeep Rally1_Data, UnityPlayer.dll and other adjacent files with Rally1.exe.\n");
+                "\nCars: Lancia Delta S4 / Peugeot 205 T16 / Audi Quattro S1\nIncludes denser driving dust, larger water/mud splash effects, 20 km/h splash threshold and current player steering tuning (2026-10-19).\nEntry scene: MainMenu\nInput: Both\nKeep Rally1_Data, UnityPlayer.dll and other adjacent files with Rally1.exe.\n");
             File.AppendAllText(Report, "COMPLETE: PASS\n");
         }
         catch (Exception error) { File.AppendAllText(Report, "FAILED: " + error + "\n"); Debug.LogException(error); }

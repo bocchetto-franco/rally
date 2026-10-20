@@ -10,6 +10,7 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
     public Material sprayMaterial;
     [Min(0f)] public float minimumSpeedKph = 15f;
     [Range(0f, 60f)] public float particlesPerWheelPerSecond = 12f;
+    [SerializeField, Range(1f, 4f)] float sprayDensityMultiplier = 2f;
 
     ParticleSystem spray;
     RallyVehiclePresentationCache.Vehicle[] vehicles;
@@ -34,7 +35,7 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
         main.startLifetime = new ParticleSystem.MinMaxCurve(.3f, .65f);
         main.startSize = new ParticleSystem.MinMaxCurve(.035f, .14f);
         main.gravityModifier = 1.4f;
-        main.maxParticles = 96;
+        main.maxParticles = 160;
         var emission = spray.emission; emission.enabled = false;
         var shape = spray.shape; shape.enabled = false;
         var color = spray.colorOverLifetime;
@@ -64,7 +65,7 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
             Vector3 p = transform.InverseTransformPoint(car.transform.position) - localCenter;
             if (Mathf.Abs(p.x) > halfSize.x + 3 || Mathf.Abs(p.z) > halfSize.y + 4) continue;
             var body = sample.body;
-            if (body == null) continue;
+            if (body == null || body.isKinematic || Vector3.Dot(body.transform.up, Vector3.up) <= .5f) continue;
             float kph = body.linearVelocity.magnitude * 3.6f;
             if (kph < minimumSpeedKph) continue;
             float amount = Mathf.Lerp(.25f, 1f, Mathf.InverseLerp(minimumSpeedKph, 100f, kph));
@@ -82,7 +83,7 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
         float x = p.x / Mathf.Max(.1f, halfSize.x), z = p.z / Mathf.Max(.1f, halfSize.y);
         // Keep spray over the water/muddy margin and require real tire contact.
         if (x*x + z*z > 1.05f || Mathf.Abs(hit.point.y - transform.TransformPoint(localCenter).y) > .8f) return;
-        emissionRemainder += particlesPerWheelPerSecond * amount * Time.fixedDeltaTime;
+        emissionRemainder += particlesPerWheelPerSecond * sprayDensityMultiplier * amount * Time.fixedDeltaTime;
         int count = Mathf.FloorToInt(emissionRemainder);
         emissionRemainder -= count;
         if (count == 0) return;
@@ -93,10 +94,10 @@ public sealed class RallyPuddleMudVisual : MonoBehaviour
             var particle = new ParticleSystem.EmitParams
             {
                 position = hit.point + hit.normal * .06f,
-                velocity = body.linearVelocity * .08f + body.transform.right * side * Range(1.2f, 2.8f)
-                    - body.transform.forward * Range(.4f, 1.6f) + Vector3.up * Range(1.1f, 3.2f),
+                velocity = body.linearVelocity * .08f + body.transform.right * side * Range(1.6f, 3.8f)
+                    - body.transform.forward * Range(.4f, 1.6f) + Vector3.up * Range(1.5f, 4f),
                 startColor = Color.Lerp(new Color(.16f,.10f,.055f,.95f), new Color(.46f,.32f,.17f,.72f), wetness),
-                startSize = Range(.04f,.13f), startLifetime = Range(.3f,.65f)
+                startSize = Range(.06f,.18f), startLifetime = Range(.4f,.8f)
             };
             spray.Emit(particle, 1);
         }
