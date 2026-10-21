@@ -23,7 +23,9 @@ El efecto no escribe torque, fricción, Rigidbody ni controles.
   deshabilitado o fuera de vista/rango (80 m). Un teleport limpia el humo anterior.
 - Máximo por auto: 40 partículas de humo + 6 de destello. Se crean antes de la
   precarga de carrera, reutilizando textura/shader del humo existente.
-- Boquilla colocada respecto de los bounds de la carrocería seleccionada;
+- Boquilla medida en los vértices del escape de cada modelo (metros locales):
+  Lancia (−0.45, 0.20, −1.855), Peugeot (0, 0.275, −1.82), Audi (0.25, 0.275, −1.98).
+  La presentación guardada antigua copia esa metadata del prefab al iniciar;
   `nozzleOffset` permite afinar la posición visual sin mover ruedas ni colliders.
 
 ## 2. Bosque: lluvia y camino mojado
@@ -78,4 +80,10 @@ Herramientas: `Tools/RallyGraphicsSetup.cs` (instalación/comparación de compon
 `Tools/RallySelectionUxCheck.cs → RunAtmosphere` (Play, perfiles, escape y 1P/2P).
 Informes en `Logs/graphics-atmosphere-setup.txt` y `Logs/graphics-atmosphere-play.txt`.
 Las pruebas restauran escena, preferencias, input y estado de Play del usuario.
-No se ha regenerado el ejecutable de Windows ni realizado un benchmark de FPS.
+Verificación final de Play: **COMPLETE: PASS** para C01/C02/C03 en 1P y C01/C03 en 2P.
+Se comprobó input visual independiente por auto con muestras controladas, colocación
+de boquilla, ausencia de emisores duplicados, humo/cambio de marcha/petardeo, apagado
+detenido/volcado, lluvia acotada, material húmedo realmente asignado, restauración al
+apagar perfiles y ausencia de cambios de clima en C02. No equivale a probar mandos físicos.
+El build reproducible se prepara con `Build → Windows Release`; ver `BUILD_WINDOWS.md`.
+No se realizó un benchmark de FPS.

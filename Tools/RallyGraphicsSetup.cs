@@ -22,6 +22,25 @@ public static class RallyGraphicsSetup
     }
     const string Folder = "Assets/Art/Atmosphere";
     const string Report = "Logs/graphics-atmosphere-setup.txt";
+    public static void ConfigureNozzles()
+    {
+        Idle();
+        var names = new[] { "LanciaS4", "Peugeot205T16", "AudiQuattro" };
+        var positions = new[] { new Vector3(-.45f, .20f, -1.855f), new Vector3(0, .275f, -1.82f), new Vector3(.25f, .275f, -1.98f) };
+        for (int i = 0; i < names.Length; i++)
+        {
+            string path = "Assets/Resources/Vehicles/" + names[i] + ".prefab";
+            var root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                var visual = root.GetComponent<RallyVehicleVisual>();
+                visual.hasExhaustAnchor = true; visual.exhaustLocalPosition = positions[i];
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+        AssetDatabase.SaveAssets();
+    }
     public static void InspectNozzles()
     {
         Idle(); var text = new System.Text.StringBuilder();

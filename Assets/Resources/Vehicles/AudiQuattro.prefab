@@ -63,6 +63,8 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0.9133428, z: 0}
     m_Extent: {x: 0.8531307, y: 0.7801112, z: 2.1249998}
   useAuthoredScale: 1
+  hasExhaustAnchor: 1
+  exhaustLocalPosition: {x: 0.25, y: 0.275, z: -1.98}
 --- !u!1 &2030387584361892840
 GameObject:
   m_ObjectHideFlags: 0

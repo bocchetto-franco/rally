@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -11,7 +12,7 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
     [SerializeField, Min(0)] float fullThrottleRate = 12f;
     [SerializeField, Min(0)] float liftRate = 30f;
     [SerializeField] bool backfireEnabled = true;
-    [SerializeField] Vector3 nozzleOffset = new Vector3(-.5f, .2f, -.035f);
+    [SerializeField] Vector3 nozzleOffset;
     [SerializeField] float currentThrottle;
     [SerializeField] float currentEmission;
     public float CurrentEmission => currentEmission;
@@ -19,6 +20,7 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
     public ParticleSystem Backfire => flash;
     public int LiftEvents { get; private set; }
     public int ShiftEvents { get; private set; }
+    public int BackfireEvents { get; private set; }
 
     JrsVehicleController car;
     Rigidbody body;
@@ -34,9 +36,30 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
     void Awake()
     {
         car = GetComponent<JrsVehicleController>(); body = GetComponent<Rigidbody>();
+    }
+
+    IEnumerator Start()
+    {
+        // The split-screen rig finishes cloning and choosing both models first.
+        // This also prevents cloning the first car's already-created emitters.
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
         visual = GetComponentInChildren<RallyVehicleVisual>();
+        // Saved default presentations are scene copies made before tailpipe metadata existed.
+        // Read the selected definition once without rebuilding the rig or fitting its wheels.
+        if (visual != null && !visual.hasExhaustAnchor)
+        {
+            string resource = visual.name.StartsWith(RallyPlayerVehicleSelection.LanciaName) ? RallyPlayerVehicleSelection.LanciaResource :
+                visual.name.StartsWith(RallyPlayerVehicleSelection.PeugeotName) ? RallyPlayerVehicleSelection.PeugeotResource :
+                visual.name.StartsWith(RallyPlayerVehicleSelection.AudiName) ? RallyPlayerVehicleSelection.AudiResource : null;
+            var definition = resource != null ? Resources.Load<RallyVehicleVisual>(resource) : null;
+            if (definition != null && definition.hasExhaustAnchor)
+            {
+                visual.exhaustLocalPosition = definition.exhaustLocalPosition;
+                visual.hasExhaustAnchor = true;
+            }
+        }
         var source = car.rearLeftDustParticleSystem != null ? car.rearLeftDustParticleSystem.GetComponent<ParticleSystemRenderer>() : null;
-        if (source == null || source.sharedMaterial == null) { enabled = false; return; }
+        if (source == null || source.sharedMaterial == null) { enabled = false; yield break; }
         material = new Material(source.sharedMaterial) { name = "Exhaust - existing smoke shader" };
         if (material.HasProperty("_SoftParticleFadeParams")) material.SetVector("_SoftParticleFadeParams", new Vector4(0, 2.5f, 0, 0));
         smoke = Create("Exhaust Smoke", false); flash = Create("Exhaust Backfire", true);
@@ -49,7 +72,8 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
         if (smoke == null) return;
         // Bounds are authored in the selected visual's metres, not the historical Porsche rig.
         Bounds bounds = visual != null ? visual.bodyBounds : new Bounds(Vector3.up * .8f, new Vector3(1.8f, 1.3f, 4f));
-        Vector3 local = new Vector3(bounds.center.x + nozzleOffset.x, bounds.min.y + nozzleOffset.y, bounds.min.z + nozzleOffset.z);
+        Vector3 local = (visual != null && visual.hasExhaustAnchor ? visual.exhaustLocalPosition :
+            new Vector3(bounds.center.x - .5f, bounds.min.y + .2f, bounds.min.z - .035f)) + nozzleOffset;
         Transform basis = visual != null ? visual.transform : transform;
         Vector3 position = basis.TransformPoint(local);
         Quaternion rotation = Quaternion.LookRotation(-transform.forward + transform.up * .08f, transform.up);
@@ -93,7 +117,7 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
                 nextPuff = Time.time + .35f; puffUntil = Time.time + .45f;
                 smoke.Emit(lift ? 7 : 5);
                 if (lift) LiftEvents++; if (shift) ShiftEvents++;
-                if (lift && backfireEnabled && speed >= backfireSpeedKph) { flash.Play(false); flash.Emit(2); }
+                if (lift && backfireEnabled && speed >= backfireSpeedKph) { flash.Play(false); flash.Emit(2); BackfireEvents++; }
             }
             currentEmission = Time.time < puffUntil ? liftRate : fullThrottleRate * currentThrottle;
         }
@@ -133,6 +157,7 @@ public sealed class RallyVehicleExhaust : MonoBehaviour
     void OnDisable()
     {
         currentEmission = 0;
+        throttleLoaded = false; puffUntil = 0;
         if (smoke != null) smoke.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         if (flash != null) flash.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
