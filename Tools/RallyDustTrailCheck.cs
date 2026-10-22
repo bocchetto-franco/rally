@@ -65,7 +65,7 @@ public static class RallyDustTrailCheck
                     (secondCamera != null && (bool)sees.Invoke(dust, new object[] { secondCamera }));
                 typeof(RallyVehicleDust).GetField("visible", Private).SetValue(dust, inView);
                 typeof(RallyVehicleDust).GetField("nextVisibilityCheck", Private).SetValue(dust, float.MaxValue);
-                Call(dust, "LateUpdate");
+                Call(dust, "Update");
             };
             Time.timeScale = 1;
             tick(8, 0); float slowRate = Rate(left), slowSize = left.main.startSize.constantMax;
@@ -106,6 +106,26 @@ public static class RallyDustTrailCheck
             tick(80, 30); Check(Rate(left) > 0, "either local-player camera keeps visible trail active");
             for (int i = 0; i < 100; i++) tick(80, 30);
             Check(root.GetComponentsInChildren<ParticleSystem>(true).Length == count && left.main.maxParticles == 96 && front.main.maxParticles == 24, "no emitter duplication; fixed particle budgets");
+            // Two independent rigs on the same road, with different live steering.
+            var secondRoot = Object.Instantiate(original.gameObject); SceneManager.MoveGameObjectToScene(secondRoot, scene); secondRoot.SetActive(true);
+            var secondCar = secondRoot.GetComponent<JrsVehicleController>(); var secondBody = secondRoot.GetComponent<Rigidbody>();
+            secondCar.enabled = true; secondBody.isKinematic = false;
+            var secondClassifier = secondRoot.AddComponent<RallyOffTrackSpeedPenalty>(); secondClassifier.Configure(secondCar,null);
+            var secondDust = secondRoot.AddComponent<RallyVehicleDust>(); Call(secondDust,"Awake"); Call(secondDust,"Start");
+            var secondTrail = Field<ParticleSystem>(secondDust,"leftDust");
+            body.position = new Vector3(-2,settled.y+.05f,0); body.rotation = Quaternion.identity; body.linearVelocity = body.angularVelocity = Vector3.zero;
+            secondBody.position = new Vector3(2,.7f,0); secondBody.rotation = Quaternion.identity;
+            foreach(var w in secondRoot.GetComponentsInChildren<WheelCollider>()) w.motorTorque=w.brakeTorque=w.steerAngle=0;
+            for(int i=0;i<90;i++) physics.Simulate(.02f);
+            typeof(RallyVehicleDust).GetField("visible",Private).SetValue(secondDust,true);
+            typeof(RallyVehicleDust).GetField("nextVisibilityCheck",Private).SetValue(secondDust,float.MaxValue);
+            secondBody.linearVelocity=Vector3.forward*(80f/3.6f); Call(secondDust,"Update"); tick(80,car.maxSteerAngle);
+            Check(Rate(left)>Rate(secondTrail)*2 && left.main.startSize.constantMax>secondTrail.main.startSize.constantMax,
+                "two rigs: J1 turning raises only its own emission and initial particle size");
+            tick(80,0); secondCar.frontLeftWheel.steerAngle=secondCar.frontRightWheel.steerAngle=secondCar.maxSteerAngle; Call(secondDust,"Update");
+            Check(Rate(secondTrail)>Rate(left)*2 && secondTrail.main.startSize.constantMax>left.main.startSize.constantMax,
+                "two rigs: J2 turning reverses the effect independently, J1 returns to straight trail");
+            Object.DestroyImmediate(secondRoot);
             car.enabled = false; tick(80, 30); Check(Rate(left) == 0, "finished/disabled control blocks trail");
             report.Add("COMPLETE: PASS");
         }

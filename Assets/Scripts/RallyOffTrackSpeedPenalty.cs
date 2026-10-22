@@ -47,6 +47,10 @@ public sealed class RallyOffTrackSpeedPenalty : MonoBehaviour
         foreach (WheelCollider wheel in wheels)
         {
             if (wheel == null || !wheel.enabled || !wheel.GetGroundHit(out WheelHit hit)) continue;
+            // Side contacts with containment/vehicles are not evidence of leaving the road.
+            // Only upward-facing, static support under the wheels classifies the surface.
+            if (hit.collider == null || hit.collider.attachedRigidbody != null ||
+                Vector3.Dot(hit.normal, Vector3.up) < .45f || RallyTrackBoundary.IsBoundary(hit.collider)) continue;
             if (roadSurfaces.Contains(hit.collider)) road++; else other++;
         }
         // Airborne/one-wheel contact is not an exit. Straddling the edge is not a confirmed exit either.

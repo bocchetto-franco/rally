@@ -9,9 +9,7 @@ using UnityEngine.UI;
 
 public enum RallyBotDifficulty
 {
-    Easy,
-    Medium,
-    Hard
+    Easy
 }
 
 public static class RallyGameSession
@@ -55,7 +53,7 @@ public static class RallyGameSession
         PlayerPrefs.Save();
     }
     public static string SelectedCircuit { get; private set; } = CircuitName;
-    public static RallyBotDifficulty SelectedBotDifficulty { get; private set; } = RallyBotDifficulty.Medium;
+    public static RallyBotDifficulty SelectedBotDifficulty => RallyBotDifficulty.Easy;
     public static float LastRaceTime { get; private set; } = -1f;
     public static string SelectedRaceScene
     {
@@ -77,10 +75,10 @@ public static class RallyGameSession
 
     public static void SelectDifficulty(int index)
     {
-        if (index < 0 || index > (int)RallyBotDifficulty.Hard)
+        if (index < 0)
             throw new ArgumentOutOfRangeException(nameof(index));
-        SelectedBotDifficulty = (RallyBotDifficulty)index;
-        PlayerPrefs.SetInt(DifficultyKey, index);
+        // Older saved selections/callers also migrate to the only supported level.
+        PlayerPrefs.SetInt(DifficultyKey, (int)RallyBotDifficulty.Easy);
         PlayerPrefs.Save();
     }
 
@@ -113,9 +111,7 @@ public static class RallyGameSession
         SelectedCircuit = PlayerPrefs.GetString(CircuitKey, CircuitName);
         if (Array.IndexOf(CircuitNames, SelectedCircuit) < 0)
             SelectedCircuit = CircuitName;
-        int difficulty = PlayerPrefs.GetInt(DifficultyKey, (int)RallyBotDifficulty.Medium);
-        SelectedBotDifficulty = difficulty >= (int)RallyBotDifficulty.Easy && difficulty <= (int)RallyBotDifficulty.Hard
-            ? (RallyBotDifficulty)difficulty : RallyBotDifficulty.Medium;
+        if (PlayerPrefs.GetInt(DifficultyKey, 0) != 0) PlayerPrefs.SetInt(DifficultyKey, 0);
         LastRaceTime = PlayerPrefs.GetFloat(TimeKey, -1f);
     }
 
@@ -198,6 +194,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
     bool waitingForStartInput;
     bool mainMenuRevealed;
     GameObject frontendCanvas;
+    RectTransform sharedCircuitCard;
     readonly bool[] localReady = new bool[2];
     Button[][] localVehicleButtons;
     Button[] localReadyButtons;
@@ -285,6 +282,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
             Destroy(frontendCanvas);
         }
         localVehicleButtons = null;
+        sharedCircuitCard = null;
         localDeviceLabels = null;
         localNavigations = null;
         vehiclePreview = null;
@@ -367,8 +365,8 @@ public sealed partial class RallyMenuController : MonoBehaviour
         RectTransform card = PanelRect(root, "Start Card", Panel, new Vector2(525f, -15f), new Vector2(580f, 760f));
         mainMenuCard = card.gameObject;
         Text(card, "Card Label", "RALLY ARCADE", 21f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 305f), new Vector2(460f, 36f), Accent);
-        Text(card, "Circuit", RallyGameSession.SelectedCircuitDisplayName.ToUpperInvariant(), 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 240f), new Vector2(460f, 60f), Color.white);
-        Text(card, "Details", "3 circuitos · 3 autos del Grupo B\nUna vuelta contrarreloj con bots", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 156f), new Vector2(460f, 80f), Muted);
+        Text(card, "Circuit", "CORRÉ A TU MANERA", 44f, FontStyles.Bold, TextAlignmentOptions.Left, new Vector2(0f, 240f), new Vector2(460f, 60f), Color.white);
+        Text(card, "Details", "Rally arcade · 3 circuitos · Grupo B\nCompetí solo o con otro jugador", 23f, FontStyles.Normal, TextAlignmentOptions.Left, new Vector2(0f, 156f), new Vector2(460f, 80f), Muted);
         Button(card, "Play Button", "JUGAR", new Vector2(0f, 20f), new Vector2(470f, 86f), StartSelection, true);
         Button(card, "Controls Button", "CONTROLES", new Vector2(0f, -85f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Controls), false);
         Button(card, "Options Button", "OPCIONES", new Vector2(0f, -180f), new Vector2(470f, 74f), () => OpenFrontendPage(RallyMenuScreen.Options), false);
@@ -428,7 +426,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
         RectTransform difficultyCard = PanelRect(root, "Bot Difficulty Card", Panel, new Vector2(0f, -278f), new Vector2(1400f, 84f));
         Text(difficultyCard, "Category", "DIFICULTAD BOTS", 22f, FontStyles.Bold, TextAlignmentOptions.Left,
             new Vector2(-515f, 0f), new Vector2(290f, 42f), Accent);
-        string[] difficulties = { "FÁCIL", "MEDIO", "DIFÍCIL" };
+        string[] difficulties = { "FÁCIL" };
         difficultyButtons = new Button[difficulties.Length];
         for (int i = 0; i < difficulties.Length; i++)
         {
@@ -500,7 +498,14 @@ public sealed partial class RallyMenuController : MonoBehaviour
             localNavigations[p] = card.gameObject.AddComponent<RallyMenuNavigation>();
             localNavigations[p].ConfigureForLocalPlayer(p);
         }
-        var track = PanelRect(root, "Shared Circuit Card", Panel, new Vector2(0f, -251f), new Vector2(1580f, 172f));
+        // This belongs to the screen, never to either player's car panel.
+        // Retire a previous row immediately if this section is rebuilt in the same frame.
+        if (sharedCircuitCard != null)
+        {
+            sharedCircuitCard.gameObject.SetActive(false);
+            Destroy(sharedCircuitCard.gameObject);
+        }
+        var track = sharedCircuitCard = PanelRect(root, "Shared Circuit Card", Panel, new Vector2(0f, -251f), new Vector2(1580f, 172f));
         selectedCircuitTitle = Text(track, "Selected Circuit", "", 25f, FontStyles.Bold, TextAlignmentOptions.Left,
             new Vector2(-530f, 58f), new Vector2(480f, 40f), Accent);
         selectedCircuitDetails = Text(track, "Circuit Details", "", 17f, FontStyles.Normal, TextAlignmentOptions.Right,
@@ -686,7 +691,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
     void RefreshCircuitSelection()
     {
         int selected = Array.IndexOf(RallyGameSession.CircuitNames, RallyGameSession.SelectedCircuit);
-        selectedCircuitTitle.text = RallyGameSession.SelectedCircuitDisplayName;
+        selectedCircuitTitle.text = RallyGameSession.LocalPlayerCount == 2 ? "PISTA COMPARTIDA" : RallyGameSession.SelectedCircuitDisplayName;
         selectedCircuitDetails.text = selected == 2 ? "BOSQUE / MONTAÑA · TIERRA HÚMEDA" : selected == 1 ? "MINA CLAVERO / SIERRAS · TIERRA Y ROCA" : "DESIERTO / RALLYCROSS · TIERRA Y RIPIO";
         SetPreview(selectedTrackPreview, Mathf.Max(0, selected));
         backdrop.Show(RallyGameSession.SelectedRaceScene);

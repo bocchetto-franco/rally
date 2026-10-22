@@ -88,7 +88,7 @@ public sealed class RallyVehicleDust : MonoBehaviour
         return viewport.z > 0f && viewport.x > -.2f && viewport.x < 1.2f && viewport.y > -.2f && viewport.y < 1.2f;
     }
 
-    void LateUpdate()
+    void Update()
     {
         float speedKph = Vector3.ProjectOnPlane(body.linearVelocity, Vector3.up).magnitude * 3.6f;
         currentSpeedKph = speedKph;
@@ -109,8 +109,9 @@ public sealed class RallyVehicleDust : MonoBehaviour
         float rate = moving ? Mathf.Min(maximumEmissionPerWheel,
             Mathf.Lerp(minimumEmission, maximumEmission, blend) + fullTurnEmissionBonus * steering * turnSpeed) : 0f;
         currentRearEmission = rate;
-        float particleSize = Mathf.Lerp(.22f, .85f, blend);
         float growth = Mathf.Lerp(1f, fullTurnSizeMultiplier, steering);
+        // Steering changes the size of new particles too, not only their later expansion.
+        float particleSize = Mathf.Lerp(.22f, .85f, blend) * Mathf.Lerp(1f, 1.2f, steering);
         UpdateEmitter(controller.rearLeftWheel, leftDust, rate, particleSize, blend, growth);
         UpdateEmitter(controller.rearRightWheel, rightDust, rate, particleSize, blend, growth);
 

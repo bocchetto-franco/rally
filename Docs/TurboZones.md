@@ -4,9 +4,9 @@ Implementación adicional al controlador existente, compartida por jugadores y b
 
 ## Parámetros
 
-- Tres zonas por circuito bajo `Rally Turbo Zones`, con hijos `Turbo_01/02/03 - centre lane 1.4m`.
+- Tres zonas por circuito bajo `Rally Turbo Zones`, con hijos `Turbo_01/02/03 - centre lane 4.4m` (actualización de posición/hitbox del 2026-10-21).
 - Señal visual actual (2026-10-17): solo cuatro chevrones amarillos, sin franja de fondo. Ocupan 2.4 × 8.3 m, frente a flechas anteriores de 1.28 × 7.2 m. Material URP Unlit transparente, RGBA `(1, 0.88, 0.30, 0.55)`, mezcla alpha y ZWrite desactivado. Malla adaptada por raycast al camino, sin sombras ni colisión sólida. El mayor tamaño es únicamente visual: no ensancha la activación.
-- La raíz del Rigidbody debe entrar en un carril central de 1.4 m, dentro del volumen y avanzando en el sentido de las flechas. Rozar con la carrocería/ruedas no alcanza. Velocidad mínima: 12 km/h; alineación mínima del movimiento: coseno 0.5.
+- La raíz del Rigidbody debe entrar en un carril central de **4.4 m**, dentro del BoxCollider de **5.2 × 3 × 10 m** y avanzando en el sentido de las flechas. `Activation Half Width = 2.2`; el margen exterior del collider no activa por mero roce de la carrocería. Velocidad mínima: 12 km/h; alineación mínima del movimiento: coseno 0.5. El visual conserva sus 2.4 × 8.3 m; ensanchar la activación no escala las flechas.
 - Impulso: 4.5 m/s² durante 2.25 s mediante `ForceMode.Acceleration`, igual para cualquier masa. Solo empuja con al menos dos ruedas apoyadas y el auto enderezado; sin fuerza vertical añadida. El impulso deja de aportar aceleración a 180 km/h y nunca reduce una velocidad superior existente.
 - No se acumula mientras ya está activo. Cada zona tiene un rearme de 8 s por vehículo; el cooldown no es compartido entre corredores y usa tiempo de juego, por lo que la pausa lo congela.
 - Los bots reciben temporalmente +35 km/h en el objetivo de su conducción para no frenar inmediatamente el impulso. El perfil/dificultad base permanecen intactos; el margen vuelve a cero al expirar/deshabilitarse el efecto.
@@ -28,11 +28,15 @@ Prueba real de Play: `Logs/turbo-play-check.txt`, **COMPLETE: PASS** y **RESTORE
 
 | Circuito | Estaciones aproximadas desde salida | Desplazamiento lateral |
 | --- | --- | --- |
-| Circuit_01 | 266 / 726 / 1122 m | +1.2 / -1.2 / +1.2 m |
-| Circuit_02 | 290 / 814 / 1258 m | +1.2 / -1.2 / +1.2 m |
-| Circuit_03 | 278 / 830 / 1306 m | +1.2 / -1.2 / +1.2 m |
+| Circuit_01 | 440 / 725 / 1223 m | 0 / 0 / 0 m |
+| Circuit_02 | 398 / 233 / 1502 m | 0 / 0 / 0 m |
+| Circuit_03 | 218 / 1568 / 1664 m | 0 / 0 / 0 m |
 
 Las distancias se miden sobre los waypoints actuales, incluido el puente; no se regeneraron trazados. Materiales/mallas originales de señalización en `Assets/Art/RallyTurbo/`, sin descargas nuevas. No son oclusores: los bakes existentes se conservan.
+
+La tabla vigente sigue el orden de nombres Turbo_01/02/03, no necesariamente el orden de paso. La revisión 2026-10-21 reubicó las zonas a rectas/salidas con 82–413 m hasta la próxima entrada de curva relevante. Las notas de grado 5 representan quiebres suaves, no se consideran horquillas; también se comprobó el cambio real de rumbo en los siguientes 55 m (máximo 25°), apoyo de cada vértice de las flechas sobre el camino y ausencia de charcos superpuestos. No se movieron las notas de frenada.
+
+Autoría explícita: `Tools/RallyTurboRoadReadability.cs` (`Plan`/`Apply`); no ejecutarlo para cambiar un solo parámetro manual porque vuelve a planificar las nueve ubicaciones y restablece los valores de esta revisión. Informe de aplicación: `Logs/turbo-road-readability.txt`, respaldo `Logs/SceneBackups/TurboReadability_20261021_182357/`. `Tools/VerifyTurboRoadReadability.ps1 -Baseline <respaldo>` compara todos los bloques YAML: únicamente poses/nombres/anchos/colliders de las tres zonas y el material permitido del camino cambian. El impulso, las mallas/materiales de flechas, autos, terreno, notas, checkpoints y waypoints permanecen iguales.
 
 ## Actualización visual sin cambios de gameplay
 

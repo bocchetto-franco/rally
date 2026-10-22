@@ -122773,8 +122773,8 @@ MonoBehaviour:
   botGripProfile: {fileID: 0}
   vehicleMass: 1160
   vehicleAngularDamping: 2.6
-  maximumSteerAngle: 44
-  steeringResponse: 60
+  maximumSteerAngle: 46
+  steeringResponse: 66
   motorForce: 480
   firstGearRatio: 6
   secondGearRatio: 3.75
@@ -647267,7 +647267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   motorForce: 480
-  maxSteerAngle: 36
+  maxSteerAngle: 46
   frontLeftWheel: {fileID: 1817842582}
   frontRightWheel: {fileID: 135501692}
   rearLeftWheel: {fileID: 1180953520}
@@ -790439,7 +790439,7 @@ GameObject:
   - component: {fileID: 1380749325}
   - component: {fileID: 1380749324}
   m_Layer: 0
-  m_Name: Turbo_03 - centre lane 1.4m
+  m_Name: Turbo_03 - centre lane 4.4m
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -790453,8 +790453,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380749322}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.01485954, y: -0.83734393, z: -0.023774147, w: 0.5459571}
-  m_LocalPosition: {x: 195.74858, y: -9.142191, z: -214.14415}
+  m_LocalRotation: {x: -0, y: -0.17993645, z: -0, w: 0.9836783}
+  m_LocalPosition: {x: 11.093071, y: 0, z: -45.926895}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -790473,7 +790473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a752812d60d4b12ad1babc1590e0011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyTurboZone
-  activationHalfWidth: 0.7
+  activationHalfWidth: 2.2
   minimumSpeedKph: 12
   minimumForwardAlignment: 0.5
   durationSeconds: 2.25
@@ -790500,7 +790500,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.2, y: 3, z: 8}
+  m_Size: {x: 5.2, y: 3, z: 10}
   m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1 &1381018014
 GameObject:
@@ -807750,7 +807750,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 3, z: 5.5483227}
   m_Center: {x: 0, y: 0, z: 0}
@@ -841063,7 +841063,7 @@ MonoBehaviour:
   sirenButton: {fileID: 1420738667}
   signalLightsButton: {fileID: 1420429414}
   extraLightsButton: {fileID: 39046554}
-  steerSpeed: 60
+  steerSpeed: 66
   cameras:
   - {fileID: 901743558}
 --- !u!4 &1701726375
@@ -872734,7 +872734,7 @@ GameObject:
   - component: {fileID: 1899212070}
   - component: {fileID: 1899212069}
   m_Layer: 0
-  m_Name: Turbo_01 - centre lane 1.4m
+  m_Name: Turbo_01 - centre lane 4.4m
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -872748,8 +872748,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1899212067}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.9957562, z: -0.0920303, w: 0}
-  m_LocalPosition: {x: 54.799988, y: 16.412987, z: 71.774895}
+  m_LocalRotation: {x: 0.0011566321, y: 0.9964736, z: 0.06466895, w: 0.05345016}
+  m_LocalPosition: {x: 55.828976, y: 18.428673, z: 131.46695}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -872768,7 +872768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a752812d60d4b12ad1babc1590e0011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyTurboZone
-  activationHalfWidth: 0.7
+  activationHalfWidth: 2.2
   minimumSpeedKph: 12
   minimumForwardAlignment: 0.5
   durationSeconds: 2.25
@@ -872795,7 +872795,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.2, y: 3, z: 8}
+  m_Size: {x: 5.2, y: 3, z: 10}
   m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1001 &1899385766
 PrefabInstance:
@@ -898021,7 +898021,7 @@ GameObject:
   - component: {fileID: 2043056476}
   - component: {fileID: 2043056475}
   m_Layer: 0
-  m_Name: Turbo_02 - centre lane 1.4m
+  m_Name: Turbo_02 - centre lane 4.4m
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -898035,8 +898035,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2043056473}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.037711095, y: 0.952125, z: -0.11676626, w: -0.28000256}
-  m_LocalPosition: {x: 321.9933, y: 10.010786, z: 111.207924}
+  m_LocalRotation: {x: -0, y: 0.11503849, z: -0, w: 0.99336106}
+  m_LocalPosition: {x: 2.4377203, y: 0, z: -138.76477}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -898055,7 +898055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a752812d60d4b12ad1babc1590e0011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyTurboZone
-  activationHalfWidth: 0.7
+  activationHalfWidth: 2.2
   minimumSpeedKph: 12
   minimumForwardAlignment: 0.5
   durationSeconds: 2.25
@@ -898082,7 +898082,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.2, y: 3, z: 8}
+  m_Size: {x: 5.2, y: 3, z: 10}
   m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!1 &2043889654
 GameObject:

@@ -17,6 +17,18 @@ public sealed class RallyBotController : MonoBehaviour
     [Header("Difficulty")]
     [SerializeField, Min(10f)] private float maxSpeedKph = 118f;
     [SerializeField, Range(0f, 1f)] private float cornerBrakingAggressiveness = 0.88f;
+    [Header("Easy — the only race difficulty")]
+    [SerializeField, Range(.1f, 2f)] private float easySpeedMultiplier = .7225f;
+    [SerializeField, Range(0f, 1f)] private float easyBrakingMultiplier = .85f;
+    [SerializeField, Range(0f, 1f)] private float easyBrakingBonus = .05f;
+
+    [Header("Yield when pinning a player")]
+    [SerializeField, Range(.5f, 1f)] private float playerContactBrakeSeconds = .75f;
+    [SerializeField, Min(0f)] private float blockedPlayerSpeedKph = 6f;
+    [SerializeField, Min(0f)] private float playerContactCooldownSeconds = 1f;
+    float yieldUntil, nextYieldAllowed;
+    public bool IsYieldingToPlayer => Time.time < yieldUntil;
+    public int PlayerYieldCount { get; private set; }
 
     private float raceMaxSpeedKph;
     private float raceCornerBrakingAggressiveness;
@@ -31,8 +43,8 @@ public sealed class RallyBotController : MonoBehaviour
 
     public float VerticalInput { get; private set; }
     public float HorizontalInput { get; private set; }
-    public bool Braking => VerticalInput < -0.1f;
-    public float BrakeInput => Mathf.Clamp01(-VerticalInput);
+    public bool Braking => BrakeInput > .1f;
+    public float BrakeInput => IsYieldingToPlayer ? 1f : Mathf.Clamp01(-VerticalInput);
     public int CurrentWaypointIndex => targetIndex;
     public int WaypointCount => waypoints != null ? waypoints.Length : 0;
     public bool HasRoute => routeReady;
@@ -65,24 +77,9 @@ public sealed class RallyBotController : MonoBehaviour
 
     private void ApplySelectedDifficulty()
     {
-        // Retain each bot's serialized speed difference (110/118/126 km/h on the
-        // circuits) while applying one selection consistently to every bot.
-        // Reduce the previous difficulty values by 15% / 10% / 8%, respectively.
-        switch (RallyGameSession.SelectedBotDifficulty)
-        {
-            case RallyBotDifficulty.Easy:
-                raceMaxSpeedKph = maxSpeedKph * 0.85f * 0.85f;
-                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness + 0.05f) * 0.85f;
-                break;
-            case RallyBotDifficulty.Hard:
-                raceMaxSpeedKph = maxSpeedKph * 1.15f * 0.92f;
-                raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness - 0.12f) * 0.92f;
-                break;
-            default:
-                raceMaxSpeedKph = maxSpeedKph * 0.90f;
-                raceCornerBrakingAggressiveness = cornerBrakingAggressiveness * 0.90f;
-                break;
-        }
+        // Preserve the existing Easy tuning and individual serialized speed variation.
+        raceMaxSpeedKph = maxSpeedKph * easySpeedMultiplier;
+        raceCornerBrakingAggressiveness = Mathf.Clamp01(cornerBrakingAggressiveness + easyBrakingBonus) * easyBrakingMultiplier;
     }
 
     public void SetLaneOffset(float offsetMeters) =>
@@ -127,6 +124,11 @@ public sealed class RallyBotController : MonoBehaviour
             vehicleBody = vehicle.GetComponent<Rigidbody>();
         if (vehicle != null)
             vehicle.SetBotInput(this);
+        if (vehicleBody != null)
+        {
+            var contact = vehicleBody.GetComponent<RallyBotCollisionYield>() ?? vehicleBody.gameObject.AddComponent<RallyBotCollisionYield>();
+            contact.Bind(this);
+        }
         RallyVehicleRecovery recovery = GetComponent<RallyVehicleRecovery>();
         if (recovery != null) recovery.MarkAsBot();
         RallyVehicleDynamics dynamics = GetComponent<RallyVehicleDynamics>();
@@ -144,6 +146,12 @@ public sealed class RallyBotController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (IsYieldingToPlayer)
+        {
+            // Coast with service brake input; never reverse torque into the player.
+            VerticalInput = HorizontalInput = 0f;
+            return;
+        }
         if (vehicle == null || vehicleBody == null || !routeReady)
         {
             VerticalInput = 0f;
@@ -287,5 +295,16 @@ public sealed class RallyBotController : MonoBehaviour
         activeBots.Remove(this);
         VerticalInput = 0f;
         HorizontalInput = 0f;
+        yieldUntil = nextYieldAllowed = 0f;
+    }
+
+    public void ReportBlockedPlayer(Rigidbody player)
+    {
+        if (!isActiveAndEnabled || player == null || vehicleBody == null || Time.timeScale <= 0 || RallyRaceLoading.IsPreparing ||
+            Time.time < nextYieldAllowed || player.linearVelocity.sqrMagnitude > Mathf.Pow(blockedPlayerSpeedKph / 3.6f, 2)) return;
+        yieldUntil = Time.time + Mathf.Clamp(playerContactBrakeSeconds, .5f, 1f);
+        nextYieldAllowed = yieldUntil + playerContactCooldownSeconds;
+        PlayerYieldCount++;
+        VerticalInput = HorizontalInput = 0f;
     }
 }

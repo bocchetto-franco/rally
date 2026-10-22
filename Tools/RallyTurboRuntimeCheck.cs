@@ -13,7 +13,7 @@ public static class RallyTurboRuntimeCheck
 {
     const string Report = "Logs/turbo-play-check.txt";
     static IEnumerator steps;
-    static bool stopping, background, wasPaused;
+    static bool stopping, background, wasPaused, hasPlayed;
     static SceneAsset start;
     static int previousPlayers, frame;
     static bool hadPlayers;
@@ -32,7 +32,7 @@ public static class RallyTurboRuntimeCheck
         start = EditorSceneManager.playModeStartScene; background = Application.runInBackground; wasPaused = EditorApplication.isPaused; oldScale = Time.timeScale;
         hadPlayers = PlayerPrefs.HasKey("Rally.LocalPlayers"); previousPlayers = PlayerPrefs.GetInt("Rally.LocalPlayers", 1);
         RallyGameSession.SelectLocalPlayers(1);
-        stopping = false; frame = -1; next = 0; deadline = EditorApplication.timeSinceStartup + 600;
+        stopping = false; hasPlayed = false; frame = -1; next = 0; deadline = EditorApplication.timeSinceStartup + 600;
         Directory.CreateDirectory("Logs"); File.WriteAllText(Report, "Turbo real Play: physical centre/edge/reverse passes, players/bots, expiry and base tuning\n");
         steps = Steps(); EditorApplication.update += Tick;
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/Circuit_01.unity");
@@ -41,6 +41,8 @@ public static class RallyTurboRuntimeCheck
     static void Tick()
     {
         if (stopping) { if (!EditorApplication.isPlayingOrWillChangePlaymode) Restore(); return; }
+        if (EditorApplication.isPlaying) { hasPlayed = true; EditorApplication.QueuePlayerLoopUpdate(); }
+        else if (hasPlayed && !EditorApplication.isPlayingOrWillChangePlaymode) { Finish(new Exception("Play stopped externally before checks completed")); return; }
         if (EditorApplication.timeSinceStartup > deadline) { Finish(new Exception("Timeout")); return; }
         if (!EditorApplication.isPlaying || EditorApplication.isCompiling || EditorApplication.isUpdating || frame == Time.frameCount || Time.timeAsDouble < next) return;
         frame = Time.frameCount;
@@ -95,20 +97,20 @@ public static class RallyTurboRuntimeCheck
             {
                 int count = turbo.ActivationCount;
                 zone.enabled = false;
-                Place(zone, 0, -7, 22);
+                Place(zone, Mathf.Min(1.65f, zone.ActivationHalfWidth - .1f), -7, 22);
                 yield return .8f;
                 float withoutBoost = Speed();
                 Check(turbo.ActivationCount == count, "Disabled zone control pass does not boost");
                 zone.enabled = true;
-                Place(zone, 1.02f, -7, 22);
+                Place(zone, zone.ActivationHalfWidth + .5f, -7, 22);
                 yield return .85f;
                 Check(turbo.ActivationCount == count, sceneName + "/" + zone.name + ": overlapping edge pass does not activate");
-                Place(zone, 0, -7, 22);
+                Place(zone, Mathf.Min(1.65f, zone.ActivationHalfWidth - .1f), -7, 22);
                 float before = Speed();
                 yield return .3f;
                 ScreenCapture.CaptureScreenshot("Logs/Turbo_" + sceneName + "_" + System.Array.IndexOf(zones, zone) + ".png");
                 yield return .5f;
-                Check(turbo.ActivationCount == count + 1 && turbo.IsBoosting, sceneName + "/" + zone.name + ": real central trigger activates once");
+                Check(turbo.ActivationCount == count + 1 && turbo.IsBoosting, sceneName + "/" + zone.name + ": widened lane at 1.65m offset activates once");
                 Check(Speed() > before + 3f, "Additional force measurably raises player speed (" + before.ToString("F1") + " -> " + Speed().ToString("F1") + " km/h)");
                 Check(Speed() > withoutBoost + 2f, "Boosted pass is faster than the same lane with the zone disabled (control=" + withoutBoost.ToString("F1") + " km/h)");
                 Check(!turbo.Activate(2.25f, 4.5f, 180, 35), "Active boosts cannot stack");

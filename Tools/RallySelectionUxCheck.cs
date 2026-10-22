@@ -44,6 +44,156 @@ public static class RallySelectionUxCheck
     public static void Run() => Start(false);
     public static void RunMenusOnly() => Start(true);
     public static void RunSharedRow() => Start(true, true);
+    public static void RunFiveBlocks()
+    {
+        Start(true);
+        Report = "Logs/five-blocks-play.txt";
+        File.WriteAllText(Report, "Five blocks: real Play/menu inputs and controlled physical bot-player contact. No scene writes; not full driving laps.\n");
+        steps = FiveBlocksSteps();
+    }
+    public static void RunBotContacts()
+    {
+        Start(true);
+        Report = "Logs/five-blocks-bot-contacts.txt";
+        File.WriteAllText(Report,"Real Play: controlled physical contacts on existing player/bot Rigidbodies in the three scenes. No saved tuning changes.\n");
+        steps = BotContactSteps();
+        EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/Circuit_01.unity");
+    }
+    public static void RunBotCircuit01() => StartBotCircuit("Circuit_01");
+    public static void RunBotCircuit02() => StartBotCircuit("Circuit_02");
+    public static void RunBotCircuit03() => StartBotCircuit("Circuit_03");
+    static void StartBotCircuit(string circuit)
+    {
+        Start(true); Report="Logs/five-blocks-bot-"+circuit+".txt";
+        File.WriteAllText(Report,"Real Play: controlled real collision on the existing vehicle Rigidbodies. No scene/tuning writes.\n");
+        steps=BotContactSteps(circuit);
+        EditorSceneManager.playModeStartScene=AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/"+circuit+".unity");
+    }
+    public static void RunMenuGraph()
+    {
+        Start(true);
+        Report = "Logs/five-blocks-menu-graph.txt";
+        File.WriteAllText(Report,"Play: actual menu button graph/submission, not a hardware-input or rendered-animation test.\n");
+        EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/VehicleCircuitSelection.unity");
+        steps = MenuGraphSteps();
+    }
+    static IEnumerator MenuGraphSteps()
+    {
+        while(Object.FindAnyObjectByType<RallyMenuController>()==null) yield return null;
+        var menu=Object.FindAnyObjectByType<RallyMenuController>();
+        Check(Field<Button[]>(menu,"vehicleButtons").Length==3 && Field<Button[]>(menu,"circuitButtons").Length==3 && Field<Button[]>(menu,"difficultyButtons").Length==1,
+            "1P: original three cars/three tracks, only one difficulty");
+        for(int repeat=0;repeat<3;repeat++)
+        {
+            B("Local Players 2").onClick.Invoke(); menu=Object.FindAnyObjectByType<RallyMenuController>();
+            var shared=Field<Button[]>(menu,"circuitButtons");
+            var navs=Object.FindObjectsByType<RallyMenuNavigation>().Where(n=>n.isActiveAndEnabled).ToArray();
+            Check(shared.Length==3 && navs.Length==2 && navs.All(n=>shared.All(b=>Field<Selectable[]>(n,"buttons").Contains(b))) &&
+                Object.FindObjectsByType<RectTransform>().Count(t=>t.name=="Shared Circuit Card")==1,
+                "exactly one active shared row; both navigation owners reference the same physical buttons, rebuild "+repeat);
+            int one=RallyGameSession.VehicleIndexForPlayer(0),two=RallyGameSession.VehicleIndexForPlayer(1);
+            for(int p=0;p<2;p++)
+            {
+                navs.Single(n=>n.LocalPlayer==p).FocusVehicle(shared[p]);
+                ExecuteEvents.Execute(shared[p].gameObject,new BaseEventData(EventSystem.current),ExecuteEvents.submitHandler);
+                Check(RallyGameSession.SelectedRaceScene==RallyGameSession.CircuitScenes[p],"J"+(p+1)+" submits a shared circuit selection");
+            }
+            Check(RallyGameSession.VehicleIndexForPlayer(0)==one && RallyGameSession.VehicleIndexForPlayer(1)==two,"car selections untouched");
+            B("Local Players 1").onClick.Invoke();
+            Check(Object.FindObjectsByType<Button>().Count(b=>b.name.StartsWith("Circuit ") && b.name.EndsWith(" Button"))==3,"returning to 1P retains exactly three track buttons");
+        }
+    }
+    static IEnumerator FiveBlocksSteps()
+    {
+        foreach (int legacy in new[] { 1, 2 })
+        {
+            PlayerPrefs.SetInt("Rally.BotDifficulty", legacy); RallyGameSession.RestoreSavedState();
+            Check(RallyGameSession.SelectedBotDifficulty == RallyBotDifficulty.Easy && PlayerPrefs.GetInt("Rally.BotDifficulty") == 0,
+                "saved difficulty " + legacy + " migrates to Easy");
+        }
+        while (Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+        var main = Object.FindAnyObjectByType<RallyMenuController>();
+        typeof(RallyMenuController).GetMethod("RevealMainMenu",Private).Invoke(main,null);
+        var info = GameObject.Find("Start Card").GetComponentsInChildren<TMP_Text>();
+        Check(info.Single(t => t.name == "Card Label").text == "RALLY ARCADE" && info.Single(t => t.name == "Circuit").text == "CORRÉ A TU MANERA",
+            "generic information preserves block title");
+        B("Play Button").onClick.Invoke();
+        while (SceneManager.GetActiveScene().name != RallyGameSession.SelectionScene || Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
+        yield return null;
+        var menu = Object.FindAnyObjectByType<RallyMenuController>();
+        Check(Field<Button[]>(menu,"vehicleButtons").Length == 3 && Field<Button[]>(menu,"circuitButtons").Length == 3 &&
+            Field<Button[]>(menu,"difficultyButtons").Length == 1 && Field<Button[]>(menu,"difficultyButtons")[0].GetComponentInChildren<TMP_Text>().text == "FÁCIL",
+            "1P retains three cars/tracks, with Easy as its only difficulty option");
+        int carOne = RallyGameSession.VehicleIndexForPlayer(0), carTwo = RallyGameSession.VehicleIndexForPlayer(1);
+        for (int repeat=0; repeat<2; repeat++)
+        {
+            B("Local Players 2").onClick.Invoke(); yield return null;
+            menu = Object.FindAnyObjectByType<RallyMenuController>();
+            var shared = Field<Button[]>(menu,"circuitButtons");
+            var navigation = Object.FindObjectsByType<RallyMenuNavigation>().Where(n=>n.isActiveAndEnabled).ToArray();
+            Check(Object.FindObjectsByType<RectTransform>().Count(t=>t.name=="Shared Circuit Card") == 1 && shared.Length == 3 &&
+                navigation.Length == 2 && navigation.All(n=>shared.All(b=>Field<Selectable[]>(n,"buttons").Contains(b))),
+                "2P has one physical row shared by both navigators, rebuild " + repeat);
+            for (int p=0;p<2;p++)
+            {
+                navigation.Single(n=>n.LocalPlayer==p).FocusVehicle(shared[p]);
+                ExecuteEvents.Execute(shared[p].gameObject,new BaseEventData(EventSystem.current),ExecuteEvents.submitHandler);
+                Check(RallyGameSession.SelectedRaceScene==RallyGameSession.CircuitScenes[p],"J"+(p+1)+" confirms the shared circuit");
+            }
+            Check(RallyGameSession.VehicleIndexForPlayer(0)==carOne && RallyGameSession.VehicleIndexForPlayer(1)==carTwo,"shared track selection leaves both car choices unchanged");
+            ScreenCapture.CaptureScreenshot("Logs/FiveBlocks_Selection_2P.png");
+            B("Local Players 1").onClick.Invoke(); yield return null;
+        }
+        var contacts = BotContactSteps(); while (contacts.MoveNext()) yield return contacts.Current;
+    }
+    static IEnumerator BotContactSteps(string onlyCircuit=null)
+    {
+        foreach (string circuit in onlyCircuit==null ? RallyGameSession.CircuitScenes : new[]{onlyCircuit})
+        {
+            RallyGameSession.SelectLocalPlayers(1);
+            if(SceneManager.GetActiveScene().name != circuit) RallyRaceLoading.Load(circuit);
+            while (RallyRaceLoading.IsPreparing || SceneManager.GetActiveScene().name != circuit) yield return null;
+            yield return .5f;
+            var bots = Object.FindObjectsByType<RallyBotController>();
+            Check(bots.Length == 3 && bots.All(b => Mathf.Abs(b.RaceMaxSpeedKph - Field<float>(b, "maxSpeedKph") * Field<float>(b, "easySpeedMultiplier")) < .001f),
+                circuit + " every bot uses serialized Easy tuning");
+            var player = Object.FindObjectsByType<JrsVehicleController>().Single(c => c.GetComponentInParent<RallyBotController>() == null && c.name == RallyGameSession.VehicleName);
+            var bot = bots[0]; var botCar = bot.GetComponentInChildren<JrsVehicleController>();
+            foreach (var other in bots.Where(b => b != bot)) { other.enabled = false; other.GetComponentInChildren<JrsVehicleController>().enabled = false; other.GetComponentInChildren<Rigidbody>().isKinematic = true; }
+            // Exercise actual contact messages on the existing vehicle Rigidbodies,
+            // isolated above the scenery. Temporary proxy shapes avoid mesh shape bias.
+            var playerBody = player.GetComponent<Rigidbody>(); var botBody = botCar.GetComponent<Rigidbody>();
+            foreach (var car in new[] { player, botCar })
+            {
+                car.enabled = false;
+                foreach (var collider in car.GetComponentsInChildren<Collider>()) collider.enabled = false;
+                var proxy = car.gameObject.AddComponent<BoxCollider>(); proxy.size = Vector3.one;
+            }
+            var dynamics = Object.FindObjectsByType<RallyVehicleDynamics>();
+            foreach (var d in dynamics) d.enabled = false;
+            Vector3 p = playerBody.position + Vector3.up * 30;
+            foreach (var body in new[] { playerBody, botBody })
+            {
+                body.isKinematic = false; body.useGravity = false; body.constraints = RigidbodyConstraints.FreezeAll;
+                body.linearVelocity = body.angularVelocity = Vector3.zero; body.sleepThreshold = 0; body.WakeUp();
+                body.rotation = Quaternion.identity;
+            }
+            playerBody.position = p; botBody.position = p - Vector3.forward * .9f; Physics.SyncTransforms();
+            Check(botBody.GetComponent<RallyBotCollisionYield>() != null, circuit + " collision receiver lives on bot Rigidbody");
+            float timeout = Time.time + 2;
+            while (!bot.IsYieldingToPlayer && Time.time < timeout) { playerBody.WakeUp(); botBody.WakeUp(); yield return null; }
+            Check(bot.IsYieldingToPlayer && bot.PlayerYieldCount > 0 && bot.BrakeInput == 1 && bot.VerticalInput == 0,
+                circuit + " sustained real contact with blocked player starts braking, without reverse throttle");
+            float startYield = Time.time;
+            while (bot.IsYieldingToPlayer && Time.time < startYield + 1.2f) yield return null;
+            float elapsed = Time.time - startYield;
+            Check(elapsed >= .5f && elapsed <= 1f && !bot.IsYieldingToPlayer,
+                circuit + " yields for 0.5-1 seconds then releases brake (" + elapsed.ToString("F2") + "s)");
+            yield return null;
+            Check(bot.VerticalInput > 0 && bot.BrakeInput == 0, circuit + " resumes forward route input after yielding");
+            if(onlyCircuit==null) { SceneManager.LoadScene("MainMenu"); while (SceneManager.GetActiveScene().name != "MainMenu") yield return null; }
+        }
+    }
     public static void RunGroupB()
     {
         Start(true);
@@ -212,7 +362,11 @@ public static class RallySelectionUxCheck
     {
         if (!stopping && (type == LogType.Exception || type == LogType.Error || type == LogType.Assert)) runtimeError = message + "\n" + stack;
     }
-    static void Mode(PlayModeStateChange mode) { if (mode == PlayModeStateChange.EnteredEditMode) { exited = true; next = EditorApplication.timeSinceStartup + 1; } }
+    static void Mode(PlayModeStateChange mode)
+    {
+        if (mode == PlayModeStateChange.ExitingPlayMode && !stopping) Finish(new Exception("Play stopped externally before verification completed"));
+        if (mode == PlayModeStateChange.EnteredEditMode) { exited = true; next = EditorApplication.timeSinceStartup + 1; }
+    }
     static void Tick()
     {
         if (stopping) { if (exited && EditorApplication.timeSinceStartup >= next && !EditorApplication.isPlayingOrWillChangePlaymode && !Application.isPlaying) Restore(); return; }
@@ -230,7 +384,13 @@ public static class RallySelectionUxCheck
         }
         catch (Exception e) { Finish(e); }
     }
-    static Button B(string name) => GameObject.Find(name).GetComponent<Button>();
+    static Button B(string name)
+    {
+        var found = GameObject.Find(name);
+        if (found != null) return found.GetComponent<Button>();
+        throw new Exception("Missing button '" + name + "' in " + SceneManager.GetActiveScene().name + "; active buttons: " +
+            string.Join(", ", Object.FindObjectsByType<Button>().Select(b => b.name)));
+    }
     static RallyMenuNavigation Nav() => Object.FindObjectsByType<RallyMenuNavigation>().Single(n => n.isActiveAndEnabled);
     static Selectable Focus(RallyMenuNavigation nav) => ((Selectable[])typeof(RallyMenuNavigation).GetField("buttons", Private).GetValue(nav))[nav.SelectedIndex];
     static T Field<T>(object target, string name) => (T)target.GetType().GetField(name, Private).GetValue(target);
@@ -289,6 +449,11 @@ public static class RallySelectionUxCheck
         _ = first.buttonSouth.wasPressedThisFrame; _ = second.buttonSouth.wasPressedThisFrame;
         Neutral(first); Neutral(second); yield return null;
         Cross(first); yield return null; Neutral(first); yield return null;
+        var info = GameObject.Find("Start Card").GetComponentsInChildren<TMP_Text>();
+        Check(info.Single(t => t.name == "Card Label").text == "RALLY ARCADE" &&
+            info.Single(t => t.name == "Circuit").text == "CORRÉ A TU MANERA" &&
+            !info.Any(t => t.text.Contains("PEUGEOT") || t.text.Contains("PRÓXIMA ETAPA") || t.text.Contains("3 PISTAS DISPONIBLES")),
+            "main information card is generic, with the original block title preserved");
         B("Play Button").onClick.Invoke();
         while (SceneManager.GetActiveScene().name != RallyGameSession.SelectionScene || Object.FindAnyObjectByType<RallyMenuController>() == null) yield return null;
         yield return .4f;
@@ -348,7 +513,10 @@ public static class RallySelectionUxCheck
         ExecuteEvents.Execute(cars[1].gameObject, new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left }, ExecuteEvents.pointerClickHandler);
         yield return .15f; Check(RallyGameSession.SelectedVehicleIndex == 1, "mouse confirms the clicked car"); Chosen(cars, 1);
         nav.FocusVehicle(B("Difficulty FÁCIL Button"));
-        Dpad(first, Vector2.right); yield return null; Neutral(first); yield return null; Check(Focus(nav) == B("Difficulty MEDIO Button"), "right stays within difficulty row");
+        Dpad(first, Vector2.right); yield return null; Neutral(first); yield return null;
+        Check(Focus(nav) == B("Difficulty FÁCIL Button") &&
+            menu.GetComponentsInChildren<Button>(true).Count(b => b.name.StartsWith("Difficulty ")) == 1,
+            "Easy is the only difficulty button; right cannot select a removed level");
         Dpad(first, Vector2.down); yield return null; Neutral(first); yield return null;
         Check(Focus(nav).name.StartsWith("Local Players"), "down from difficulty reaches player-count row");
         var preview = Field<RallyMenuVehiclePreview>(menu, "vehiclePreview");
@@ -412,6 +580,17 @@ public static class RallySelectionUxCheck
         Check(previews.All(p => p.VisibleModel != null), "both local preview models remain visible");
         DisplayOutput();
         ScreenCapture.CaptureScreenshot("Logs/SelectionUX_2P.png"); yield return .3f;
+        if (!sharedRaceCheck)
+            for (int repeat = 0; repeat < 2; repeat++)
+            {
+                B("Local Players 1").onClick.Invoke(); yield return .3f;
+                Check(Object.FindObjectsByType<Button>().Count(b => b.name.StartsWith("Circuit ") && b.name.EndsWith(" Button")) == 3,
+                    "rebuilding 1P preserves its three circuit options");
+                B("Local Players 2").onClick.Invoke(); yield return .3f;
+                Check(Object.FindObjectsByType<RectTransform>().Count(t => t.name == "Shared Circuit Card") == 1 &&
+                    Object.FindObjectsByType<Button>().Count(b => b.name.StartsWith("Circuit ") && b.name.EndsWith(" Button")) == 3,
+                    "rebuilding 2P keeps exactly one shared row, repeat " + repeat);
+            }
         if (sharedRaceCheck)
         {
             B("Player 1 Ready").onClick.Invoke(); B("Player 2 Ready").onClick.Invoke();
