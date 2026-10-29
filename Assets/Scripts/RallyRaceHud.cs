@@ -192,6 +192,8 @@ public sealed class RallyRaceHud : MonoBehaviour
         while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
         var miniMap = GetComponent<RallyMiniMap>() ?? gameObject.AddComponent<RallyMiniMap>();
         miniMap.Configure(vehicleBody, speedText != null ? speedText.font : null);
+        var controls = GetComponent<RallyDrivingControlsHud>() ?? gameObject.AddComponent<RallyDrivingControlsHud>();
+        controls.Configure(vehicleBody, miniMap.Panel, speedText != null ? speedText.font : null);
         var assists = GetComponent<RallyRaceAssistHud>() ?? gameObject.AddComponent<RallyRaceAssistHud>();
         assists.Configure(vehicleBody, speedText != null ? speedText.font : null);
     }

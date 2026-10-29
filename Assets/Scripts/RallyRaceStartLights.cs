@@ -51,7 +51,8 @@ public sealed class RallyRaceStartLights : MonoBehaviour
     void Update()
     {
         if (!begun || overlay == null) return;
-        elapsed += Time.unscaledDeltaTime;
+        // A stalled first frame must not skip visible lights after scene setup.
+        elapsed += Mathf.Min(Time.unscaledDeltaTime, .1f);
         float greenAt = 5f * lightInterval + allRedHold;
         if (!released)
         {
