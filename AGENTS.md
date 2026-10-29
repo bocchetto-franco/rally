@@ -1,3 +1,12 @@
+## Corrección de manejo/interfaz — 2026-10-29 (posterior al build)
+
+- Pedido vigente: **NO actualizar el build**. Los ejecutables anteriores no incluyen esta revisión.
+- Dirección del jugador: **55 grados / respuesta 96**, compartida y serializada. No restaurar 52/82. Masa, fricción y downforce conservados.
+- Autofreno solo desde 60% de giro; objetivo a giro máximo 85 km/h, fuerza máxima 0,25 y transición SmoothStep. Nunca recortar el torque motor solicitado por el jugador al girar. Manual brake conservado.
+- Eliminados aviso de agua y textos auxiliares señalados de selección 2P; turbo, controles, selección y lógica de charcos conservados.
+- Rigs ajustados: fuerzas exclusivamente en FixedUpdate, ruedas en LateUpdate con compensación de interpolación; cámara en LateUpdate y shake después de ella. No reintroducir escrituras de torque/freno en Update. Shake 0,025 m / 0,12 grados solo agua/banquina, sin vibración de suspensión normal.
+- Detalles y límites de prueba: Docs/HandlingFix_2026-10-29.md; evidencia Logs/HandlingFix_20261029/.
+
 # Rally — instrucciones para agentes
 
 ## Build vigente con semáforo (2026-10-29)

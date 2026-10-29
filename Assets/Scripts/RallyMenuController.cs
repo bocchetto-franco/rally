@@ -202,7 +202,7 @@ public sealed partial class RallyMenuController : MonoBehaviour
     readonly bool[] localReady = new bool[2];
     Button[][] localVehicleButtons;
     Button[] localReadyButtons;
-    TextMeshProUGUI[] localVehicleTitles, localDeviceLabels;
+    TextMeshProUGUI[] localVehicleTitles;
     RallyMenuNavigation[] localNavigations;
     Button localRaceButton;
     RallyMenuVehiclePreview vehiclePreview;
@@ -226,11 +226,9 @@ public sealed partial class RallyMenuController : MonoBehaviour
     void Update()
     {
         if (RallyRaceLoading.IsPreparing) return;
-        if (localDeviceLabels != null)
+        if (localReadyButtons != null)
             for (int i = 0; i < 2; i++)
             {
-                string caption = RallyLocalDevices.Label(i);
-                if (localDeviceLabels[i].text != caption) localDeviceLabels[i].text = caption;
                 bool available = RallyLocalDevices.GamepadFor(i) != null || RallyLocalDevices.UsesKeyboard(i);
                 if (localReadyButtons[i].interactable != available)
                 {
@@ -287,7 +285,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
         }
         localVehicleButtons = null;
         sharedCircuitCard = null;
-        localDeviceLabels = null;
         localNavigations = null;
         vehiclePreview = null;
         localVehiclePreviews = null;
@@ -454,12 +451,9 @@ public sealed partial class RallyMenuController : MonoBehaviour
     {
         Text(root, "Title", "CARRERA LOCAL · DOS PILOTOS", 48f, FontStyles.Bold, TextAlignmentOptions.Center,
             new Vector2(0f, 394f), new Vector2(1500f, 70f), Color.white);
-        Text(root, "Subtitle", "Cada piloto elige su auto. Ambos pueden elegir la pista compartida y confirmar LISTO.", 21f,
-            FontStyles.Normal, TextAlignmentOptions.Center, new Vector2(0f, 342f), new Vector2(1600f, 40f), Muted);
         localVehicleButtons = new Button[2][];
         localReadyButtons = new Button[2];
         localVehicleTitles = new TextMeshProUGUI[2];
-        localDeviceLabels = new TextMeshProUGUI[2];
         localNavigations = new RallyMenuNavigation[2];
         localVehiclePreviews = new RallyMenuVehiclePreview[2];
         for (int p = 0; p < 2; p++)
@@ -470,8 +464,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
             PanelRect(card, "Player Accent", playerColor, new Vector2(-380f, 0f), new Vector2(8f, 470f));
             Text(card, "Player Title", "JUGADOR " + (p + 1), 32f, FontStyles.Bold, TextAlignmentOptions.Left,
                 new Vector2(-125f, 182f), new Vector2(430f, 50f), playerColor);
-            localDeviceLabels[p] = Text(card, "Device", RallyLocalDevices.Label(p), 18f, FontStyles.Normal,
-                TextAlignmentOptions.Right, new Vector2(215f, 182f), new Vector2(270f, 44f), Muted);
             localVehiclePreviews[p] = VehicleDisplay(card, p, true, out localVehicleTitles[p]);
             localVehiclePreviews[p].Show(RallyGameSession.VehicleIndexForPlayer(p));
             localVehicleButtons[p] = new Button[3];
@@ -508,8 +500,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
             circuitButtons[i] = Button(track, "Circuit " + (i + 1) + " Button", RallyGameSession.CircuitDisplayNames[i],
                 new Vector2(-440f + i * 475f, -18f), new Vector2(430f, 52f), () => ChooseCircuit(choice), false);
         }
-        Text(root, "No Bots", "TECLADO: J1 WASD + ESPACIO · J2 FLECHAS + ENTER · O UN MANDO POR JUGADOR", 18f, FontStyles.Normal, TextAlignmentOptions.Center,
-            new Vector2(0f, 304f), new Vector2(1600f, 32f), Muted);
         localPlayerButtons = new Button[2];
         localPlayerButtons[0] = Button(root, "Local Players 1", "1 JUGADOR", new Vector2(-435f, -373f), new Vector2(290f, 55f), () => ChangePlayerCount(1), false);
         localPlayerButtons[1] = Button(root, "Local Players 2", "2 JUGADORES", new Vector2(-80f, -373f), new Vector2(330f, 55f), () => ChangePlayerCount(2), false);

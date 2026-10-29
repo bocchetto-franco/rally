@@ -473407,8 +473407,8 @@ MonoBehaviour:
   botGripProfile: {fileID: 0}
   vehicleMass: 1160
   vehicleAngularDamping: 2.6
-  maximumSteerAngle: 52
-  steeringResponse: 82
+  maximumSteerAngle: 55
+  steeringResponse: 96
   manualDriftRearGripMultiplier: 0.45
   motorForce: 480
   firstGearRatio: 6
@@ -473451,14 +473451,13 @@ MonoBehaviour:
   absMinimumTorqueMultiplier: 0.35
   rearHandbrakeTorque: 3500
   handbrakeRecoveryTorqueMultiplier: 0.55
-  automaticBrakeStartSteering: 0.15
+  automaticBrakeStartSteering: 0.6
   automaticBrakeFreeSpeedKph: 125
-  automaticBrakeFullSteerSpeedKph: 60
+  automaticBrakeFullSteerSpeedKph: 85
   automaticBrakeSpeedRangeKph: 20
-  automaticBrakeMaximumFraction: 0.55
+  automaticBrakeMaximumFraction: 0.25
   automaticBrakeEngageRate: 4
   automaticBrakeReleaseRate: 5
-  automaticBrakeThrottleReduction: 0.95
   minimumDownforceSpeedKph: 65
   downforceCoefficient: 3.2
   maximumDownforce: 4500
@@ -504708,8 +504707,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e65f5d59c6fbce4a89f5d9142a9bf4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RallyCameraRoadShake
-  intensity: 0.09
-  rotationDegrees: 0.4
+  intensity: 0.025
+  rotationDegrees: 0.12
   fullIntensitySpeedKph: 110
 --- !u!1 &901827930
 GameObject:
@@ -529411,7 +529410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   motorForce: 480
-  maxSteerAngle: 52
+  maxSteerAngle: 55
   frontLeftWheel: {fileID: 1817842582}
   frontRightWheel: {fileID: 135501692}
   rearLeftWheel: {fileID: 1180953520}

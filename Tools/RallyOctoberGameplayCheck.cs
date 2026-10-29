@@ -100,9 +100,9 @@ public static class RallyOctoberGameplayCheck
             {
                 var car=cars[p];var body=car.GetComponent<Rigidbody>();
                 var input=car.GetComponent<RallyLocalPlayerInput>()??car.gameObject.AddComponent<RallyLocalPlayerInput>();
-                input.Configure(RallyLocalPlayerInput.InputDevice.Gamepad,82);input.PairGamepad(pads[p]);car.SetLocalInput(input);
+                input.Configure(RallyLocalPlayerInput.InputDevice.Gamepad,96);input.PairGamepad(pads[p]);car.SetLocalInput(input);
                 var dynamics=Object.FindObjectsByType<RallyVehicleDynamics>().Single(d=>d.VehicleController==car);dynamics.SetLocalInput(input);
-                Check(car.maxSteerAngle==52 && dynamics.SteeringResponse==82,"same agile steering in selected model");
+                Check(car.maxSteerAngle==55 && dynamics.SteeringResponse==96,"same agile steering in selected model");
                 var penalty=car.GetComponent<RallyOffTrackSpeedPenalty>();Check(penalty!=null && penalty.RetainedSpeed==.75f,"off-track retains 75%, never 50%");
                 var timer=count==2?(p==0?RallySplitScreen.Active.TimerOne:RallySplitScreen.Active.TimerTwo):Object.FindAnyObjectByType<RallyCheckpointManager>();
                 input.Checkpoints=timer;timer.BindVehicle(body);

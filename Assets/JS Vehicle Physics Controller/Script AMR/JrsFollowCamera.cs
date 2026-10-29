@@ -22,6 +22,7 @@
 
 using UnityEngine;
 
+[DefaultExecutionOrder(1000)]
 public class JrsFollowCamera : MonoBehaviour
 {
     public Transform target; // The vehicle to follow
@@ -30,17 +31,22 @@ public class JrsFollowCamera : MonoBehaviour
     public float horizontalDampingConstant = 0.3f; // The damping constant for horizontal movement
     private Vector3 velocity; // The velocity of the camera
 
-    void FixedUpdate()
+    void LateUpdate()
     {
+        if (target == null || Time.deltaTime <= 0f) return;
+        // Follow the interpolated render pose, with bounded integration steps.
+        float remaining = Mathf.Min(Time.deltaTime, .1f);
         Vector3 desiredPosition = target.TransformPoint(offset);
-        Vector3 horizontalDisplacement = new Vector3(desiredPosition.x - transform.position.x, 0, desiredPosition.z - transform.position.z);
-        Vector3 horizontalSpringForce = horizontalSpringConstant * horizontalDisplacement;
-        Vector3 horizontalDampingForce = -horizontalDampingConstant * new Vector3(velocity.x, 0, velocity.z);
-        Vector3 force = horizontalSpringForce + horizontalDampingForce;
-
-        velocity += force * Time.fixedDeltaTime;
-
-        transform.position += new Vector3(velocity.x, 0, velocity.z) * Time.fixedDeltaTime;
+        while (remaining > 0f)
+        {
+            float step = Mathf.Min(remaining, 1f / 120f);
+            Vector3 displacement = desiredPosition - transform.position;
+            Vector3 force = horizontalSpringConstant * new Vector3(displacement.x, 0, displacement.z)
+                - horizontalDampingConstant * new Vector3(velocity.x, 0, velocity.z);
+            velocity += force * step;
+            transform.position += new Vector3(velocity.x, 0, velocity.z) * step;
+            remaining -= step;
+        }
 
         // Calculate the desired camera height based on the target's position and offset
         float desiredCameraHeight = target.position.y + offset.y;

@@ -39,9 +39,9 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float vehicleMass = 1160f;
     [SerializeField] private float vehicleAngularDamping = 2.6f;
     [Tooltip("Maximum front wheel steering angle in degrees, shared by all player car visuals.")]
-    [SerializeField, Range(1f, 60f)] private float maximumSteerAngle = 52f;
+    [SerializeField, Range(1f, 60f)] private float maximumSteerAngle = 55f;
     [Tooltip("Keyboard steering input travel per second. Analog stick input remains direct.")]
-    [SerializeField, Min(0.1f)] private float steeringResponse = 82f;
+    [SerializeField, Min(0.1f)] private float steeringResponse = 96f;
     [Tooltip("Temporary rear lateral grip while Square/handbrake is held. Base curves remain unchanged.")]
     [SerializeField, Range(.15f, 1f)] private float manualDriftRearGripMultiplier = .45f;
     [SerializeField] private float motorForce = 480f;
@@ -107,16 +107,14 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
 
     [Header("Automatic corner braking - player only")]
     [Tooltip("Fraction of steering travel before the corner speed assistance starts.")]
-    [SerializeField, Range(0f, 0.9f)] private float automaticBrakeStartSteering = 0.15f;
+    [SerializeField, Range(0f, 0.9f)] private float automaticBrakeStartSteering = 0.60f;
     [SerializeField, Min(0f)] private float automaticBrakeFreeSpeedKph = 125f;
-    [SerializeField, Min(0f)] private float automaticBrakeFullSteerSpeedKph = 60f;
+    [SerializeField, Min(0f)] private float automaticBrakeFullSteerSpeedKph = 85f;
     [SerializeField, Min(1f)] private float automaticBrakeSpeedRangeKph = 20f;
-    [SerializeField, Range(0f, 1f)] private float automaticBrakeMaximumFraction = 0.55f;
+    [SerializeField, Range(0f, 1f)] private float automaticBrakeMaximumFraction = 0.25f;
     [Tooltip("Brake input per second: gradual engagement, without a sudden engine cut.")]
     [SerializeField, Min(0.1f)] private float automaticBrakeEngageRate = 4f;
     [SerializeField, Min(0.1f)] private float automaticBrakeReleaseRate = 5f;
-    [Tooltip("Maximum reduction of engine torque while the automatic brake is fully engaged.")]
-    [SerializeField, Range(0f, 1f)] private float automaticBrakeThrottleReduction = 0.95f;
 
     [Header("High-speed downforce")]
     [SerializeField] private float minimumDownforceSpeedKph = 65f;
@@ -177,19 +175,18 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         frontSideStiffness = rearSideStiffness = 1.25f;
         lateralVelocityCorrection = 5f;
         maximumLateralCorrectionAcceleration = 12f;
-        maximumSteerAngle = isBot ? 40f : 52f;
-        steeringResponse = isBot ? 6f : 82f;
+        maximumSteerAngle = isBot ? 40f : 55f;
+        steeringResponse = isBot ? 6f : 96f;
         spinAssistYawRateThreshold = 1.25f;
         spinAssistCorrectionStrength = 7f;
         handbrakeRecoveryTorqueMultiplier = 0.55f;
-        automaticBrakeStartSteering = 0.15f;
+        automaticBrakeStartSteering = 0.60f;
         automaticBrakeFreeSpeedKph = 125f;
-        automaticBrakeFullSteerSpeedKph = 60f;
+        automaticBrakeFullSteerSpeedKph = 85f;
         automaticBrakeSpeedRangeKph = 20f;
-        automaticBrakeMaximumFraction = 0.55f;
+        automaticBrakeMaximumFraction = 0.25f;
         automaticBrakeEngageRate = 4f;
         automaticBrakeReleaseRate = 5f;
-        automaticBrakeThrottleReduction = 0.95f;
         frontServiceBrakeTorque = 4200f;
         rearServiceBrakeTorque = 1800f;
         serviceBrakeMinimumForwardSpeedKph = 3f;
@@ -405,18 +402,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             rearLeft.motorTorque = 0f;
             rearRight.motorTorque = 0f;
         }
-        else if (botInput == null && automaticBrakeAmount > 0f)
-        {
-            // Retain a small amount of drive and restore it continuously as the
-            // car slows or straightens. The base controller supplies fresh torque
-            // each FixedUpdate, so this does not accumulate across physics steps.
-            float intervention = Mathf.Clamp01(automaticBrakeAmount / Mathf.Max(0.001f, automaticBrakeMaximumFraction));
-            float torqueScale = 1f - intervention * automaticBrakeThrottleReduction;
-            frontLeft.motorTorque *= torqueScale;
-            frontRight.motorTorque *= torqueScale;
-            rearLeft.motorTorque *= torqueScale;
-            rearRight.motorTorque *= torqueScale;
-        }
+        // Corner assistance never cuts the driver's requested engine torque.
 
         if (handbrake)
         {
@@ -434,7 +420,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     {
         // Earlier response to partial steering; full steering still carries
         // useful speed. No brake in a straight line, below target, or in reverse.
-        float turn = Mathf.Sqrt(Mathf.InverseLerp(automaticBrakeStartSteering, 1f, Mathf.Clamp01(steering)));
+        float turn = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(automaticBrakeStartSteering, 1f, Mathf.Clamp01(steering)));
         float targetSpeed = Mathf.Lerp(automaticBrakeFreeSpeedKph, automaticBrakeFullSteerSpeedKph, turn);
         float excessSpeed = Mathf.Clamp01((forwardSpeedKph - targetSpeed) /
             Mathf.Max(1f, automaticBrakeSpeedRangeKph));
@@ -596,6 +582,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     {
         if (vehicleBody != null)
         {
+            vehicleBody.interpolation = RigidbodyInterpolation.Interpolate;
             vehicleBody.mass = vehicleMass;
             vehicleBody.angularDamping = vehicleAngularDamping;
         }

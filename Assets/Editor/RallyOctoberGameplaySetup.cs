@@ -66,9 +66,9 @@ public static class RallyOctoberGameplaySetup
                 }
                 foreach(var dynamics in All<RallyVehicleDynamics>(scene))
                     if(dynamics.VehicleController!=null && dynamics.VehicleController.GetComponentInParent<RallyBotController>()==null)
-                    {Set(dynamics,"maximumSteerAngle",52);Set(dynamics,"steeringResponse",82);Set(dynamics.VehicleController,"maxSteerAngle",52);}
-                foreach(var input in All<JrsInputController>(scene))Set(input,"steerSpeed",82);
-                foreach(var input in All<RallyLocalPlayerInput>(scene))Set(input,"steeringResponse",82);
+                    {Set(dynamics,"maximumSteerAngle",55);Set(dynamics,"steeringResponse",96);Set(dynamics.VehicleController,"maxSteerAngle",55);}
+                foreach(var input in All<JrsInputController>(scene))Set(input,"steerSpeed",96);
+                foreach(var input in All<RallyLocalPlayerInput>(scene))Set(input,"steeringResponse",96);
                 foreach(var bot in All<RallyBotController>(scene)){Set(bot,"easySpeedMultiplier",.65025f);Set(bot,"easyBrakingMultiplier",.765f);}
                 foreach(var car in All<JrsVehicleController>(scene))
                     if(car.name==RallyGameSession.VehicleName || car.GetComponentInParent<RallyBotController>()!=null)
@@ -86,7 +86,7 @@ public static class RallyOctoberGameplaySetup
                 }
                 Physics.SyncTransforms();VerifyRoute(scene,road);
                 EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);AssetDatabase.SaveAssets();
-                File.AppendAllText(Report,$"{scene.name}: saved, {All<RallyTurboZone>(scene).Count()} pickups, steering 52/82, bot multipliers .65025/.765\n");
+                File.AppendAllText(Report,$"{scene.name}: saved, {All<RallyTurboZone>(scene).Count()} pickups, steering 55/96, bot multipliers .65025/.765\n");
             }
             foreach(string guid in AssetDatabase.FindAssets("Bot_Car t:Prefab"))
             {

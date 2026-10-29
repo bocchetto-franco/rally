@@ -2,11 +2,12 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 /// <summary>Render-only vibration: restores the exact follow pose after each camera.</summary>
+[DefaultExecutionOrder(1100)]
 [RequireComponent(typeof(Camera), typeof(JrsFollowCamera))]
 public sealed class RallyCameraRoadShake : MonoBehaviour
 {
-    [SerializeField, Range(0f,.4f)] float intensity = .09f;
-    [SerializeField, Range(0f,2f)] float rotationDegrees = .4f;
+    [SerializeField, Range(0f,.4f)] float intensity = .025f;
+    [SerializeField, Range(0f,2f)] float rotationDegrees = .12f;
     [SerializeField, Min(1f)] float fullIntensitySpeedKph = 110f;
     JrsFollowCamera follow;
     Camera view;
@@ -16,7 +17,7 @@ public sealed class RallyCameraRoadShake : MonoBehaviour
     RallyWaterSurface[] puddles;
     Transform owner;
     WheelCollider[] wheels;
-    float previousVerticalSpeed, strength;
+    float strength;
     Vector3 offset, basePosition;
     Quaternion rotation, baseRotation;
     bool applied;
@@ -35,7 +36,7 @@ public sealed class RallyCameraRoadShake : MonoBehaviour
         car=body!=null?body.GetComponent<JrsVehicleController>():null;
         road=body!=null?body.GetComponent<RallyOffTrackSpeedPenalty>():null;
         wheels=car==null?new WheelCollider[0]:new[]{car.frontLeftWheel,car.frontRightWheel,car.rearLeftWheel,car.rearRightWheel};
-        puddles=RallyWaterSurface.Read(gameObject.scene);previousVerticalSpeed=body!=null?body.linearVelocity.y:0;strength=0;
+        puddles=RallyWaterSurface.Read(gameObject.scene);strength=0;
     }
     void LateUpdate()
     {
@@ -49,12 +50,12 @@ public sealed class RallyCameraRoadShake : MonoBehaviour
             if(grounded>=2)
             {
                 float speed=Vector3.ProjectOnPlane(body.linearVelocity,Vector3.up).magnitude*3.6f;
-                float roughness=Mathf.Clamp01(Mathf.Abs(body.linearVelocity.y-previousVerticalSpeed)/Mathf.Max(.01f,Time.deltaTime)*.025f);
+                // Suspension noise alone must not shake the camera on ordinary road.
+                float roughness=0f;
                 if(onRoad<grounded)roughness=Mathf.Max(roughness,.55f);
                 foreach(var puddle in puddles)if(puddle.Contains(body)){roughness=Mathf.Max(roughness,.9f);break;}
                 target=roughness*Mathf.InverseLerp(8,fullIntensitySpeedKph,speed);
             }
-            previousVerticalSpeed=body.linearVelocity.y;
         }
         strength=Mathf.MoveTowards(strength,target,Time.unscaledDeltaTime*4f);
         if(Time.timeScale<=0 || RallyRaceLoading.IsPreparing)strength=0;

@@ -34,6 +34,7 @@ public class JrsVehicleController : MonoBehaviour
 
     public GameObject centerOfMassObject;
     private Rigidbody rb;
+    private bool tunedPhysics;
     public WheelCollider[] wheelCollidersBrake;
     public float brakeForce = 500f;
 
@@ -73,6 +74,8 @@ public class JrsVehicleController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        tunedPhysics = GetComponent<RallyVehicleDynamics>() != null;
+        if (tunedPhysics) rb.interpolation = RigidbodyInterpolation.Interpolate;
         prevRotation = frontLeftWheelTransform.rotation;
 
         mobileInputController = FindAnyObjectByType<JrsInputController>();
@@ -94,6 +97,8 @@ public class JrsVehicleController : MonoBehaviour
 
     void Update()
     {
+        // Tuned cars write forces only in FixedUpdate, never from render Update.
+        if (tunedPhysics) return;
         if (centerOfMassObject)
         {
             rb.centerOfMass = transform.InverseTransformPoint(centerOfMassObject.transform.position);
@@ -174,7 +179,7 @@ public class JrsVehicleController : MonoBehaviour
         frontLeftWheel.steerAngle = h;
         frontRightWheel.steerAngle = h;
 
-        UpdateWheelPoses();
+        if (!tunedPhysics) UpdateWheelPoses();
 
         // Calculate the wheel's angular velocity
         Quaternion currentRotation = frontLeftWheelTransform.rotation;
@@ -256,6 +261,11 @@ public class JrsVehicleController : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        if (tunedPhysics && rb != null) UpdateWheelPoses();
+    }
+
     void UpdateWheelPoses()
     {
         UpdateWheelPose(frontLeftWheel, frontLeftWheelTransform);
@@ -270,6 +280,15 @@ public class JrsVehicleController : MonoBehaviour
         Quaternion quat = transform.rotation;
 
         collider.GetWorldPose(out pos, out quat);
+
+        if (tunedPhysics && rb.interpolation == RigidbodyInterpolation.Interpolate)
+        {
+            // GetWorldPose is a simulation pose. Apply the chassis render delta
+            // so wheels and body share the same interpolated frame.
+            Quaternion renderDelta = this.transform.rotation * Quaternion.Inverse(rb.rotation);
+            pos = this.transform.position + renderDelta * (pos - rb.position);
+            quat = renderDelta * quat;
+        }
 
         if (flip)
         {
