@@ -86,11 +86,14 @@ public sealed class RallyFrameProbe : MonoBehaviour
         // Diagnostic-only, same cap/counters in both comparison runs. Prevent a hidden
         // player from silently filling the buffer with non-rendered 1000fps frames.
         Application.targetFrameRate = 120;
-        Profiler.enabled = true;
-        // CPU profiling alone does not enable the Rendering module's stats.
-        // A valid recorder with permanently zero batches is not render evidence.
-        Profiler.SetAreaEnabled(ProfilerArea.Rendering, true);
-        Profiler.SetAreaEnabled(ProfilerArea.Memory, true);
+        if (Application.isEditor || Debug.isDebugBuild)
+        {
+            Profiler.enabled = true;
+            // CPU profiling alone does not enable the Rendering module's stats.
+            // Release uses only the recorders that are actually available.
+            Profiler.SetAreaEnabled(ProfilerArea.Rendering, true);
+            Profiler.SetAreaEnabled(ProfilerArea.Memory, true);
+        }
         InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
         main = ProfilerRecorder.StartNew(ProfilerCategory.Internal, "Main Thread", 1);
         render = ProfilerRecorder.StartNew(ProfilerCategory.Internal, "Render Thread", 1);

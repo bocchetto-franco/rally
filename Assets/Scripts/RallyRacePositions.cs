@@ -179,10 +179,30 @@ public sealed class RallyRacePositions : MonoBehaviour
         if (target == null) return 1;
         int position = 1;
         foreach (Racer racer in racers)
-            if (racer != target && (racer.progress > target.progress ||
-                (racer.progress == target.progress && racer.order < target.order)))
+            if (racer != target && IsAhead(racer, target))
                 position++;
         return position;
+    }
+
+    private static bool IsAhead(Racer candidate, Racer target)
+    {
+        // Local finish records are authoritative against another timed player.
+        // Bots have no finish timer: retain their existing lap/progress ordering.
+        if (candidate.checkpoints == null || target.checkpoints == null)
+            return candidate.progress > target.progress ||
+                (candidate.progress == target.progress && candidate.order < target.order);
+        bool candidateFinished = candidate.checkpoints != null && candidate.checkpoints.IsFinished;
+        bool targetFinished = target.checkpoints != null && target.checkpoints.IsFinished;
+        if (candidateFinished != targetFinished) return candidateFinished;
+        if (candidateFinished)
+        {
+            float candidateTime = candidate.checkpoints.ElapsedTime;
+            float targetTime = target.checkpoints.ElapsedTime;
+            if (candidateTime != targetTime) return candidateTime < targetTime;
+            return candidate.order < target.order;
+        }
+        return candidate.progress > target.progress ||
+            (candidate.progress == target.progress && candidate.order < target.order);
     }
 
     private void UpdateProgress(Racer racer)

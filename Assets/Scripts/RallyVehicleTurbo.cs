@@ -7,11 +7,15 @@ public sealed class RallyVehicleTurbo : MonoBehaviour
     Rigidbody body;
     JrsVehicleController car;
     RallyBotController bot;
+    RallyLocalPlayerInput localInput;
+    [SerializeField] bool hasStoredTurbo;
+    float storedSeconds, storedAcceleration, storedMaximum, storedBonus;
     float remaining, acceleration, maximumSpeed, speedBonus;
     Vector3 previousPosition;
     public bool IsBoosting => remaining > 0f;
     public float RemainingSeconds => remaining;
     public int ActivationCount { get; private set; }
+    public bool HasStoredTurbo => hasStoredTurbo;
 
     void Awake()
     {
@@ -19,6 +23,52 @@ public sealed class RallyVehicleTurbo : MonoBehaviour
         car = GetComponent<JrsVehicleController>();
         bot = GetComponentInParent<RallyBotController>();
         previousPosition = transform.position;
+    }
+
+    System.Collections.IEnumerator Start()
+    {
+        // Split-screen assigns devices during roster creation, possibly after this
+        // receiver's first Start. Bind once the owning local input actually exists.
+        while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
+        localInput = GetComponent<RallyLocalPlayerInput>();
+    }
+
+    public bool Collect(float seconds, float push, float maximumKph, float bonusKph)
+    {
+        if (hasStoredTurbo || !CanUseVehicle()) return false;
+        hasStoredTurbo = true;
+        storedSeconds = seconds; storedAcceleration = push; storedMaximum = maximumKph; storedBonus = bonusKph;
+        return true;
+    }
+
+    bool CanUseVehicle() => body != null && !body.isKinematic && car != null && car.isActiveAndEnabled &&
+        !RallyRaceLoading.IsPreparing && Time.timeScale > 0f;
+
+    public bool UseStoredTurbo()
+    {
+        if (!hasStoredTurbo || !CanUseVehicle() || IsBoosting || Vector3.Dot(transform.up, Vector3.up) < .5f) return false;
+        int grounded = 0;
+        if (car.frontLeftWheel != null && car.frontLeftWheel.isGrounded) grounded++;
+        if (car.frontRightWheel != null && car.frontRightWheel.isGrounded) grounded++;
+        if (car.rearLeftWheel != null && car.rearLeftWheel.isGrounded) grounded++;
+        if (car.rearRightWheel != null && car.rearRightWheel.isGrounded) grounded++;
+        if (grounded < 2 || Vector3.Dot(body.linearVelocity, transform.forward) < 1f) return false;
+        if (!Activate(storedSeconds, storedAcceleration, storedMaximum, storedBonus)) return false;
+        hasStoredTurbo = false;
+        return true;
+    }
+
+    void Update()
+    {
+        if (bot != null)
+        {
+            if (Mathf.Abs(bot.HorizontalInput) < .2f) UseStoredTurbo();
+            return;
+        }
+        if (localInput == null && RallyGameSession.LocalPlayerCount == 2) return;
+        bool pressed = localInput != null ? localInput.TurboPressed :
+            (Input.GetKeyDown(KeyCode.LeftShift) || RallyGamepadInput.TurboPressedThisFrame);
+        if (pressed) UseStoredTurbo();
     }
 
     public bool Activate(float seconds, float accelerationMps2, float maximumKph, float botBonusKph)

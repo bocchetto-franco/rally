@@ -105,7 +105,7 @@ public sealed class RallyRaceHud : MonoBehaviour
             displayedRecoveryKeyboard == keyboard && displayedRecoverySplit == split) return;
         string control = keyboard ? (local != null ? RallyLocalKeyboard.RecoveryLabel(local.PlayerIndex) : "M") : "";
         if (pad != null && (local == null || !keyboard))
-            control += (control.Length > 0 ? " / " : "") + (pad is DualShockGamepad ? "Cuadrado" : "X");
+            control += (control.Length > 0 ? " / " : "") + (pad is DualShockGamepad ? "Círculo" : "B");
         recoveryText.SetText("RESTABLECER AUTO · " + control);
         displayedRecoveryPad = pad;
         displayedRecoveryPlayer = player;
@@ -192,6 +192,8 @@ public sealed class RallyRaceHud : MonoBehaviour
         while (!RallyVehiclePresentationCache.IsRosterReady(gameObject.scene)) yield return null;
         var miniMap = GetComponent<RallyMiniMap>() ?? gameObject.AddComponent<RallyMiniMap>();
         miniMap.Configure(vehicleBody, speedText != null ? speedText.font : null);
+        var assists = GetComponent<RallyRaceAssistHud>() ?? gameObject.AddComponent<RallyRaceAssistHud>();
+        assists.Configure(vehicleBody, speedText != null ? speedText.font : null);
     }
 
     void CacheVehicleReferences()

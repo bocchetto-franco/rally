@@ -25,6 +25,7 @@ public sealed class RallyRaceFlow : MonoBehaviour
     void Awake()
     {
         Time.timeScale = 1f;
+        if (GetComponent<RallyRaceStartLights>() == null) gameObject.AddComponent<RallyRaceStartLights>();
         if (checkpointManager == null) checkpointManager = FindAnyObjectByType<RallyCheckpointManager>();
         // All three race scenes already contain Race Flow, so install pause without
         // rewriting large scene files or changing their vehicle/track configuration.

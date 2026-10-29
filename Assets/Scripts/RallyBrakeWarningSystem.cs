@@ -62,17 +62,11 @@ public sealed class RallyBrakeWarningSystem : MonoBehaviour
             wasVisible = false;
         }
         float speedKph = vehicleBody.linearVelocity.magnitude * 3.6f;
-        float excess = Mathf.Clamp01((speedKph - activeTrigger.TargetSpeedKph) / fullIntensitySpeedExcessKph);
-        // A pace note remains readable after braking to the recommended speed.
-        warningGroup.alpha = Mathf.Lerp(.78f, 1f, Mathf.SmoothStep(0f, 1f, excess));
+        warningGroup.alpha = RallyPaceNotePresentation.Opacity(speedKph,activeTrigger.TargetSpeedKph,fullIntensitySpeedExcessKph);
         if (!wasVisible) appearanceTime = 0f;
         wasVisible = true;
         appearanceTime = Mathf.Min(appearanceTime + Time.deltaTime, appearanceDuration);
-        float progress = Mathf.Clamp01(appearanceTime / Mathf.Max(.1f, appearanceDuration));
-        float scale = progress < .7f
-            ? Mathf.Lerp(.84f, 1.04f, Mathf.SmoothStep(0f, 1f, progress / .7f))
-            : Mathf.Lerp(1.04f, 1f, Mathf.SmoothStep(0f, 1f, (progress - .7f) / .3f));
-        warningRect.localScale = Vector3.one * scale;
+        warningRect.localScale = Vector3.one * RallyPaceNotePresentation.Scale(appearanceTime,appearanceDuration);
     }
 
     public void Enter(RallyBrakeWarningTrigger trigger)

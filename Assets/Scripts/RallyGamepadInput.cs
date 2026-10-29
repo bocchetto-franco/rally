@@ -6,6 +6,10 @@ public static class RallyGamepadInput
 {
     private static bool resetWasHeld;
     private static bool recoveryWasHeld;
+    private static bool turboWasHeld;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetEdges() { resetWasHeld = recoveryWasHeld = turboWasHeld = false; }
 
     public static float Throttle => ReadTrigger(Gamepad.current == null ? 0f :
         Gamepad.current.rightTrigger.ReadValue());
@@ -16,16 +20,16 @@ public static class RallyGamepadInput
     public static float Steering => Gamepad.current == null ? 0f :
         Gamepad.current.leftStick.x.ReadValue();
 
-    // South = A on Xbox / Cross on PlayStation; North = Y / Triangle.
+    // West = X on Xbox / Square on PlayStation: hold for drift/handbrake.
     public static bool HandbrakePressed => Gamepad.current != null &&
-        Gamepad.current.buttonSouth.isPressed;
+        Gamepad.current.buttonWest.isPressed;
 
-    // West = X on Xbox / Square on PlayStation; independent of checkpoint reset.
+    // East = B / Circle: right the car, without resetting checkpoint progress.
     public static bool RecoverPressedThisFrame
     {
         get
         {
-            bool held = Gamepad.current != null && Gamepad.current.buttonWest.isPressed;
+            bool held = Gamepad.current != null && Gamepad.current.buttonEast.isPressed;
             bool pressed = held && !recoveryWasHeld;
             recoveryWasHeld = held;
             return pressed;
@@ -36,10 +40,18 @@ public static class RallyGamepadInput
     {
         get
         {
-            bool held = Gamepad.current != null && Gamepad.current.buttonNorth.isPressed;
+            bool held = Gamepad.current != null && Gamepad.current.rightStickButton.isPressed;
             bool pressed = held && !resetWasHeld;
             resetWasHeld = held;
             return pressed;
+        }
+    }
+
+    public static bool TurboPressedThisFrame
+    {
+        get {
+            bool held = Gamepad.current != null && Gamepad.current.buttonNorth.isPressed;
+            bool pressed = held && !turboWasHeld; turboWasHeld = held; return pressed;
         }
     }
 

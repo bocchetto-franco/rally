@@ -11,13 +11,14 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
     [SerializeField] int playerIndex;
     [SerializeField] float steeringResponse = 14f;
     Gamepad assignedGamepad;
-    bool resetHeld, recoverHeld;
+    bool resetHeld, recoverHeld, turboHeld;
     public float Vertical { get; private set; }
     public float Horizontal { get; private set; }
     public float Brake { get; private set; }
     public bool Handbrake { get; private set; }
     public bool ResetPressed { get; private set; }
     public bool RecoverPressed { get; private set; }
+    public bool TurboPressed { get; private set; }
     public InputDevice Device => device == InputDevice.Automatic ?
         (RallyLocalDevices.GamepadFor(playerIndex) != null ? InputDevice.Gamepad : InputDevice.Keyboard) : device;
     public int PlayerIndex => playerIndex;
@@ -49,7 +50,7 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
     void Update()
     {
         float steer;
-        bool reset, recover;
+        bool reset, recover, turbo;
         if (device == InputDevice.Keyboard || (device == InputDevice.Automatic && RallyLocalDevices.UsesKeyboard(playerIndex)))
         {
             bool accelerate = RallyLocalKeyboard.Accelerate(playerIndex);
@@ -63,6 +64,7 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
             Handbrake = RallyLocalKeyboard.Handbrake(playerIndex);
             reset = RallyLocalKeyboard.Reset(playerIndex);
             recover = RallyLocalKeyboard.Recover(playerIndex);
+            turbo = RallyLocalKeyboard.Turbo(playerIndex);
         }
         else
         {
@@ -78,13 +80,16 @@ public sealed class RallyLocalPlayerInput : MonoBehaviour
             if (Brake < .02f) Brake = 0f;
             Vertical = throttle - Brake;
             Horizontal = assignedGamepad == null ? 0f : assignedGamepad.leftStick.x.ReadValue();
-            Handbrake = assignedGamepad != null && assignedGamepad.buttonSouth.isPressed;
-            reset = assignedGamepad != null && assignedGamepad.buttonNorth.isPressed;
-            recover = assignedGamepad != null && assignedGamepad.buttonWest.isPressed;
+            Handbrake = assignedGamepad != null && assignedGamepad.buttonWest.isPressed;
+            reset = assignedGamepad != null && assignedGamepad.rightStickButton.isPressed;
+            recover = assignedGamepad != null && assignedGamepad.buttonEast.isPressed;
+            turbo = assignedGamepad != null && assignedGamepad.buttonNorth.isPressed;
         }
         ResetPressed = reset && !resetHeld;
         RecoverPressed = recover && !recoverHeld;
+        TurboPressed = turbo && !turboHeld;
         resetHeld = reset;
         recoverHeld = recover;
+        turboHeld = turbo;
     }
 }

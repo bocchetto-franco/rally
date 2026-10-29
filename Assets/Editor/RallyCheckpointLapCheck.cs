@@ -60,6 +60,9 @@ public static class RallyCheckpointLapCheck
    }
    if(phase==1)
    {
+    // Preparation needs live cameras to warm the real shaders. The route driver
+    // may disable them only after the loading overlay releases the scene.
+    if(RallyRaceLoading.IsPreparing)return;
     var split=RallySplitScreen.Active;if(mode==2&&(split==null||!split.Ready))return;
     var manager=split!=null?split.TimerOne:UnityEngine.Object.FindAnyObjectByType<RallyCheckpointManager>();
     if(manager==null)return;

@@ -61,7 +61,9 @@ public static class RallyTurboRuntimeCheck
     static void Place(RallyTurboZone zone, float x, float z, float speed)
     {
         turbo.CancelBoost();
-        body.position = zone.transform.TransformPoint(new Vector3(x, .65f, z));
+        Vector3 position = zone.transform.TransformPoint(new Vector3(x, .65f, z));
+        body.transform.SetPositionAndRotation(position, zone.transform.rotation);
+        body.position = position;
         body.rotation = zone.transform.rotation;
         body.angularVelocity = Vector3.zero;
         body.linearVelocity = zone.transform.forward * speed;

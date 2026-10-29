@@ -8,9 +8,7 @@ public sealed class RallyTurboZone : MonoBehaviour
 {
     [Header("Precise entry - vehicle centre must cross this lane")]
     [SerializeField, Min(.1f)] float activationHalfWidth = .7f;
-    [SerializeField, Min(0f)] float minimumSpeedKph = 12f;
-    [SerializeField, Range(0f, 1f)] float minimumForwardAlignment = .5f;
-    [Header("Temporary boost - same for players and bots")]
+    [Header("Stored boost - same effect for players and bots")]
     [SerializeField, Min(.1f)] float durationSeconds = 2.25f;
     [SerializeField, Min(0f)] float accelerationMps2 = 4.5f;
     [SerializeField, Min(1f)] float maximumSpeedKph = 180f;
@@ -18,9 +16,26 @@ public sealed class RallyTurboZone : MonoBehaviour
     [SerializeField, Min(.1f)] float rearmSeconds = 8f;
     readonly Dictionary<Rigidbody, float> lastPass = new Dictionary<Rigidbody, float>(4);
     BoxCollider trigger;
+    [SerializeField] Transform pickupVisual;
+    float availableAt;
+    Vector3 visualOrigin;
     public float ActivationHalfWidth => activationHalfWidth;
+    public bool IsAvailable => Time.time >= availableAt;
 
-    void Awake() => trigger = GetComponent<BoxCollider>();
+    void Awake()
+    {
+        trigger = GetComponent<BoxCollider>();
+        if (pickupVisual != null) visualOrigin = pickupVisual.localPosition;
+    }
+
+    void Update()
+    {
+        if (pickupVisual == null) return;
+        if (pickupVisual.gameObject.activeSelf != IsAvailable) pickupVisual.gameObject.SetActive(IsAvailable);
+        if (!IsAvailable || Time.timeScale <= 0f) return;
+        pickupVisual.localPosition = visualOrigin + Vector3.up * (Mathf.Sin(Time.time * 2.5f) * .15f);
+        pickupVisual.localRotation = Quaternion.Euler(0f, Time.time * 60f, 0f);
+    }
 
     IEnumerator Start()
     {
@@ -36,18 +51,18 @@ public sealed class RallyTurboZone : MonoBehaviour
     public bool TryActivate(Rigidbody body)
     {
         if (body == null || trigger == null || !trigger.enabled || !isActiveAndEnabled ||
-            RallyRaceLoading.IsPreparing || Time.timeScale <= 0f) return false;
+            !IsAvailable || RallyRaceLoading.IsPreparing || Time.timeScale <= 0f) return false;
         Vector3 local = transform.InverseTransformPoint(body.position) - trigger.center;
         Vector3 half = trigger.size * .5f;
         // Collider overlap alone is deliberately insufficient: wheels/body corners
         // brushing the lane must not activate it. Stay also catches the root later.
         if (Mathf.Abs(local.x) > activationHalfWidth || Mathf.Abs(local.z) > half.z || Mathf.Abs(local.y) > half.y) return false;
-        Vector3 velocity = Vector3.ProjectOnPlane(body.linearVelocity, transform.up);
-        if (velocity.magnitude * 3.6f < minimumSpeedKph || Vector3.Dot(velocity.normalized, transform.forward) < minimumForwardAlignment) return false;
         if (lastPass.TryGetValue(body, out float last) && Time.time < last + rearmSeconds) return false;
         if (!body.TryGetComponent<RallyVehicleTurbo>(out var turbo) ||
-            !turbo.Activate(durationSeconds, accelerationMps2, maximumSpeedKph, botSpeedBonusKph)) return false;
+            !turbo.Collect(durationSeconds, accelerationMps2, maximumSpeedKph, botSpeedBonusKph)) return false;
         lastPass[body] = Time.time;
+        availableAt = Time.time + rearmSeconds;
+        if (pickupVisual != null) pickupVisual.gameObject.SetActive(false);
         return true;
     }
 

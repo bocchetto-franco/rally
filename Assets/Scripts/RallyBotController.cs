@@ -18,8 +18,8 @@ public sealed class RallyBotController : MonoBehaviour
     [SerializeField, Min(10f)] private float maxSpeedKph = 118f;
     [SerializeField, Range(0f, 1f)] private float cornerBrakingAggressiveness = 0.88f;
     [Header("Easy — the only race difficulty")]
-    [SerializeField, Range(.1f, 2f)] private float easySpeedMultiplier = .7225f;
-    [SerializeField, Range(0f, 1f)] private float easyBrakingMultiplier = .85f;
+    [SerializeField, Range(.1f, 2f)] private float easySpeedMultiplier = .65025f;
+    [SerializeField, Range(0f, 1f)] private float easyBrakingMultiplier = .765f;
     [SerializeField, Range(0f, 1f)] private float easyBrakingBonus = .05f;
 
     [Header("Yield when pinning a player")]

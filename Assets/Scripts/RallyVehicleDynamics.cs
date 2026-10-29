@@ -39,9 +39,11 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
     [SerializeField] private float vehicleMass = 1160f;
     [SerializeField] private float vehicleAngularDamping = 2.6f;
     [Tooltip("Maximum front wheel steering angle in degrees, shared by all player car visuals.")]
-    [SerializeField, Range(1f, 60f)] private float maximumSteerAngle = 46f;
+    [SerializeField, Range(1f, 60f)] private float maximumSteerAngle = 52f;
     [Tooltip("Keyboard steering input travel per second. Analog stick input remains direct.")]
-    [SerializeField, Min(0.1f)] private float steeringResponse = 66f;
+    [SerializeField, Min(0.1f)] private float steeringResponse = 82f;
+    [Tooltip("Temporary rear lateral grip while Square/handbrake is held. Base curves remain unchanged.")]
+    [SerializeField, Range(.15f, 1f)] private float manualDriftRearGripMultiplier = .45f;
     [SerializeField] private float motorForce = 480f;
     [SerializeField] private float firstGearRatio = 6.0f;
     [SerializeField] private float secondGearRatio = 3.75f;
@@ -175,8 +177,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         frontSideStiffness = rearSideStiffness = 1.25f;
         lateralVelocityCorrection = 5f;
         maximumLateralCorrectionAcceleration = 12f;
-        maximumSteerAngle = isBot ? 40f : 46f;
-        steeringResponse = isBot ? 6f : 66f;
+        maximumSteerAngle = isBot ? 40f : 52f;
+        steeringResponse = isBot ? 6f : 82f;
         spinAssistYawRateThreshold = 1.25f;
         spinAssistCorrectionStrength = 7f;
         handbrakeRecoveryTorqueMultiplier = 0.55f;
@@ -236,8 +238,8 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
             return;
 
         Vector3 planarVelocity = Vector3.ProjectOnPlane(vehicleBody.linearVelocity, Vector3.up);
-        UpdateRearHighSpeedGrip(planarVelocity.magnitude * 3.6f);
         UpdateBrakes();
+        UpdateRearHighSpeedGrip(planarVelocity.magnitude * 3.6f);
 
         // Apply a strong but capped, torque-free aerodynamic load only while
         // both axles have contact. Vertical/bounce velocity must not amplify it.
@@ -475,6 +477,7 @@ public sealed class RallyVehicleDynamics : MonoBehaviour
         float normalizedSpeed = Mathf.Clamp01((speedKph - rearGripIncreaseStartKph) / speedRange);
         float blend = Mathf.SmoothStep(0f, 1f, normalizedSpeed);
         float stiffness = rearSideStiffness * Mathf.Lerp(1f, rearGripMultiplierAtFullSpeed, blend);
+        if (botInput == null && handbrakeHeld) stiffness *= manualDriftRearGripMultiplier;
         SetRearSidewaysStiffness(stiffness);
     }
 

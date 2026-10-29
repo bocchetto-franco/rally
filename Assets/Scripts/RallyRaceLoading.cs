@@ -14,7 +14,7 @@ public sealed class RallyRaceLoading : MonoBehaviour
 {
     static RallyRaceLoading instance;
     public static bool IsPreparing => instance != null;
-    public static bool IsInputBlocked => instance != null && instance.preparing;
+    public static bool IsInputBlocked => (instance != null && instance.preparing) || RallyRaceStartLights.IsBlocking;
     readonly List<UnityEngine.Object> retained = new List<UnityEngine.Object>();
     readonly List<Behaviour> held = new List<Behaviour>();
     readonly List<bool> enabledBefore = new List<bool>();
@@ -93,11 +93,13 @@ public sealed class RallyRaceLoading : MonoBehaviour
         Restore();
         // Runtime-created buffers and temporary text can be collected while the overlay still covers the race.
         retained.Clear();
+        yield return RallyMenuAssetLifetime.PrepareRace();
         GC.Collect();
         for (int i = 0; i < 3; i++) yield return null;
         Time.timeScale = 1f;
         preparing = false;
         instance = null;
+        RallyRaceStartLights.BeginPrepared();
         Destroy(gameObject);
     }
     IEnumerator Prepare(string sceneName, bool load)
@@ -145,8 +147,9 @@ public sealed class RallyRaceLoading : MonoBehaviour
             Hold(root.GetComponentsInChildren<RallyPauseMenu>(true));
         }
         Stage("PREPARANDO AUTOS Y AUDIO", .25f);
-        // Only the selectable models, not every historical Resources asset.
-        foreach (string path in new[] { RallyPlayerVehicleSelection.LanciaResource, RallyPlayerVehicleSelection.PeugeotResource, RallyPlayerVehicleSelection.AudiResource, "Audio/RallyAudioLibrary" })
+        // Actual cars are already instantiated by Start. Warm their audio rather
+        // than keeping all three unselected vehicle prefabs resident in 2P.
+        foreach (string path in new[] { "Audio/RallyAudioLibrary" })
         {
             var request = Resources.LoadAsync<UnityEngine.Object>(path);
             while (!request.isDone) yield return null;

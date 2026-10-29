@@ -35,8 +35,9 @@ public sealed class RallyMenuNavigation : MonoBehaviour
 
     public int SelectedIndex => selectedIndex;
     public int LocalPlayer => localPlayer;
-    Gamepad Pad => localPlayer >= 0 ? RallyLocalDevices.GamepadFor(localPlayer) :
-        RallyGameSession.LocalPlayerCount == 2 ? RallyLocalDevices.GamepadFor(0) : Gamepad.current;
+    // Shared pages/results accept the controller currently being used. Only a
+    // local panel or an owned pause menu is restricted to its paired gamepad.
+    Gamepad Pad => localPlayer >= 0 ? RallyLocalDevices.GamepadFor(localPlayer) : Gamepad.current;
     bool KeyboardAllowed => localPlayer < 0 || keyboardOverride || RallyLocalDevices.UsesKeyboard(localPlayer);
 
     public void ConfigureForLocalPlayer(int player, bool allowKeyboard = false)

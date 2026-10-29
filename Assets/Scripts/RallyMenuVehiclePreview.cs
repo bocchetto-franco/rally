@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,8 +9,6 @@ using UnityEngine.UI;
 public sealed class RallyMenuVehiclePreview : MonoBehaviour
 {
     static readonly string[] Paths = { "MenuVehicles/LanciaS4", "MenuVehicles/Peugeot205T16", "MenuVehicles/AudiQuattro" };
-    static readonly HashSet<RallyMenuVehiclePreview> views = new HashSet<RallyMenuVehiclePreview>();
-    static AsyncOperation unusedCleanup;
     [SerializeField, Range(4f, 30f)] float rotationSpeed = 12f;
     [SerializeField, Range(.1f, .6f)] float fadeDuration = .22f;
     RawImage image;
@@ -24,8 +21,6 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
     int requested = -1, shown = -1, layer;
     float lastChange;
     Coroutine transition;
-    ResourceRequest activeRequest;
-    bool cleaning;
 
     public int RequestedIndex => requested;
     public int ShownIndex => shown;
@@ -34,16 +29,12 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
     public GameObject VisibleModel => model;
     public float Opacity => fade != null ? fade.alpha : 0f;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void ResetStatics() { views.Clear(); unusedCleanup = null; }
-
     public void Configure(RawImage display, TMP_Text nameLabel, TMP_Text description, int player)
     {
         image = display; title = nameLabel; details = description;
         fade = gameObject.AddComponent<CanvasGroup>(); fade.alpha = 0;
         layer = 30 - player; // Backdrop uses 31; the two studios cannot see each other.
         CreateStudio(player);
-        views.Add(this);
     }
 
     public void Show(int index)
@@ -65,7 +56,7 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
             shown = -1;
             yield return null; // Destroy old renderers before allocating the replacement.
             while (Time.unscaledTime - lastChange < .12f) yield return null;
-            if (unusedCleanup != null && !unusedCleanup.isDone) yield return unusedCleanup;
+            while (RallyMenuAssetLifetime.IsUnloading) yield return null;
             int choice = requested;
             // Keep request/prefab references inside this short coroutine, not in a persistent cache.
             yield return LoadModel(choice);
@@ -82,15 +73,14 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
             yield return FadeTo(1);
         }
         transition = null;
-        cleaning = true;
+        RallyMenuAssetLifetime.RequestCleanup();
     }
 
     IEnumerator LoadModel(int choice)
     {
         var request = Resources.LoadAsync<GameObject>(Paths[choice]);
-        activeRequest = request;
+        RallyMenuAssetLifetime.Track(request);
         yield return request;
-        activeRequest = null;
         if (choice != requested) yield break;
         if (request.asset == null)
         {
@@ -121,12 +111,6 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
     void LateUpdate()
     {
         if (model != null) turntable.Rotate(Vector3.up, rotationSpeed * Time.unscaledDeltaTime, Space.Self);
-        if (!cleaning || transition != null || Time.unscaledTime - lastChange < 1f) return;
-        foreach (var view in views) if (view != null && view.transition != null) return;
-        cleaning = false;
-        // Resources.LoadAsync doesn't automatically evict discarded prefab assets.
-        // One debounced asynchronous cleanup, after BOTH panels finish transitioning.
-        if (unusedCleanup == null || unusedCleanup.isDone) unusedCleanup = Resources.UnloadUnusedAssets();
     }
 
     void CreateStudio(int player)
@@ -182,26 +166,14 @@ public sealed class RallyMenuVehiclePreview : MonoBehaviour
     void OnDisable()
     {
         if (studio != null) studio.SetActive(false);
-        views.Remove(this);
     }
 
     void OnDestroy()
     {
-        views.Remove(this);
         if (studioCamera != null) studioCamera.targetTexture = null;
         if (image != null) image.texture = null;
         if (target != null) { target.Release(); Destroy(target); }
         if (studio != null) Destroy(studio);
-        if (views.Count == 0)
-        {
-            if (activeRequest != null && !activeRequest.isDone) activeRequest.completed += CleanupAfterExit;
-            else CleanupAfterExit(null);
-        }
-    }
-
-    static void CleanupAfterExit(AsyncOperation operation)
-    {
-        if (views.Count == 0 && !RallyRaceLoading.IsPreparing && (unusedCleanup == null || unusedCleanup.isDone))
-            unusedCleanup = Resources.UnloadUnusedAssets();
+        RallyMenuAssetLifetime.RequestCleanup();
     }
 }

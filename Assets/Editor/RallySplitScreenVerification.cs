@@ -87,10 +87,13 @@ public static class RallySplitScreenVerification
 
     static void Tick()
     {
-        if (EditorApplication.timeSinceStartup >= nextStatusAt)
+        bool testActive = SessionState.GetBool(ActiveKey, false);
+        bool restoring = SessionState.GetBool("Rally.SplitTest.Restore", false);
+        // Diagnostic I/O belongs to a running test, not every normal Editor session.
+        if ((testActive || restoring) && EditorApplication.timeSinceStartup >= nextStatusAt)
         {
             nextStatusAt = EditorApplication.timeSinceStartup + 1;
-            File.WriteAllText("Logs/split-screen-editor-state.txt", $"{DateTime.Now:O}\nPlaying={EditorApplication.isPlaying}\nChangingPlayMode={EditorApplication.isPlayingOrWillChangePlaymode}\nCompiling={EditorApplication.isCompiling}\nUpdating={EditorApplication.isUpdating}\nTestActive={SessionState.GetBool(ActiveKey, false)}\n");
+            File.WriteAllText("Logs/split-screen-editor-state.txt", $"{DateTime.Now:O}\nPlaying={EditorApplication.isPlaying}\nChangingPlayMode={EditorApplication.isPlayingOrWillChangePlaymode}\nCompiling={EditorApplication.isCompiling}\nUpdating={EditorApplication.isUpdating}\nTestActive={testActive}\n");
         }
         if (EditorApplication.isCompiling || EditorApplication.isUpdating) return;
         if (!EditorApplication.isPlayingOrWillChangePlaymode)

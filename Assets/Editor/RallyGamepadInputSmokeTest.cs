@@ -47,20 +47,18 @@ public static class RallyGamepadInputSmokeTest
             AssertNear(RallyGamepadInput.Throttle, 0.6f, "analog throttle");
             AssertNear(RallyGamepadInput.GetVerticalInput(0f), 0.6f, "right trigger driving input");
 
-            InputSystem.QueueStateEvent(pad, new GamepadState(GamepadButton.South, GamepadButton.North));
+            InputSystem.QueueStateEvent(pad, new GamepadState(GamepadButton.West, GamepadButton.RightStick, GamepadButton.East, GamepadButton.North));
             InputSystem.Update();
-            if (!RallyGamepadInput.HandbrakePressed || !RallyGamepadInput.ResetPressedThisFrame)
-                throw new Exception("South/North button mapping failed: south=" +
-                    pad.buttonSouth.isPressed + ", north=" + pad.buttonNorth.isPressed +
-                    ", resetThisFrame=" + RallyGamepadInput.ResetPressedThisFrame +
-                    ", current=" + (Gamepad.current == pad));
-            if (RallyGamepadInput.ResetPressedThisFrame)
-                throw new Exception("Reset repeated while North was held.");
+            if (!RallyGamepadInput.HandbrakePressed || !RallyGamepadInput.ResetPressedThisFrame ||
+                !RallyGamepadInput.RecoverPressedThisFrame || !RallyGamepadInput.TurboPressedThisFrame)
+                throw new Exception("West drift / R3 checkpoint / East recovery / North turbo mapping failed.");
+            if (RallyGamepadInput.ResetPressedThisFrame || RallyGamepadInput.RecoverPressedThisFrame || RallyGamepadInput.TurboPressedThisFrame)
+                throw new Exception("An action repeated while held.");
             InputSystem.QueueStateEvent(pad, new GamepadState());
             InputSystem.Update();
-            if (RallyGamepadInput.ResetPressedThisFrame)
-                throw new Exception("Reset fired on release.");
-            InputSystem.QueueStateEvent(pad, new GamepadState(GamepadButton.North));
+            if (RallyGamepadInput.ResetPressedThisFrame || RallyGamepadInput.RecoverPressedThisFrame || RallyGamepadInput.TurboPressedThisFrame)
+                throw new Exception("An action fired on release.");
+            InputSystem.QueueStateEvent(pad, new GamepadState(GamepadButton.RightStick));
             InputSystem.Update();
             if (!RallyGamepadInput.ResetPressedThisFrame)
                 throw new Exception("Reset did not fire after a new press.");

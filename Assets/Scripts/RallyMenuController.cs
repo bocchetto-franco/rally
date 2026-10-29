@@ -117,12 +117,17 @@ public static class RallyGameSession
 
     public static string FormatTime(float elapsedTime)
     {
-        if (elapsedTime < 0f)
+        if (elapsedTime < 0f || !float.IsFinite(elapsedTime))
             return "--:--.---";
 
-        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
-        float seconds = elapsedTime - minutes * 60f;
-        return $"{minutes:00}:{seconds:00.000}";
+        // Round once, before splitting minutes/seconds. Rounding the seconds
+        // separately could show 00:60.000 at the minute boundary. Match the HUD's
+        // float-to-millisecond rounding, but keep a wider accumulator for long runs.
+        float scaledMilliseconds = elapsedTime * 1000f;
+        if (!float.IsFinite(scaledMilliseconds) || scaledMilliseconds >= long.MaxValue)
+            return "--:--.---";
+        long milliseconds = (long)Math.Round(scaledMilliseconds, MidpointRounding.ToEven);
+        return $"{milliseconds / 60000:00}:{milliseconds / 1000 % 60:00}.{milliseconds % 1000:000}";
     }
 
     public static void SelectVehicle(int index)
@@ -182,7 +187,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
     TextMeshProUGUI selectedCircuitTitle;
     TextMeshProUGUI selectedCircuitDetails;
     Button[] circuitButtons;
-    Button[] difficultyButtons;
     Button[] vehicleButtons;
     Button[] localPlayerButtons;
     TextMeshProUGUI selectedVehicleTitle;
@@ -287,7 +291,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
         localNavigations = null;
         vehiclePreview = null;
         localVehiclePreviews = null;
-        difficultyButtons = null;
         vehicleButtons = null;
         optionControls = null;
         waitingForStartInput = false;
@@ -422,19 +425,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
             label.sizeDelta = new Vector2(480f, 46f);
         }
         RefreshCircuitSelection();
-
-        RectTransform difficultyCard = PanelRect(root, "Bot Difficulty Card", Panel, new Vector2(0f, -278f), new Vector2(1400f, 84f));
-        Text(difficultyCard, "Category", "DIFICULTAD BOTS", 22f, FontStyles.Bold, TextAlignmentOptions.Left,
-            new Vector2(-515f, 0f), new Vector2(290f, 42f), Accent);
-        string[] difficulties = { "FÁCIL" };
-        difficultyButtons = new Button[difficulties.Length];
-        for (int i = 0; i < difficulties.Length; i++)
-        {
-            int choice = i;
-            difficultyButtons[i] = Button(difficultyCard, "Difficulty " + difficulties[i] + " Button", difficulties[i],
-                new Vector2(-225f + i * 310f, 0f), new Vector2(260f, 70f), () => ChooseDifficulty(choice), false);
-        }
-        RefreshDifficultySelection();
 
         RectTransform playersCard = PanelRect(root, "Local Players Card", Panel, new Vector2(0f, -365f), new Vector2(1400f, 68f));
         Text(playersCard, "Category", "JUGADORES", 20f, FontStyles.Bold, TextAlignmentOptions.Left,
@@ -625,13 +615,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
 
     void RefreshLocalPlayers()
     {
-        if (difficultyButtons != null)
-        {
-            foreach (Button button in difficultyButtons)
-                button.interactable = RallyGameSession.LocalPlayerCount == 1;
-            difficultyButtons[0].transform.parent.Find("Category").GetComponent<TMP_Text>().text =
-                RallyGameSession.LocalPlayerCount == 1 ? "DIFICULTAD BOTS" : "SIN BOTS";
-        }
         for (int i = 0; i < localPlayerButtons.Length; i++)
         {
             var colors = localPlayerButtons[i].colors;
@@ -663,29 +646,6 @@ public sealed partial class RallyMenuController : MonoBehaviour
         colors.pressedColor = chosen ? ChosenVehicle : new Color(.09f, .07f, .05f);
         button.colors = colors;
         button.GetComponentInChildren<TextMeshProUGUI>().color = chosen ? new Color(.1f, .07f, .04f) : Color.white;
-    }
-
-    void ChooseDifficulty(int index)
-    {
-        RallyGameSession.SelectDifficulty(index);
-        RefreshDifficultySelection();
-    }
-
-    void RefreshDifficultySelection()
-    {
-        for (int i = 0; i < difficultyButtons.Length; i++)
-        {
-            bool active = i == (int)RallyGameSession.SelectedBotDifficulty;
-            Color baseColor = active ? Accent : PanelLight;
-            Button button = difficultyButtons[i];
-            button.GetComponent<Image>().color = Color.white;
-            button.GetComponentInChildren<TextMeshProUGUI>().color = active ? new Color(.10f, .07f, .04f) : Color.white;
-            ColorBlock colors = button.colors;
-            colors.normalColor = baseColor;
-            colors.highlightedColor = active ? new Color(1f, .62f, .18f) : new Color(.14f, .17f, .22f);
-            colors.selectedColor = colors.highlightedColor;
-            button.colors = colors;
-        }
     }
 
     void RefreshCircuitSelection()

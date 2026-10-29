@@ -20,6 +20,7 @@ public static class RallyLocalKeyboard
             case Key.Space: return KeyCode.Space;
             case Key.RightCtrl: return KeyCode.RightControl;
             case Key.RightShift: return KeyCode.RightShift;
+            case Key.LeftShift: return KeyCode.LeftShift;
             case Key.Backspace: return KeyCode.Backspace;
             case Key.Escape: return KeyCode.Escape;
             case Key.W: return KeyCode.W;
@@ -40,6 +41,7 @@ public static class RallyLocalKeyboard
     public static bool Handbrake(int p) => Held(Second(p) ? Key.Enter : Key.Space);
     public static bool Reset(int p) => Held(Second(p) ? Key.Backspace : Key.R);
     public static bool Recover(int p) => Second(p) ? Held(Key.RightShift) : Held(Key.T) || Held(Key.M);
+    public static bool Turbo(int p) => Held(Second(p) ? Key.RightCtrl : Key.LeftShift);
     public static bool Pause(int p) => Pressed(Second(p) ? Key.P : Key.Escape);
     public static string RecoveryLabel(int p) => Second(p) ? "SHIFT DER." : "M / T";
     public static bool MenuUp(int p) => Pressed(Split && p == 0 ? Key.W : Key.UpArrow);

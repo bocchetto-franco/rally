@@ -54,21 +54,35 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
         // Coalesce rapid selection changes instead of loading every D-Pad tap.
         yield return new WaitForSecondsRealtime(.12f);
         if (request != revision) yield break;
+        // Keep the last rendered image while releasing the previous landscape.
+        // Never integrate two full terrains at once on low-memory machines.
+        if (environment != null)
+        {
+            if (cameraView != null) cameraView.enabled = false;
+            environment.gameObject.SetActive(false);
+            Destroy(environment.gameObject);
+            environment = null; terrains = null;
+            yield return null;
+            RallyMenuAssetLifetime.RequestCleanup();
+        }
+        while (RallyMenuAssetLifetime.CleanupPending)
+        {
+            if (request != revision) yield break;
+            yield return null;
+        }
+        if (request != revision) yield break;
         ResourceRequest load = Resources.LoadAsync<GameObject>("MenuBackdrops/" + track);
+        RallyMenuAssetLifetime.Track(load);
         yield return load;
         if (request != revision || load.asset == null) yield break;
         var operation = Object.InstantiateAsync((GameObject)load.asset, transform);
+        RallyMenuAssetLifetime.Track(operation);
         instantiations.Add(operation);
         yield return operation;
         instantiations.Remove(operation);
         if (operation.Result == null || operation.Result.Length == 0) yield break;
         GameObject instance = operation.Result[0];
         if (request != revision) { instance.SetActive(false); Destroy(instance); yield break; }
-        if (environment != null)
-        {
-            environment.gameObject.SetActive(false);
-            Destroy(environment.gameObject);
-        }
         environment = instance.GetComponent<RallyMenuBackdropScene>();
         if (environment == null) { Destroy(instance); yield break; }
         terrains = environment.GetComponentsInChildren<Terrain>();
@@ -111,6 +125,7 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
         RenderSettings.fogMode = environment.fogMode;
         angle = 0f;
         MoveCamera();
+        RallyMenuAssetLifetime.RequestCleanup();
     }
 
     void LateUpdate()
@@ -170,6 +185,7 @@ public sealed class RallyMenuBackdrop : MonoBehaviour
         foreach (var pending in instantiations)
             if (!pending.isDone) pending.Cancel();
         instantiations.Clear();
+        RallyMenuAssetLifetime.RequestCleanup();
         if (backgroundTarget != null)
         {
             if (cameraView != null && cameraView.targetTexture == backgroundTarget) cameraView.targetTexture = null;

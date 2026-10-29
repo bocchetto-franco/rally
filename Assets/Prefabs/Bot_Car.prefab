@@ -6108,6 +6108,8 @@ MonoBehaviour:
     m_Center: {x: -0.00000023841858, y: 0.81507903, z: -0.00000059604645}
     m_Extent: {x: 0.98114085, y: 0.68056107, z: 1.9777632}
   useAuthoredScale: 1
+  hasExhaustAnchor: 0
+  exhaustLocalPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &3345680556185823772
 GameObject:
   m_ObjectHideFlags: 0
@@ -13880,6 +13882,12 @@ MonoBehaviour:
   laneOffsetMeters: 0
   maxSpeedKph: 118
   cornerBrakingAggressiveness: 0.88
+  easySpeedMultiplier: 0.65025
+  easyBrakingMultiplier: 0.765
+  easyBrakingBonus: 0.05
+  playerContactBrakeSeconds: 0.75
+  blockedPlayerSpeedKph: 6
+  playerContactCooldownSeconds: 1
 --- !u!114 &6533994807396338111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13903,6 +13911,7 @@ MonoBehaviour:
   vehicleAngularDamping: 3
   maximumSteerAngle: 36
   steeringResponse: 6
+  manualDriftRearGripMultiplier: 0.45
   motorForce: 480
   firstGearRatio: 6
   secondGearRatio: 3.75

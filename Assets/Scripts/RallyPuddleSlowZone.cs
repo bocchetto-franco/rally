@@ -28,6 +28,7 @@ public sealed class RallyPuddleSlowZone : MonoBehaviour
     Material runtimeSplashMaterial;
     float splashEmissionAccumulator;
     float waterSurfaceY;
+    public bool ContainsVehicle(Rigidbody body) => body != null && vehicleOverlaps.ContainsKey(body);
 
     void Awake()
     {

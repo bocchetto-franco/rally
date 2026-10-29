@@ -80,7 +80,7 @@ public sealed class RallyVehicleAudio : MonoBehaviour
 
         // Read the exact same hysteresis/ground-contact decision as the rear smoke.
         bool drifting = dynamics != null && dynamics.isActiveAndEnabled && dynamics.IsRearDrifting;
-        float slip = Mathf.Max(LateralSlip(vehicle.rearLeftWheel), LateralSlip(vehicle.rearRightWheel));
+        float slip = drifting ? Mathf.Max(LateralSlip(vehicle.rearLeftWheel), LateralSlip(vehicle.rearRightWheel)) : 0f;
         float target = drifting ? library.skidVolume * Mathf.Lerp(0.3f, 1f, Mathf.InverseLerp(0.18f, 0.75f, slip)) : 0f;
         skidSource.volume = Mathf.MoveTowards(skidSource.volume, target, Time.deltaTime * 3f);
         if (target > 0f && !skidSource.isPlaying && skidSource.clip != null) skidSource.Play();

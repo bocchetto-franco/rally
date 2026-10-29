@@ -36,7 +36,7 @@ public sealed class RallyPauseMenu : MonoBehaviour
 
     void Update()
     {
-        if (RallyRaceLoading.IsPreparing) return;
+        if (RallyRaceLoading.IsPreparing || RallyRaceStartLights.IsBlocking) return;
         if (checkpointManager != null && (RallySplitScreen.Active != null ?
             RallySplitScreen.Active.AllFinished : checkpointManager.IsFinished))
         {
